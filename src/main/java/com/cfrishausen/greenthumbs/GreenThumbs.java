@@ -1,5 +1,10 @@
-package com.example.examplemod;
+package com.cfrishausen.greenthumbs;
 
+import com.cfrishausen.greenthumbs.client.ClientHandler;
+import com.cfrishausen.greenthumbs.event.EventHandler;
+import com.cfrishausen.greenthumbs.registries.GTBlockEntities;
+import com.cfrishausen.greenthumbs.registries.GTBlocks;
+import com.cfrishausen.greenthumbs.registries.GTItems;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.BlockItem;
@@ -15,6 +20,7 @@ import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -23,26 +29,25 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(GreenThumbs.ID)
 public class GreenThumbs
 {
-    // Define mod id in a common place for everything to reference
-    public static final String ID = "green-thumbs";
-    // Directly reference a slf4j logger
-    private static final Logger LOGGER = LogUtils.getLogger();
-    // Create a Deferred Register to hold Blocks which will all be registered under the "examplemod" namespace
+    public static final String ID = "greenthumbs";
+    private static final Logger LOGGER = LoggerFactory.getLogger(ID);
 
     public GreenThumbs()
     {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
+        GTBlocks.BLOCKS.register(modEventBus);
+        GTItems.ITEMS.register(modEventBus);
+        GTBlockEntities.BLOCK_ENTITIES.register(modEventBus);
 
-        // Register ourselves for server and other game events we are interested in
-        MinecraftForge.EVENT_BUS.register(this);
+        EventHandler.register();
 
-        // Register the item to a creative tab
-        modEventBus.addListener(this::addCreative);
+        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> ClientHandler::registerEvents);
     }
 }
