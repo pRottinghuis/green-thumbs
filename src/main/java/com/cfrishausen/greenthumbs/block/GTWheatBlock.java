@@ -110,7 +110,7 @@ public class GTWheatBlock extends Block implements BonemealableBlock, IPlantable
 
     @Override
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
-        if (pState.getBlock() != pNewState.getBlock()) {
+        if (!pState.is(pNewState.getBlock())) {
             BlockEntity entity = pLevel.getBlockEntity(pPos);
             if (entity instanceof GTWheatBlockEntity cropEntity) {
                 cropEntity.drops();

@@ -232,9 +232,9 @@ public class GTWheatBlockEntity extends BlockEntity{
 
     public void drops() {
         SimpleContainer drops = new SimpleContainer(2);
-        drops.setItem(1, new ItemStack(GTItems.GT_WHEAT_SEEDS.get()));
+        drops.setItem(0, new ItemStack(GTItems.GT_WHEAT_SEEDS.get()));
         if (isMaxAge()) {
-            drops.setItem(2, new ItemStack(Items.WHEAT));
+            drops.setItem(1, new ItemStack(Items.WHEAT));
         }
         Containers.dropContents(this.level, this.worldPosition, drops);
     }

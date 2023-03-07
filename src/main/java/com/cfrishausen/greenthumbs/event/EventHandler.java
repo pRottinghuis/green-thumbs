@@ -52,6 +52,9 @@ public class EventHandler {
         boolean isWheat = stack.is(Items.WHEAT_SEEDS);
         if (isWheat) {
             stack.useOn(new UseOnContext(level, player, hand, new ItemStack(GTItems.GT_WHEAT_SEEDS.get()), event.getHitVec()));
+            event.setUseItem(Event.Result.DENY);
+            event.setCanceled(true);
+            player.swing(hand);
         }
     }
 }
