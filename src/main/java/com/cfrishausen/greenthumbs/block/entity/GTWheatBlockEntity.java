@@ -1,5 +1,8 @@
 package com.cfrishausen.greenthumbs.block.entity;
 
+import com.cfrishausen.greenthumbs.GreenThumbs;
+import com.cfrishausen.greenthumbs.genetics.Gene;
+import com.cfrishausen.greenthumbs.genetics.Genome;
 import com.cfrishausen.greenthumbs.registries.GTBlockEntities;
 import com.cfrishausen.greenthumbs.registries.GTBlocks;
 import com.cfrishausen.greenthumbs.registries.GTItems;
@@ -45,6 +48,8 @@ import net.minecraftforge.common.IPlantable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
+
 public class GTWheatBlockEntity extends BlockEntity{
 
     // See example @ https://www.mcjty.eu/docs/1.18/ep3
@@ -55,12 +60,19 @@ public class GTWheatBlockEntity extends BlockEntity{
     public static final ModelProperty<Integer> AGE = new ModelProperty<>();
 
     private int age;
-    private int growthSpeed;
+
+    private Genome genome;
 
     public GTWheatBlockEntity(BlockPos pos, BlockState state) {
         super(GTBlockEntities.GT_WHEAT.get(), pos, state);
-        growthSpeed = 1;
+        this.genome = new Genome(level.random);
         age = 0;
+    }
+
+    public GTWheatBlockEntity(BlockPos pos, BlockState state, Genome genome) {
+        super(GTBlockEntities.GT_WHEAT.get(), pos, state);
+        this.age = 0;
+        this.genome = genome;
     }
 
     @Override
@@ -70,20 +82,25 @@ public class GTWheatBlockEntity extends BlockEntity{
                 .build();
     }
 
-
-
+    /**
+     * Save to nbt on world close
+     */
     @Override
     protected void saveAdditional(CompoundTag nbt) {
-        nbt.putInt("greenthumbs.growth_speed", this.growthSpeed);
-        nbt.putInt("greenthumbs.age", this.age);
+        // Save genetic information
+        nbt.putString(GreenThumbs.ID + ".genome", genome.toString());
+        nbt.putInt(GreenThumbs.ID + ".age", this.age);
         super.saveAdditional(nbt);
     }
 
+    /**
+     * Load data on world open
+     */
     @Override
     public void load(CompoundTag nbt) {
         super.load(nbt);
-        growthSpeed = nbt.getInt("greenthumbs.growth_speed");
-        age = nbt.getInt("greenthumbs.age");
+        this.genome = new Genome(nbt.getString(GreenThumbs.ID + ".genome"));
+        age = nbt.getInt(GreenThumbs.ID + ".age");
     }
 
     public static <E extends BlockEntity> void tick(Level level, BlockPos pos, BlockState state, E e) {
@@ -189,15 +206,16 @@ public class GTWheatBlockEntity extends BlockEntity{
     private void saveClientData(CompoundTag tag) {
         CompoundTag infoTag = new CompoundTag();
         tag.put("Info", infoTag);
-        infoTag.putInt("greenthumbs.age", age);
-        infoTag.putInt("greenthumbs.growthSpeed", growthSpeed);
+        infoTag.putString(GreenThumbs.ID + ".genome", genome.toString());
+        infoTag.putInt(GreenThumbs.ID + ".age", age);
+
     }
 
     private void loadClientData(CompoundTag tag) {
         if (tag.contains("Info")) {
             CompoundTag infoTag = tag.getCompound("Info");
-            age = infoTag.getInt("greenthumbs.age");
-            growthSpeed = infoTag.getInt("greenthumbs.growthSpeed");
+            this.genome = new Genome(infoTag.getString(GreenThumbs.ID + ".genome"));
+            age = infoTag.getInt(GreenThumbs.ID + ".age");
         }
     }
 
@@ -215,8 +233,8 @@ public class GTWheatBlockEntity extends BlockEntity{
     @Override
     public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
         // This is called client side: remember the current state of the values that we're interested in
-        int oldAge = age;
-        int oldGrowthSpeed = growthSpeed;
+        int oldAge = this.age;
+        String oldGenome = this.genome.toString();
 
         CompoundTag tag = pkt.getTag();
         // This will call loadClientData()
@@ -224,7 +242,7 @@ public class GTWheatBlockEntity extends BlockEntity{
 
         // If any of the values was changed we request a refresh of our model data and send a block update (this will cause
         // the baked model to be recreated)
-        if (oldAge != age || oldGrowthSpeed != growthSpeed) {
+        if (oldAge != age || oldGenome != genome.toString()) {
             requestModelDataUpdate();
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_ALL);
         }
