@@ -3,6 +3,7 @@ package com.cfrishausen.greenthumbs.block.entity;
 import com.cfrishausen.greenthumbs.GreenThumbs;
 import com.cfrishausen.greenthumbs.genetics.Gene;
 import com.cfrishausen.greenthumbs.genetics.Genome;
+import com.cfrishausen.greenthumbs.item.custom.GTWheatSeeds;
 import com.cfrishausen.greenthumbs.registries.GTBlockEntities;
 import com.cfrishausen.greenthumbs.registries.GTBlocks;
 import com.cfrishausen.greenthumbs.registries.GTItems;
@@ -65,7 +66,6 @@ public class GTWheatBlockEntity extends BlockEntity{
 
     public GTWheatBlockEntity(BlockPos pos, BlockState state) {
         super(GTBlockEntities.GT_WHEAT.get(), pos, state);
-        this.genome = new Genome(level.random);
         age = 0;
     }
 
@@ -73,6 +73,15 @@ public class GTWheatBlockEntity extends BlockEntity{
         super(GTBlockEntities.GT_WHEAT.get(), pos, state);
         this.age = 0;
         this.genome = genome;
+    }
+
+    // Used for initializing genome once entity has been added to level
+    @Override
+    public void onLoad() {
+        if (this.genome == null) {
+            this.genome = new Genome(level.random);
+        }
+        super.onLoad();
     }
 
     @Override
@@ -87,9 +96,8 @@ public class GTWheatBlockEntity extends BlockEntity{
      */
     @Override
     protected void saveAdditional(CompoundTag nbt) {
-        // Save genetic information
-        nbt.putString(GreenThumbs.ID + ".genome", genome.toString());
-        nbt.putInt(GreenThumbs.ID + ".age", this.age);
+        nbt.putString(GreenThumbs.ID + ".Genome", genome.toString());
+        nbt.putInt(GreenThumbs.ID + ".Age", this.age);
         super.saveAdditional(nbt);
     }
 
@@ -99,8 +107,13 @@ public class GTWheatBlockEntity extends BlockEntity{
     @Override
     public void load(CompoundTag nbt) {
         super.load(nbt);
-        this.genome = new Genome(nbt.getString(GreenThumbs.ID + ".genome"));
-        age = nbt.getInt(GreenThumbs.ID + ".age");
+        if (nbt.contains(GreenThumbs.ID + ".Genome")) {
+            this.genome = new Genome(nbt.getString(GreenThumbs.ID + ".Genome"));
+        }
+        if (nbt.contains(GreenThumbs.ID + ".Age")) {
+            age = nbt.getInt(GreenThumbs.ID + ".Age");
+        }
+
     }
 
     public static <E extends BlockEntity> void tick(Level level, BlockPos pos, BlockState state, E e) {
@@ -206,16 +219,14 @@ public class GTWheatBlockEntity extends BlockEntity{
     private void saveClientData(CompoundTag tag) {
         CompoundTag infoTag = new CompoundTag();
         tag.put("Info", infoTag);
-        infoTag.putString(GreenThumbs.ID + ".genome", genome.toString());
-        infoTag.putInt(GreenThumbs.ID + ".age", age);
+        infoTag.putInt(GreenThumbs.ID + ".Age", age);
 
     }
 
     private void loadClientData(CompoundTag tag) {
-        if (tag.contains("Info")) {
+        if (tag != null && tag.contains("Info")) {
             CompoundTag infoTag = tag.getCompound("Info");
-            this.genome = new Genome(infoTag.getString(GreenThumbs.ID + ".genome"));
-            age = infoTag.getInt(GreenThumbs.ID + ".age");
+            age = infoTag.getInt(GreenThumbs.ID + ".Age");
         }
     }
 
@@ -248,12 +259,49 @@ public class GTWheatBlockEntity extends BlockEntity{
         }
     }
 
-    public void drops() {
+
+
+
+    /**
+     * @param placementSwap should be a placementSwap for a quick harvest and plant
+     * @return seed for quick swap. Null if there is no quick swap
+     */
+
+    // TODO add fortune and remove drops in creative
+    public ItemStack drops(boolean placementSwap) {
         SimpleContainer drops = new SimpleContainer(2);
-        drops.setItem(0, new ItemStack(GTItems.GT_WHEAT_SEEDS.get()));
+        ItemStack seedDropStack = getSeedsStack();
+        // used to return seed with proper genome for quick replant
+        ItemStack seedReplant = null;
+        if (placementSwap) {
+            // Set seed for return and reduce drop stack
+            seedReplant = new ItemStack(seedDropStack.getItem());
+            seedReplant.getOrCreateTag().putString(GreenThumbs.ID + ".Genome", genome.toString());
+            seedDropStack.shrink(1);
+        }
+        drops.setItem(0, seedDropStack);
         if (isMaxAge()) {
             drops.setItem(1, new ItemStack(Items.WHEAT));
         }
         Containers.dropContents(this.level, this.worldPosition, drops);
+        return seedReplant;
+    }
+
+    /**
+     *
+     * @return Item stack of seeds for drop
+     */
+    private ItemStack getSeedsStack() {
+        ItemStack seedsStack = new ItemStack(GTItems.GT_WHEAT_SEEDS.get());
+        seedsStack.getOrCreateTag().putString(GreenThumbs.ID + ".Genome", genome.toString());
+        return seedsStack;
+    }
+
+    public Genome getGenome() {
+        return genome;
+    }
+
+    public void setGenome(Genome genome) {
+        this.genome = genome;
     }
 }

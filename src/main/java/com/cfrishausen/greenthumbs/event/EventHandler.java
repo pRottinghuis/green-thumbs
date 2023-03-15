@@ -2,7 +2,9 @@ package com.cfrishausen.greenthumbs.event;
 
 import com.cfrishausen.greenthumbs.GreenThumbs;
 import com.cfrishausen.greenthumbs.block.GTWheatBlock;
+import com.cfrishausen.greenthumbs.block.entity.GTWheatBlockEntity;
 import com.cfrishausen.greenthumbs.client.model.block.GTWheatBakedModel;
+import com.cfrishausen.greenthumbs.genetics.Genome;
 import com.cfrishausen.greenthumbs.registries.GTBlocks;
 import com.cfrishausen.greenthumbs.registries.GTItems;
 import net.minecraft.client.renderer.block.BlockModelShaper;
@@ -19,6 +21,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FarmBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -49,8 +52,14 @@ public class EventHandler {
         BlockPos pos = event.getPos();
         Level level = event.getLevel();
         Player player = event.getEntity();
-        boolean isWheat = stack.is(Items.WHEAT_SEEDS);
-        if (isWheat) {
+        boolean isSeeds = stack.is(Items.WHEAT_SEEDS); // TODO make abstract for all seeds
+        if (isSeeds) {
+            // if minecraft wheat seeds are clicked, actually place green thumb wheat seeds
+
+            // create seed itemstack with genome
+            ItemStack seedsStack = new ItemStack(GTItems.GT_WHEAT_SEEDS.get());
+            seedsStack.getOrCreateTag().putString(GreenThumbs.ID + ".Genome", new Genome(level.random).toString());
+
             stack.useOn(new UseOnContext(level, player, hand, new ItemStack(GTItems.GT_WHEAT_SEEDS.get()), event.getHitVec()));
             event.setUseItem(Event.Result.DENY);
             event.setCanceled(true);

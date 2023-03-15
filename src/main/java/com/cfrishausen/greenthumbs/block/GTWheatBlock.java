@@ -1,19 +1,31 @@
 package com.cfrishausen.greenthumbs.block;
 
+import com.cfrishausen.greenthumbs.GreenThumbs;
 import com.cfrishausen.greenthumbs.block.entity.GTWheatBlockEntity;
+import com.cfrishausen.greenthumbs.registries.GTItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 import net.minecraft.world.level.block.state.BlockState;
 
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.IPlantable;
+import org.apache.commons.lang3.concurrent.Computable;
 import org.jetbrains.annotations.Nullable;
 
 public class GTWheatBlock extends Block implements BonemealableBlock, IPlantable, EntityBlock {
@@ -33,6 +45,36 @@ public class GTWheatBlock extends Block implements BonemealableBlock, IPlantable
 
     protected boolean mayPlaceOn(BlockState pState, BlockGetter pLevel, BlockPos pPos) {
         return pState.is(Blocks.FARMLAND);
+    }
+
+    /**
+     *  Functionality for quick replant
+     */
+    @Override
+    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
+        if (!pLevel.isClientSide()) {
+            boolean isDebugStick = pPlayer.getItemInHand(InteractionHand.MAIN_HAND).is(GTItems.GT_DEBUG_STICK.get());
+            // Allow debug stick to work on grown plant without quick replant
+            if (!isDebugStick) {
+                // quick replant from harvest implementation
+                BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
+                if (blockEntity instanceof GTWheatBlockEntity cropEntity) {
+                    if (cropEntity.isMaxAge()) {
+                        ItemStack seed = cropEntity.drops(true);
+                        if (seed != null) {
+                            CompoundTag seedTag = seed.getTag();
+                            if (seedTag != null && seedTag.contains(GreenThumbs.ID + ".Genome")) {
+                                seedTag.putInt(GreenThumbs.ID + ".Age", 0);
+                                cropEntity.load(seedTag);
+                                // sendBlockUpdated will cause new baked model to be created for crop at age 0
+                                pLevel.sendBlockUpdated(pPos, pState, pState, Block.UPDATE_ALL);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
     }
 
     @Override
@@ -113,9 +155,11 @@ public class GTWheatBlock extends Block implements BonemealableBlock, IPlantable
         if (!pState.is(pNewState.getBlock())) {
             BlockEntity entity = pLevel.getBlockEntity(pPos);
             if (entity instanceof GTWheatBlockEntity cropEntity) {
-                cropEntity.drops();
+                cropEntity.drops(false);
             }
         }
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
     }
+
+
 }

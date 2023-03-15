@@ -33,6 +33,7 @@ public class ClientHandler {
     }
 
 
+    // Event used to copy baked models from minecraft to this mod
     public static void registerBakedModels(ModelEvent.ModifyBakingResult event) {
         Map<ResourceLocation, BakedModel> models = event.getModels();
         ArrayList<BakedModel> bakedModels = new ArrayList<>();

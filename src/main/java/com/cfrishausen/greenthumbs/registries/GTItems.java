@@ -1,9 +1,9 @@
 package com.cfrishausen.greenthumbs.registries;
 
 import com.cfrishausen.greenthumbs.GreenThumbs;
-import net.minecraft.world.item.BlockItem;
+import com.cfrishausen.greenthumbs.item.custom.GTDebugStick;
+import com.cfrishausen.greenthumbs.item.custom.GTWheatSeeds;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -13,15 +13,15 @@ public class GTItems {
 
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.Keys.ITEMS, GreenThumbs.ID);
 
-    public static final RegistryObject<Item> GT_WHEAT_SEEDS = registerBlockItem(GTBlocks.GT_WHEAT, "gt_wheat_seeds");
+    public static final RegistryObject<Item> GT_WHEAT_SEEDS = registerCropSeeds("gt_wheat_seeds", GTBlocks.GT_WHEAT);
+
+    public static final RegistryObject<Item> GT_DEBUG_STICK = ITEMS.register("gt_debug_stick", () -> new GTDebugStick(new Item.Properties()));
+
 
     // Assume same name as block
-    public static RegistryObject<Item> registerBlockItem(RegistryObject<? extends Block> block) {
-        return registerBlockItem(block, block.getId().getPath());
-    }
 
-    public static RegistryObject<Item> registerBlockItem(RegistryObject<? extends Block> block, String path) {
-        return ITEMS.register(path, () -> new BlockItem(block.get(), new Item.Properties()));
+    public static RegistryObject<Item> registerCropSeeds(String path, RegistryObject<? extends Block> block) {
+        return ITEMS.register(path, () -> new GTWheatSeeds(block.get(), new Item.Properties()));
     }
 
 }

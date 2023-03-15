@@ -18,14 +18,18 @@ public class Genome {
     }
 
     public Genome(RandomSource random) {
-        this.cropYield = new Gene("crop_yield", "C", random);
+        this.cropYield = new Gene("crop_yield", 'C', random);
+    }
+
+    public Genome() {
+        this("Cc");
     }
 
     @Override
     public String toString() {
         String genomeString = "";
         // Order must match constructor field initialization
-        genomeString.concat(cropYield.toString());
+        genomeString += (cropYield.toString());
         return genomeString;
     }
 }
