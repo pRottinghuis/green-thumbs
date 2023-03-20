@@ -1,7 +1,7 @@
 package com.cfrishausen.greenthumbs.item.custom;
 
 import com.cfrishausen.greenthumbs.GreenThumbs;
-import com.cfrishausen.greenthumbs.block.entity.GTWheatBlockEntity;
+import com.cfrishausen.greenthumbs.block.entity.GTCropBlockEntity;
 import com.cfrishausen.greenthumbs.genetics.Genome;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -11,7 +11,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -20,9 +19,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class GTWheatSeeds extends BlockItem {
+public class GTGenomeBlockItem extends BlockItem {
 
-    public GTWheatSeeds(Block block, Properties properties) {
+    public GTGenomeBlockItem(Block block, Properties properties) {
         super(block, properties);
     }
 
@@ -31,10 +30,10 @@ public class GTWheatSeeds extends BlockItem {
         // Must be client
         if (!pLevel.isClientSide()) {
             BlockEntity entity = pLevel.getBlockEntity(pPos);
-            if (entity instanceof GTWheatBlockEntity cropEntity) {
+            if (entity instanceof GTCropBlockEntity cropEntity) {
                 CompoundTag tag = pStack.getTag();
                 // See if seed has genome loaded to tag
-                if (tag != null && tag.contains(GreenThumbs.ID + ".Genome")) {
+                if (tag != null && tag.contains(GTCropBlockEntity.INFO_TAG)) {
                     // give tag back to BlockEntity for a load
                     cropEntity.load(tag);
                 }
@@ -47,12 +46,19 @@ public class GTWheatSeeds extends BlockItem {
     public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltip, TooltipFlag pFlag) {
         if (pStack.hasTag()) {
             CompoundTag tag = pStack.getTag();
-            if (tag.contains(GreenThumbs.ID + ".Genome")) {
-                String genomeStr = tag.getString(GreenThumbs.ID + ".Genome");
-                pTooltip.add(Component.literal("Genome: " + genomeStr).withStyle(style -> style.withColor(ChatFormatting.GREEN)));
+            if (tag.contains(GTCropBlockEntity.INFO_TAG)) {
+                CompoundTag genomeTag = tag.getCompound(Genome.GENOME_TAG);
+
+                // Add genes for tooltip
+                addTooltipFromTag(genomeTag, pTooltip, Genome.GROWTH_SPEED);
             }
         }
 
         super.appendHoverText(pStack, pLevel, pTooltip, pFlag);
+    }
+
+    private void addTooltipFromTag(CompoundTag tag, List<Component> pTooltip, String geneKey) {
+        String geneStr = tag.getString(geneKey);
+        pTooltip.add(Component.literal(geneKey + ": " + geneStr).withStyle(style -> style.withColor(ChatFormatting.GREEN)));
     }
 }

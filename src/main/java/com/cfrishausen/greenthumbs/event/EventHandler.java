@@ -1,41 +1,23 @@
 package com.cfrishausen.greenthumbs.event;
 
 import com.cfrishausen.greenthumbs.GreenThumbs;
-import com.cfrishausen.greenthumbs.block.GTWheatBlock;
-import com.cfrishausen.greenthumbs.block.entity.GTWheatBlockEntity;
-import com.cfrishausen.greenthumbs.client.model.block.GTWheatBakedModel;
+import com.cfrishausen.greenthumbs.crop.CropType;
 import com.cfrishausen.greenthumbs.genetics.Genome;
-import com.cfrishausen.greenthumbs.registries.GTBlocks;
+import com.cfrishausen.greenthumbs.item.custom.GTGenomeBlockItem;
 import com.cfrishausen.greenthumbs.registries.GTItems;
-import net.minecraft.client.renderer.block.BlockModelShaper;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.FarmBlock;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.MutableHashedLinkedMap;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import org.apache.logging.log4j.core.pattern.AbstractStyleNameConverter;
-
-import java.util.ArrayList;
-import java.util.Map;
+import net.minecraftforge.registries.*;
 
 public class EventHandler {
 
@@ -44,26 +26,32 @@ public class EventHandler {
         IEventBus forge = MinecraftForge.EVENT_BUS;
 
         forge.addListener(EventHandler::onRightClickBlock);
+        forge.addListener(EventHandler::createNewRegistry);
     }
 
     public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
         ItemStack stack = event.getItemStack();
+        Item item = stack.getItem();
         InteractionHand hand = event.getHand();
-        BlockPos pos = event.getPos();
         Level level = event.getLevel();
         Player player = event.getEntity();
-        boolean isSeeds = stack.is(Items.WHEAT_SEEDS); // TODO make abstract for all seeds
+        boolean isSeeds = GTItems.GT_REPLACEMENTS.containsKey(item); // TODO make abstract for all seeds
         if (isSeeds) {
-            // if minecraft wheat seeds are clicked, actually place green thumb wheat seeds
+            // if minecraft item is clicked, place green thumbs replacement
+            GTGenomeBlockItem gtItem = GTItems.GT_REPLACEMENTS.get(item).get();
 
             // create seed itemstack with genome
-            ItemStack seedsStack = new ItemStack(GTItems.GT_WHEAT_SEEDS.get());
-            seedsStack.getOrCreateTag().putString(GreenThumbs.ID + ".Genome", new Genome(level.random).toString());
+            ItemStack seedsStack = new ItemStack(gtItem);
+            seedsStack.getOrCreateTag().put(Genome.GENOME_TAG, new Genome(level.random).writeTag());
 
-            stack.useOn(new UseOnContext(level, player, hand, new ItemStack(GTItems.GT_WHEAT_SEEDS.get()), event.getHitVec()));
+            stack.useOn(new UseOnContext(level, player, hand, new ItemStack(gtItem), event.getHitVec()));
             event.setUseItem(Event.Result.DENY);
             event.setCanceled(true);
             player.swing(hand);
         }
+    }
+
+    public static void createNewRegistry(NewRegistryEvent event) {
+        event.create(new RegistryBuilder<CropType>().setName(new ResourceLocation(GreenThumbs.ID, "crop_type")));
     }
 }

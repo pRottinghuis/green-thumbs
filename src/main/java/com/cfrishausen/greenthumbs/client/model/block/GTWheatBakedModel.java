@@ -1,6 +1,6 @@
 package com.cfrishausen.greenthumbs.client.model.block;
 
-import com.cfrishausen.greenthumbs.block.entity.GTWheatBlockEntity;
+import com.cfrishausen.greenthumbs.block.entity.GTCropBlockEntity;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
@@ -14,7 +14,6 @@ import net.minecraftforge.client.model.data.ModelData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,9 +34,9 @@ public class GTWheatBakedModel implements IDynamicBakedModel {
             return Collections.EMPTY_LIST;
         }
 
-        if (extraData.has(GTWheatBlockEntity.AGE)) {
+        if (extraData.has(GTCropBlockEntity.AGE)) {
             // Pretend to be wheat block and then get quads from there
-            return bakedModels[extraData.get(GTWheatBlockEntity.AGE)].getQuads(null, null, rand);
+            return bakedModels[extraData.get(GTCropBlockEntity.AGE)].getQuads(null, null, rand);
         }
         return null;
     }
@@ -71,8 +70,8 @@ public class GTWheatBakedModel implements IDynamicBakedModel {
     // used by forge in place of getParticleIcion()
     @Override
     public TextureAtlasSprite getParticleIcon(@NotNull ModelData data) {
-        if (data.has(GTWheatBlockEntity.AGE)) {
-            return bakedModels[data.get(GTWheatBlockEntity.AGE)].getParticleIcon();
+        if (data.has(GTCropBlockEntity.AGE)) {
+            return bakedModels[data.get(GTCropBlockEntity.AGE)].getParticleIcon();
         }
         return bakedModels[0].getParticleIcon();
     }

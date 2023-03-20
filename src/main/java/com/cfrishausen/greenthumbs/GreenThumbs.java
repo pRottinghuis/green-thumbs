@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 public class GreenThumbs
 {
     public static final String ID = "greenthumbs";
-    private static final Logger LOGGER = LoggerFactory.getLogger(ID);
+    public static final Logger LOGGER = LoggerFactory.getLogger(ID);
 
     public GreenThumbs()
     {
