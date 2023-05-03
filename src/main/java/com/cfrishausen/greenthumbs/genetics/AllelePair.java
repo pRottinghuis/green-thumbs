@@ -2,7 +2,7 @@ package com.cfrishausen.greenthumbs.genetics;
 
 import net.minecraft.util.RandomSource;
 
-public class AllelePair implements GTAllelePairType{
+public class AllelePair {
 
     private char allele0;
     private char allele1;
@@ -20,12 +20,16 @@ public class AllelePair implements GTAllelePairType{
         this(allelePairStr.charAt(0), allelePairStr.charAt(1));
     }
 
+    public void randomizeAlleles(RandomSource randomSource) {
+        allele0 = randomSource.nextBoolean() ? Character.toUpperCase(allele0) : Character.toLowerCase(allele0);
+        allele1 = randomSource.nextBoolean() ? Character.toUpperCase(allele1) : Character.toLowerCase(allele1);
+    }
+
     @Override
     public String toString() {
         return "" + this.allele0 + this.allele1;
     }
 
-    @Override
     public boolean hasDominant() {
         return Character.isUpperCase(this.allele0) || Character.isUpperCase(allele1);
     }

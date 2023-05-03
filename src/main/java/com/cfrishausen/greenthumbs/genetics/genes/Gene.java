@@ -15,6 +15,10 @@ public class Gene {
         this.allelePair = new AllelePair(alleles);
     }
 
+    public void setAllelePair(String allelePair) {
+        this.allelePair = new AllelePair(allelePair);
+    }
+
     @Override
     public String toString() {
         return allelePair.toString();

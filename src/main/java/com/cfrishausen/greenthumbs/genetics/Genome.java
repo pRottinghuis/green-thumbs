@@ -2,12 +2,7 @@ package com.cfrishausen.greenthumbs.genetics;
 
 import com.cfrishausen.greenthumbs.GreenThumbs;
 import com.cfrishausen.greenthumbs.genetics.genes.Gene;
-import net.minecraft.data.PackOutput;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.util.RandomSource;
-import org.apache.commons.lang3.concurrent.Computable;
-import org.apache.logging.log4j.core.pattern.AbstractStyleNameConverter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,51 +12,31 @@ public class Genome {
     public static final String GENOME_TAG = GreenThumbs.ID + ".Genome";
     public static final String GROWTH_SPEED = "growth-speed";
 
-    private Map<String, Gene> genes;
+    public static final Map<String, Gene> GENES = new HashMap<>();
 
-    // Constructor field initialization must be in the same order
-
-    public Genome(CompoundTag tag) {
-        initializeFromTag(tag);
+    public void addGene(String name, Gene gene) {
+        GENES.put(name, gene);
     }
 
-    public Genome(RandomSource random) {
-        genes.put(GROWTH_SPEED, new Gene('G', random));
-    }
-
-    private void initializeFromTag(CompoundTag tag) {
-        if (tag != null && tag.contains(GENOME_TAG)) {
-            // add all genes to initialize
-            CompoundTag geneTag = tag.getCompound(GENOME_TAG);
-            setGeneFromTag(geneTag, GROWTH_SPEED);
-            return;
-        }
-        GreenThumbs.LOGGER.error("Tried initializing Genome from null tag or tag without genome data.");
-    }
-
-    private void setGeneFromTag(CompoundTag tag, String geneName) {
-        String tagName = GENOME_TAG + "." + geneName;
-        if (tag.contains(tagName)) {
-            genes.put(geneName, new Gene(tag.getString(tagName)));
-        } else {
-            GreenThumbs.LOGGER.error(geneName + " missing from gene tag");
+    public void setGenomeFromTag(CompoundTag tag) {
+        for (String geneName : GENES.keySet()) {
+            if (tag.contains(geneName)) {
+                // Update gene alleles with string from tag
+                GENES.get(geneName).setAllelePair(tag.getString(geneName));
+            }
         }
     }
 
     public CompoundTag writeTag() {
         CompoundTag geneTag = new CompoundTag();
-        String tagName;
-        String tagGene;
-        for (String geneName : genes.keySet()) {
-            tagName = GENOME_TAG + "." + geneName;
-            tagGene = genes.get(geneName).toString();
-            geneTag.putString(tagName, tagGene);
+        for (String geneName : GENES.keySet()) {
+            geneTag.putString(geneName, GENES.get(geneName).toString());
         }
         return geneTag;
     }
 
     public Gene getGene(String geneName) {
-        return this.genes.get(geneName);
+        return this.GENES.get(geneName);
     }
 
     @Override

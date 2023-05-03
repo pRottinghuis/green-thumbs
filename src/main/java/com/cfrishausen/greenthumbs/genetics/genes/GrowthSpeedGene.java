@@ -9,8 +9,6 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class GrowthSpeedGene extends Gene{
 
-    protected AllelePair allelePair;
-
     public GrowthSpeedGene(char symbol, RandomSource random) {
         super(symbol, random);
     }

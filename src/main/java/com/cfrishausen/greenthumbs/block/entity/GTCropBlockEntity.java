@@ -1,15 +1,17 @@
 package com.cfrishausen.greenthumbs.block.entity;
 
-import com.cfrishausen.greenthumbs.GreenThumbs;
-import com.cfrishausen.greenthumbs.crop.CropType;
+import com.cfrishausen.greenthumbs.crop.ICropSpecies;
+import com.cfrishausen.greenthumbs.crop.NBTTags;
 import com.cfrishausen.greenthumbs.genetics.Genome;
 import com.cfrishausen.greenthumbs.registries.GTBlockEntities;
+import com.cfrishausen.greenthumbs.registries.GTCropSpecies;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -20,54 +22,41 @@ import net.minecraftforge.client.model.data.ModelProperty;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class GTCropBlockEntity extends BlockEntity {
+public class GTCropBlockEntity extends BlockEntity implements com.cfrishausen.greenthumbs.crop.ICrop {
 
     // See example @ https://www.mcjty.eu/docs/1.18/ep3
 
-    public static final String INFO_TAG = GreenThumbs.ID + "." + "Info";
-    public static final String AGE_TAG = GreenThumbs.ID + "." + "Age";
-
-    private CropType cropType;
+    private ICropSpecies cropSpecies = GTCropSpecies.GT_WHEAT.get();
 
     public static ModelProperty<Integer> AGE = new ModelProperty<>();
+    public static ModelProperty<String> CROP_TYPE = new ModelProperty<>();
 
     int MAX_AGE = 7;
 
 
     private int age;
 
-    private Genome genome;
+    private Genome genome = new Genome();
 
     public GTCropBlockEntity(BlockPos pos, BlockState state) {
-        super(GTBlockEntities.GT_WHEAT.get(), pos, state);
+        super(GTBlockEntities.GT_CROP_ENTITY.get(), pos, state);
         age = 0;
-    }
-
-    // Used for initializing genome once entity has been added to level
-    @Override
-    public void onLoad() {
-        if (this.genome == null) {
-            this.genome = new Genome(level.random);
-        }
-        super.onLoad();
     }
 
     @Override
     public @NotNull ModelData getModelData() {
         return ModelData.builder()
                 .with(AGE, age)
+                .with(CROP_TYPE, GTCropSpecies.CROP_SPECIES_REGISTRY.get().getKey(cropSpecies).toString())
                 .build();
     }
 
     /**
-     * Save to nbt on world close
+     * Save to nbt on world close / block unload
      */
     @Override
     protected void saveAdditional(CompoundTag nbt) {
-        CompoundTag saveTag = new CompoundTag();
-        nbt.put(INFO_TAG, saveTag);
-        saveTag.put(Genome.GENOME_TAG, genome.writeTag());
-        saveTag.putInt(AGE_TAG, this.age);
+        saveStandardNBT(nbt);
         super.saveAdditional(nbt);
     }
 
@@ -79,11 +68,7 @@ public class GTCropBlockEntity extends BlockEntity {
     @Override
     public void load(CompoundTag nbt) {
         super.load(nbt);
-        if (nbt.contains(INFO_TAG)) {
-            CompoundTag saveTag = nbt.getCompound(INFO_TAG);
-            this.genome = new Genome(saveTag.getCompound(Genome.GENOME_TAG));
-            age = nbt.getInt(AGE_TAG);
-        }
+        readStandardNBT(nbt);
     }
 
     public int getMaxAge() {
@@ -127,28 +112,40 @@ public class GTCropBlockEntity extends BlockEntity {
     @Override
     public CompoundTag getUpdateTag() {
         CompoundTag tag = super.getUpdateTag();
-        saveClientData(tag);
+        // saved on the server
+        saveStandardNBT(tag);
         return tag;
     }
 
     @Override
     public void handleUpdateTag(CompoundTag tag) {
         if (tag != null) {
-            loadClientData(tag);
+            readStandardNBT(tag);
         }
     }
 
-    private void saveClientData(CompoundTag tag) {
-        CompoundTag infoTag = new CompoundTag();
-        tag.put(INFO_TAG, infoTag);
-        tag.putInt(AGE_TAG, age);
-
+    private void saveStandardNBT(CompoundTag nbt) {
+        CompoundTag saveTag = new CompoundTag();
+        nbt.put(NBTTags.INFO_TAG, saveTag);
+        saveTag.put(Genome.GENOME_TAG, genome.writeTag());
+        saveTag.putInt(NBTTags.AGE_TAG, this.age);
+        if (cropSpecies != null) {
+            saveTag.putString(NBTTags.CROP_SPECIES_TAG, GTCropSpecies.CROP_SPECIES_REGISTRY.get().getKey(cropSpecies).toString());
+        }
     }
 
-    private void loadClientData(CompoundTag tag) {
-        if (tag != null && tag.contains(INFO_TAG)) {
-            CompoundTag infoTag = tag.getCompound(INFO_TAG);
-            age = infoTag.getInt(AGE_TAG);
+    private void readStandardNBT(CompoundTag nbt) {
+        if (nbt.contains(NBTTags.INFO_TAG)) {
+            CompoundTag saveTag = nbt.getCompound(NBTTags.INFO_TAG);
+            if (saveTag.contains(Genome.GENOME_TAG)) {
+                this.genome.setGenomeFromTag(saveTag);
+            }
+            if (saveTag.contains(NBTTags.CROP_SPECIES_TAG)) {
+                this.cropSpecies = GTCropSpecies.CROP_SPECIES_REGISTRY.get().getValue(new ResourceLocation(saveTag.getString(NBTTags.CROP_SPECIES_TAG)));
+            }
+            if (saveTag.contains(NBTTags.AGE_TAG)) {
+                age = nbt.getInt(NBTTags.AGE_TAG);
+            }
         }
     }
 
@@ -171,13 +168,18 @@ public class GTCropBlockEntity extends BlockEntity {
         CompoundTag tag = pkt.getTag();
         // This will call loadClientData()
         handleUpdateTag(tag);
-
+        // We need to reload the baked model so the default baked model is reset. This packet comes in after getModelData is called on the client side.
+        requestModelDataUpdate();
         // If any of the values was changed we request a refresh of our model data and send a block update (this will cause
         // the baked model to be recreated)
         if (oldAge != age || !(oldGenome.equals(this.genome))) {
             requestModelDataUpdate();
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_ALL);
         }
+    }
+
+    public ICropSpecies getCropSpecies() {
+        return cropSpecies;
     }
 
     public Genome getGenome() {

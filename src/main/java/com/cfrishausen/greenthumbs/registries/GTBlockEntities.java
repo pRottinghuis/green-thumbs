@@ -10,5 +10,5 @@ import net.minecraftforge.registries.RegistryObject;
 public class GTBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, GreenThumbs.ID);
 
-    public static final RegistryObject<BlockEntityType<GTCropBlockEntity>> GT_WHEAT = BLOCK_ENTITIES.register("gt_wheat", () -> BlockEntityType.Builder.of(GTCropBlockEntity::new, GTBlocks.GT_WHEAT.get()).build(null));
+    public static final RegistryObject<BlockEntityType<GTCropBlockEntity>> GT_CROP_ENTITY = BLOCK_ENTITIES.register("gt_crop_entity", () -> BlockEntityType.Builder.of(GTCropBlockEntity::new, GTBlocks.GT_CROP_BLOCK.get()).build(null));
 }
