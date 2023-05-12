@@ -24,20 +24,20 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class GTGenomeBlockItem extends BlockItem {
+public class GTGenomeCropBlockItem extends BlockItem {
 
-    public GTGenomeBlockItem(Block block, Properties properties) {
+    public GTGenomeCropBlockItem(Block block, Properties properties) {
         super(block, properties);
     }
 
     @Override
     protected boolean updateCustomBlockEntityTag(BlockPos pPos, Level pLevel, @Nullable Player pPlayer, ItemStack pStack, BlockState pState) {
-        // Must be client
-        if (!pLevel.isClientSide()) {
+
+        if (true/*pLevel.isClientSide()*/) {
             BlockEntity entity = pLevel.getBlockEntity(pPos);
             if (entity instanceof GTCropBlockEntity cropEntity) {
                 CompoundTag tag = pStack.getTag();
-                // See if seed has genome loaded to tag
+                // See if seed has a correct tag
                 if (tag != null && tag.contains(NBTTags.INFO_TAG)) {
                     // give tag back to BlockEntity for a load
                     cropEntity.load(tag);
@@ -54,7 +54,7 @@ public class GTGenomeBlockItem extends BlockItem {
         if (pStack.hasTag()) {
             CompoundTag tag = pStack.getTag();
             if (tag.contains(NBTTags.INFO_TAG)) {
-                CompoundTag genomeTag = tag.getCompound(Genome.GENOME_TAG);
+                CompoundTag genomeTag = tag.getCompound(NBTTags.GENOME_TAG);
                 // Add genes for tooltip based on what is in nbt tag
                 for (String genomeTagKey : genomeTag.getAllKeys()) {
                     addTooltipFromTag(genomeTag, pTooltip, genomeTagKey);

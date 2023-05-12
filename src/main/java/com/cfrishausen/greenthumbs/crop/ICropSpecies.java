@@ -1,7 +1,6 @@
 package com.cfrishausen.greenthumbs.crop;
 
 import com.cfrishausen.greenthumbs.block.custom.GTSimpleCropBlock;
-import com.cfrishausen.greenthumbs.block.entity.GTCropBlockEntity;
 import com.cfrishausen.greenthumbs.genetics.Genome;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -18,14 +17,14 @@ import net.minecraft.world.level.block.state.BlockState;
 public interface ICropSpecies {
 
     /**
-     *  What types of genes are supposed to be contained in this crop type
+     *  Add which genes this crop type should have
      */
     void initializeGenome(Genome genome, RandomSource random);
 
     /**
      *
      * @param pState
-     * @return can a crop be placed on another block
+     * @return can a crop be placed on specified block?
      */
     default boolean mayPlaceOn(BlockState pState) {
         return pState.is(Blocks.FARMLAND);
@@ -36,35 +35,35 @@ public interface ICropSpecies {
      * @param quickReplant needs to be a instant replant and harvest
      * @return item required to plant in quick swap. Null if there is no quick swap
      */
-    ItemStack drops(ICrop crop, Level level, BlockPos pos, boolean quickReplant);
+    ItemStack drops(ICropEntity crop, Level level, BlockPos pos, boolean quickReplant);
 
     /**
      * @return Item stack of what crop should drop when broken at all ages and that is meant for re-planting the crop
      */
-    ItemStack allAgeDrop(ICrop crop);
+    ItemStack allAgeDrop(ICropEntity crop);
 
     /**
      * @return Item stack of what should drop when crop broken at max age
      */
-    ItemStack maxAgeDrop(ICrop crop);
+    ItemStack maxAgeDrop(ICropEntity crop);
 
 
     /**
      * Override to implement quick replant compatibility
      */
-    void quickReplant(BlockState pState, Level pLevel, BlockPos pPos, ICrop crop);
+    void quickReplant(BlockState pState, Level pLevel, BlockPos pPos, ICropEntity crop);
 
     /**
      *
-     * @param crop ICrop item to copy genome from
+     * @param crop ICropEntity item to copy genome from
      * @param item  What item to make item stack for
      * @return New item stack with genome tag from the crop entity
      */
-    default ItemStack getStackWithReplantTag(ICrop crop, Item item) {
+    default ItemStack getStackWithReplantTag(ICropEntity crop, Item item) {
         ItemStack cropStack = new ItemStack(item, 1);
         CompoundTag infoTag = new CompoundTag();
         cropStack.getOrCreateTag().put(NBTTags.INFO_TAG, infoTag);
-        infoTag.put(Genome.GENOME_TAG, crop.getGenome().writeTag());
+        infoTag.put(NBTTags.GENOME_TAG, crop.getGenome().writeTag());
         infoTag.putInt(NBTTags.AGE_TAG, 0);
         return cropStack;
     }
@@ -77,5 +76,5 @@ public interface ICropSpecies {
     /**
      * What does crop need to do on a tick
      */
-    public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random, GTSimpleCropBlock block, ICrop crop);
+    public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random, GTSimpleCropBlock block, ICropEntity crop);
 }

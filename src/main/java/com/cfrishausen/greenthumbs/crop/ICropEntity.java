@@ -6,7 +6,7 @@ import net.minecraft.nbt.CompoundTag;
 /**
  * Defines what Crop entity requires
  */
-public interface ICrop {
+public interface ICropEntity {
 
     Genome getGenome();
 

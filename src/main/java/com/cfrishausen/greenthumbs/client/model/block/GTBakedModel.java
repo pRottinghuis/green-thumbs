@@ -8,11 +8,11 @@ import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.model.IDynamicBakedModel;
 import net.minecraftforge.client.model.data.ModelData;
-import net.minecraftforge.common.MinecraftForge;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,12 +21,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class GTWheatBakedModel implements IDynamicBakedModel {
+public class GTBakedModel implements IDynamicBakedModel {
 
-    private final Map<String, BakedModel[]> BAKED_MODELS = new HashMap<>();
+    private final Map<String, BakedModel[]> bakedModels = new HashMap<>();
 
-    public GTWheatBakedModel(String name, BakedModel[] bakedModels) {
-        this.BAKED_MODELS.put(name, bakedModels);
+    public void addModels(String loc, BakedModel[] bakedModels) {
+        this.bakedModels.put(loc, bakedModels);
     }
 
     @Override
@@ -46,7 +46,10 @@ public class GTWheatBakedModel implements IDynamicBakedModel {
     }
 
     private BakedModel getBakedModel(ModelData data) {
-        return BAKED_MODELS.get(data.get(GTCropBlockEntity.CROP_TYPE))[data.get(GTCropBlockEntity.AGE)];
+        var a = data.get(GTCropBlockEntity.CROP_TYPE);
+        // key: Crop type name
+        // value: array of age models
+        return bakedModels.get(a)[data.get(GTCropBlockEntity.AGE)];
     }
 
     @Override

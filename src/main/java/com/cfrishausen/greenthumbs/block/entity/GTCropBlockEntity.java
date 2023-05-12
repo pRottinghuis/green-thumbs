@@ -1,5 +1,6 @@
 package com.cfrishausen.greenthumbs.block.entity;
 
+import com.cfrishausen.greenthumbs.crop.ICropEntity;
 import com.cfrishausen.greenthumbs.crop.ICropSpecies;
 import com.cfrishausen.greenthumbs.crop.NBTTags;
 import com.cfrishausen.greenthumbs.genetics.Genome;
@@ -22,11 +23,11 @@ import net.minecraftforge.client.model.data.ModelProperty;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class GTCropBlockEntity extends BlockEntity implements com.cfrishausen.greenthumbs.crop.ICrop {
+public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
 
     // See example @ https://www.mcjty.eu/docs/1.18/ep3
 
-    private ICropSpecies cropSpecies = GTCropSpecies.GT_WHEAT.get();
+    private ICropSpecies cropSpecies;
 
     public static ModelProperty<Integer> AGE = new ModelProperty<>();
     public static ModelProperty<String> CROP_TYPE = new ModelProperty<>();
@@ -102,8 +103,9 @@ public class GTCropBlockEntity extends BlockEntity implements com.cfrishausen.gr
     }
 
     public void markUpdated() {
+        requestModelDataUpdate();
         setChanged();
-        level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+        level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_ALL);
     }
 
 
@@ -127,7 +129,7 @@ public class GTCropBlockEntity extends BlockEntity implements com.cfrishausen.gr
     private void saveStandardNBT(CompoundTag nbt) {
         CompoundTag saveTag = new CompoundTag();
         nbt.put(NBTTags.INFO_TAG, saveTag);
-        saveTag.put(Genome.GENOME_TAG, genome.writeTag());
+        saveTag.put(NBTTags.GENOME_TAG, genome.writeTag());
         saveTag.putInt(NBTTags.AGE_TAG, this.age);
         if (cropSpecies != null) {
             saveTag.putString(NBTTags.CROP_SPECIES_TAG, GTCropSpecies.CROP_SPECIES_REGISTRY.get().getKey(cropSpecies).toString());
@@ -137,14 +139,14 @@ public class GTCropBlockEntity extends BlockEntity implements com.cfrishausen.gr
     private void readStandardNBT(CompoundTag nbt) {
         if (nbt.contains(NBTTags.INFO_TAG)) {
             CompoundTag saveTag = nbt.getCompound(NBTTags.INFO_TAG);
-            if (saveTag.contains(Genome.GENOME_TAG)) {
+            if (saveTag.contains(NBTTags.GENOME_TAG)) {
                 this.genome.setGenomeFromTag(saveTag);
             }
             if (saveTag.contains(NBTTags.CROP_SPECIES_TAG)) {
                 this.cropSpecies = GTCropSpecies.CROP_SPECIES_REGISTRY.get().getValue(new ResourceLocation(saveTag.getString(NBTTags.CROP_SPECIES_TAG)));
             }
             if (saveTag.contains(NBTTags.AGE_TAG)) {
-                age = nbt.getInt(NBTTags.AGE_TAG);
+                age = saveTag.getInt(NBTTags.AGE_TAG);
             }
         }
     }
@@ -164,17 +166,16 @@ public class GTCropBlockEntity extends BlockEntity implements com.cfrishausen.gr
         // This is called client side: remember the current state of the values that we're interested in
         int oldAge = this.age;
         Genome oldGenome = this.genome;
+        ICropSpecies oldSpecies = this.cropSpecies;
 
         CompoundTag tag = pkt.getTag();
         // This will call loadClientData()
         handleUpdateTag(tag);
-        // We need to reload the baked model so the default baked model is reset. This packet comes in after getModelData is called on the client side.
-        requestModelDataUpdate();
+
         // If any of the values was changed we request a refresh of our model data and send a block update (this will cause
         // the baked model to be recreated)
         if (oldAge != age || !(oldGenome.equals(this.genome))) {
-            requestModelDataUpdate();
-            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_ALL);
+            markUpdated();
         }
     }
 

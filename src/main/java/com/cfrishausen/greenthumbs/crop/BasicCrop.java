@@ -4,7 +4,7 @@ import com.cfrishausen.greenthumbs.block.custom.GTSimpleCropBlock;
 import com.cfrishausen.greenthumbs.block.entity.GTCropBlockEntity;
 import com.cfrishausen.greenthumbs.genetics.Genome;
 import com.cfrishausen.greenthumbs.genetics.genes.GrowthSpeedGene;
-import com.cfrishausen.greenthumbs.item.custom.GTGenomeBlockItem;
+import com.cfrishausen.greenthumbs.item.custom.GTGenomeCropBlockItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -21,10 +21,10 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class BasicCrop implements ICropSpecies {
 
-    private GTGenomeBlockItem seed;
+    private GTGenomeCropBlockItem seed;
     private Item crop;
 
-    public BasicCrop(GTGenomeBlockItem seeds, Item crop) {
+    public BasicCrop(GTGenomeCropBlockItem seeds, Item crop) {
         this.seed =seeds;
         this.crop = crop;
     }
@@ -35,17 +35,17 @@ public class BasicCrop implements ICropSpecies {
     }
 
     @Override
-    public ItemStack allAgeDrop(ICrop crop) {
+    public ItemStack allAgeDrop(ICropEntity crop) {
         return getStackWithReplantTag(crop, this.seed);
     }
 
     @Override
-    public ItemStack maxAgeDrop(ICrop crop) {
+    public ItemStack maxAgeDrop(ICropEntity crop) {
         return getStackWithReplantTag(crop, this.crop);
     }
 
     @Override
-    public void quickReplant(BlockState pState, Level pLevel, BlockPos pPos, ICrop crop) {
+    public void quickReplant(BlockState pState, Level pLevel, BlockPos pPos, ICropEntity crop) {
         ItemStack replantItem = drops(crop, pLevel, pPos, true);
         if (replantItem != null) {
             CompoundTag infoTag = replantItem.getTag();
@@ -70,24 +70,27 @@ public class BasicCrop implements ICropSpecies {
     }
 
     @Override
-    public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random, GTSimpleCropBlock block, ICrop crop) {
+    public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random, GTSimpleCropBlock block, ICropEntity crop) {
         if (!level.isAreaLoaded(pos, 1))
             return; // Forge: prevent loading unloaded chunks when checking neighbor's light
         if (level.getRawBrightness(pos, 0) >= 9) {
             int i = crop.getAge();
             if (i < crop.getMaxAge()) {
                 GrowthSpeedGene growthSpeedGene = (GrowthSpeedGene) crop.getGenome().getGene(Genome.GROWTH_SPEED);
-                float f = growthSpeedGene.getGrowthSpeed(block, level, pos);
-                if (net.minecraftforge.common.ForgeHooks.onCropsGrowPre(level, pos, state, random.nextInt((int) (25.0F / f) + 1) == 0)) {
-                    crop.setAge(crop.getAge() + 1);
-                    net.minecraftforge.common.ForgeHooks.onCropsGrowPost(level, pos, state);
+                if (growthSpeedGene != null) {
+                    float f = growthSpeedGene.getGrowthSpeed(block, level, pos);
+                    if (net.minecraftforge.common.ForgeHooks.onCropsGrowPre(level, pos, state, random.nextInt((int) (25.0F / f) + 1) == 0)) {
+                        crop.setAge(crop.getAge() + 1);
+                        net.minecraftforge.common.ForgeHooks.onCropsGrowPost(level, pos, state);
+                    }
                 }
+
             }
         }
     }
 
     // TODO add fortune drops
-    public ItemStack drops(ICrop crop, Level level, BlockPos pos, boolean quickReplant) {
+    public ItemStack drops(ICropEntity crop, Level level, BlockPos pos, boolean quickReplant) {
         SimpleContainer drops = new SimpleContainer(2);
         // default item that all crops drop regardless of age
         ItemStack allAgeDropStack = allAgeDrop(crop);

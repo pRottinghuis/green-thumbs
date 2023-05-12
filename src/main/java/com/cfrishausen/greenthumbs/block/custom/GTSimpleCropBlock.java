@@ -1,7 +1,6 @@
 package com.cfrishausen.greenthumbs.block.custom;
 
 import com.cfrishausen.greenthumbs.block.entity.GTCropBlockEntity;
-import com.cfrishausen.greenthumbs.item.custom.GTGenomeBlockItem;
 import com.cfrishausen.greenthumbs.registries.GTItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -23,8 +22,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.PlantType;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Supplier;
 
 /**
  * Type of crop with only one harvestable item and no seeds. The crop is replanted from the one harvestable item. Ex. carrots, potatoes
