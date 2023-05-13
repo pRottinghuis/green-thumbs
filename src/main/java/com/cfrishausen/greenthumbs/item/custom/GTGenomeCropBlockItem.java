@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.util.List;
 
 public class GTGenomeCropBlockItem extends BlockItem {
@@ -54,29 +55,28 @@ public class GTGenomeCropBlockItem extends BlockItem {
         if (pStack.hasTag()) {
             CompoundTag tag = pStack.getTag();
             if (tag.contains(NBTTags.INFO_TAG)) {
-                CompoundTag genomeTag = tag.getCompound(NBTTags.GENOME_TAG);
+                CompoundTag genomeTag = tag.getCompound(NBTTags.INFO_TAG).getCompound(NBTTags.GENOME_TAG);
                 // Add genes for tooltip based on what is in nbt tag
                 for (String genomeTagKey : genomeTag.getAllKeys()) {
-                    addTooltipFromTag(genomeTag, pTooltip, genomeTagKey);
+                    String geneStr = genomeTag.getString(genomeTagKey);
+                    pTooltip.add(Component.literal(genomeTagKey + ": " + geneStr).withStyle(style -> style.withColor(ChatFormatting.GREEN)));
                 }
             }
         }
         super.appendHoverText(pStack, pLevel, pTooltip, pFlag);
     }
 
-    private void addTooltipFromTag(CompoundTag tag, List<Component> pTooltip, String geneKey) {
-        String geneStr = tag.getString(geneKey);
-        pTooltip.add(Component.literal(geneKey + ": " + geneStr).withStyle(style -> style.withColor(ChatFormatting.GREEN)));
-    }
-
     @Override
     protected boolean canPlace(BlockPlaceContext pContext, BlockState pState) {
-        CompoundTag nbt = pContext.getPlayer().getItemInHand(InteractionHand.MAIN_HAND).getTag();
+        Player player  = pContext.getPlayer();
+        CompoundTag nbt = player.getItemInHand(InteractionHand.MAIN_HAND).getTag();
         CompoundTag saveTag = nbt.getCompound(NBTTags.INFO_TAG);
         if (saveTag.contains(NBTTags.CROP_SPECIES_TAG)) {
             saveTag.getString(NBTTags.CROP_SPECIES_TAG);
             ICropSpecies cropSpecies = GTCropSpecies.CROP_SPECIES_REGISTRY.get().getValue(new ResourceLocation(saveTag.getString(NBTTags.CROP_SPECIES_TAG)));
             return cropSpecies.canSurvive(pState, pContext.getLevel(), pContext.getClickedPos(), this.getBlock());
+        } else {
+            player.sendSystemMessage(Component.literal("Seed has no genome").withStyle(style -> style.withColor(ChatFormatting.RED)));
         }
         return false;
     }
