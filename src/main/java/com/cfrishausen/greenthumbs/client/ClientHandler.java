@@ -40,8 +40,10 @@ public class ClientHandler {
         // This baked model stores all crop type models and corresponding age models
         GTBakedModel gtBakedModel = new GTBakedModel();
 
-        copyCropBaked(gtBakedModel, eventModels, GTCropSpecies.GT_CARROTS.get(), Blocks.CARROTS);
+        copyCropBaked(gtBakedModel, eventModels, GTCropSpecies.GT_CARROT.get(), Blocks.CARROTS);
         copyCropBaked(gtBakedModel, eventModels, GTCropSpecies.GT_WHEAT.get(), Blocks.WHEAT);
+        //copyCropBaked(gtBakedModel, eventModels, GTCropSpecies.GT_BEETROOT.get(), Blocks.BEETROOTS);
+        copyCropBaked(gtBakedModel, eventModels, GTCropSpecies.GT_POTATO.get(), Blocks.POTATOES);
     }
 
     /**
@@ -51,7 +53,7 @@ public class ClientHandler {
      * @param cropSpecies What species of crop these models need to be made for
      * @param block What Minecraft block to copy models over from
      */
-    private static void copyCropBaked(GTBakedModel gtBakedModel, Map<ResourceLocation, BakedModel> eventModels, ICropSpecies cropSpecies, Block block) {
+    public static void copyCropBaked(GTBakedModel gtBakedModel, Map<ResourceLocation, BakedModel> eventModels, ICropSpecies cropSpecies, Block block) {
         ArrayList<BakedModel> bakedModels = new ArrayList<>();
         // Get baked model for each age of crop
         for (int age = 0; age <= 7; age++) {

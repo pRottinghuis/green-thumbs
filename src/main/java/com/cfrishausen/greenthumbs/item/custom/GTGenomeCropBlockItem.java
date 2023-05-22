@@ -33,18 +33,13 @@ public class GTGenomeCropBlockItem extends BlockItem {
 
     @Override
     protected boolean updateCustomBlockEntityTag(BlockPos pPos, Level pLevel, @Nullable Player pPlayer, ItemStack pStack, BlockState pState) {
-
-        if (true/*pLevel.isClientSide()*/) {
-            BlockEntity entity = pLevel.getBlockEntity(pPos);
-            if (entity instanceof GTCropBlockEntity cropEntity) {
-                CompoundTag tag = pStack.getTag();
-                // See if seed has a correct tag
-                if (tag != null && tag.contains(NBTTags.INFO_TAG)) {
-                    // give tag back to BlockEntity for a load
-                    cropEntity.load(tag);
-                } else {
-
-                }
+        BlockEntity entity = pLevel.getBlockEntity(pPos);
+        if (entity instanceof GTCropBlockEntity cropEntity) {
+            CompoundTag tag = pStack.getTag();
+            // See if seed has a correct tag
+            if (tag != null && tag.contains(NBTTags.INFO_TAG)) {
+                // give tag back to BlockEntity for a load
+                cropEntity.load(tag);
             }
         }
         return super.updateCustomBlockEntityTag(pPos, pLevel, pPlayer, pStack, pState);

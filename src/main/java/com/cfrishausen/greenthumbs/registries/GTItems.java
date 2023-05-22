@@ -1,13 +1,14 @@
 package com.cfrishausen.greenthumbs.registries;
 
 import com.cfrishausen.greenthumbs.GreenThumbs;
+import com.cfrishausen.greenthumbs.crop.ICropSpecies;
 import com.cfrishausen.greenthumbs.item.custom.GTDebugStick;
 import com.cfrishausen.greenthumbs.item.custom.GTGenomeCropBlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraftforge.registries.*;
+
+import java.util.function.Supplier;
 
 public class GTItems {
 
@@ -15,9 +16,11 @@ public class GTItems {
 
     public static final RegistryObject<Item> GT_DEBUG_STICK = ITEMS.register("gt_debug_stick", () -> new GTDebugStick(new Item.Properties()));
 
-    public static final RegistryObject<GTGenomeCropBlockItem> GT_CARROT_SEEDS = registerGenomeBlockItem("gt_carrot_seeds", GTBlocks.GT_CROP_BLOCK);
+    public static final RegistryObject<GTGenomeCropBlockItem> CARROT_SEEDS = registerGenomeBlockItem("carrot_seeds", GTBlocks.GT_CROP_BLOCK);
+    public static final RegistryObject<GTGenomeCropBlockItem> WHEAT_SEEDS = registerGenomeBlockItem("wheat_seeds", GTBlocks.GT_CROP_BLOCK);
+    public static final RegistryObject<GTGenomeCropBlockItem> POTATO_SEEDS = registerGenomeBlockItem("potato_seeds", GTBlocks.GT_CROP_BLOCK);
+    public static final RegistryObject<GTGenomeCropBlockItem> BEETROOT_SEEDS = registerGenomeBlockItem("beetroot_seeds", GTBlocks.GT_CROP_BLOCK);
 
-    public static final RegistryObject<GTGenomeCropBlockItem> GT_WHEAT_SEEDS = registerGenomeBlockItem("gt_wheat_seeds", GTBlocks.GT_CROP_BLOCK);
 
     public static RegistryObject<GTGenomeCropBlockItem> registerGenomeBlockItem(String path, RegistryObject<? extends Block> block) {
         return ITEMS.register(path, () -> new GTGenomeCropBlockItem(block.get(), new Item.Properties()));

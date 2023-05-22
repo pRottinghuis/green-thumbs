@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:beetroot_seeds"
+    }
+  ],
+  "result": {
+    "item": "greenthumbs:beetroot_seeds",
+    "nbt": "{\"greenthumbs.Info\": {\"greenthumbs.Genome\": {\"growth-speed\": \"Gg\"}, \"greenthumbs.Age\": 0, \"greenthumbs.CropSpecies\": \"greenthumbs:gt_beetroot\"}}"
+  }
+}

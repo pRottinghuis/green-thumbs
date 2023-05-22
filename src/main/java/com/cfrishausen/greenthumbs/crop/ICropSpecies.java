@@ -2,6 +2,7 @@ package com.cfrishausen.greenthumbs.crop;
 
 import com.cfrishausen.greenthumbs.block.custom.GTSimpleCropBlock;
 import com.cfrishausen.greenthumbs.genetics.Genome;
+import com.cfrishausen.greenthumbs.genetics.genes.Gene;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -14,12 +15,18 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.Map;
+
+/**
+ * ICropSpecies defines functionality for making a new crop species. Each crop species contains functionality that is unique to a certain crop.
+ * For example Carrots drop something other than wheat does. Maybe some crop species need different conditions to survive ect.
+ */
 public interface ICropSpecies {
 
     /**
      *  Add which genes this crop type should have
      */
-    void initializeGenome(Genome genome, RandomSource random);
+    Map<String, Gene> defineGenome();
 
     /**
      *

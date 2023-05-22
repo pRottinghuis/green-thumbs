@@ -3,6 +3,7 @@ package com.cfrishausen.greenthumbs.crop;
 import com.cfrishausen.greenthumbs.block.custom.GTSimpleCropBlock;
 import com.cfrishausen.greenthumbs.block.entity.GTCropBlockEntity;
 import com.cfrishausen.greenthumbs.genetics.Genome;
+import com.cfrishausen.greenthumbs.genetics.genes.Gene;
 import com.cfrishausen.greenthumbs.genetics.genes.GrowthSpeedGene;
 import com.cfrishausen.greenthumbs.item.custom.GTGenomeCropBlockItem;
 import net.minecraft.core.BlockPos;
@@ -19,6 +20,10 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 public class BasicCrop implements ICropSpecies {
 
     private GTGenomeCropBlockItem seed;
@@ -30,8 +35,10 @@ public class BasicCrop implements ICropSpecies {
     }
 
     @Override
-    public void initializeGenome(Genome genome, RandomSource random) {
-        genome.addGene(Genome.GROWTH_SPEED, new GrowthSpeedGene('G', random));
+    public Map<String, Gene> defineGenome() {
+        Map<String, Gene> genes = new HashMap<>();
+        genes.put(Genome.GROWTH_SPEED, new GrowthSpeedGene("Gg"));
+        return genes;
     }
 
     @Override
