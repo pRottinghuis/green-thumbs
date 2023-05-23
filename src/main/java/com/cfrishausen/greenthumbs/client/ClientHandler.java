@@ -12,6 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -42,7 +43,7 @@ public class ClientHandler {
 
         copyCropBaked(gtBakedModel, eventModels, GTCropSpecies.GT_CARROT.get(), Blocks.CARROTS);
         copyCropBaked(gtBakedModel, eventModels, GTCropSpecies.GT_WHEAT.get(), Blocks.WHEAT);
-        //copyCropBaked(gtBakedModel, eventModels, GTCropSpecies.GT_BEETROOT.get(), Blocks.BEETROOTS);
+        copyCropBaked(gtBakedModel, eventModels, GTCropSpecies.GT_BEETROOT.get(), Blocks.BEETROOTS);
         copyCropBaked(gtBakedModel, eventModels, GTCropSpecies.GT_POTATO.get(), Blocks.POTATOES);
     }
 
@@ -56,8 +57,9 @@ public class ClientHandler {
     public static void copyCropBaked(GTBakedModel gtBakedModel, Map<ResourceLocation, BakedModel> eventModels, ICropSpecies cropSpecies, Block block) {
         ArrayList<BakedModel> bakedModels = new ArrayList<>();
         // Get baked model for each age of crop
-        for (int age = 0; age <= 7; age++) {
-            ResourceLocation location = BlockModelShaper.stateToModelLocation(block.defaultBlockState().setValue(BlockStateProperties.AGE_7, age));
+        int maxAge = cropSpecies.getMaxAge();
+        for (int age = 0; age <= maxAge; age++) {
+            ResourceLocation location = BlockModelShaper.stateToModelLocation(block.defaultBlockState().setValue(IntegerProperty.create("age", 0, maxAge), age));
             bakedModels.add(eventModels.get(location));
         }
         //

@@ -28,10 +28,23 @@ public class BasicCrop implements ICropSpecies {
 
     private GTGenomeCropBlockItem seed;
     private Item crop;
+    private int maxAge;
 
-    public BasicCrop(GTGenomeCropBlockItem seeds, Item crop) {
+    public BasicCrop(GTGenomeCropBlockItem seeds, Item crop, int maxAge) {
         this.seed =seeds;
         this.crop = crop;
+        if (maxAge > 0) {
+            this.maxAge = maxAge;
+        } else {
+            this.maxAge = 7;
+        }
+    }
+
+    /**
+     * used for default age 7 crop
+     */
+    public BasicCrop(GTGenomeCropBlockItem seeds, Item crop) {
+        this(seeds, crop, 7);
     }
 
     @Override
@@ -116,5 +129,10 @@ public class BasicCrop implements ICropSpecies {
         }
         Containers.dropContents(level, pos, drops);
         return cropReplantStack;
+    }
+
+    @Override
+    public int getMaxAge() {
+        return this.maxAge;
     }
 }

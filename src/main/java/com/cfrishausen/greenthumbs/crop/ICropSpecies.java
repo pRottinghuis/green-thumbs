@@ -84,4 +84,6 @@ public interface ICropSpecies {
      * What does crop need to do on a tick
      */
     public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random, GTSimpleCropBlock block, ICropEntity crop);
+
+    int getMaxAge();
 }

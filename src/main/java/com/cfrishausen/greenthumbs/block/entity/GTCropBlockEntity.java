@@ -73,7 +73,7 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
     }
 
     public int getMaxAge() {
-        return MAX_AGE;
+        return cropSpecies.getMaxAge();
     }
 
     public int getAge() {

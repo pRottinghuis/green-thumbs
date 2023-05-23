@@ -26,6 +26,6 @@ public class GTCropSpecies {
             () -> new BasicCrop(GTItems.POTATO_SEEDS.get(), Items.POTATO));
 
     public static final RegistryObject<ICropSpecies> GT_BEETROOT = CROP_SPECIES.register("gt_beetroot",
-            () -> new BasicCrop(GTItems.BEETROOT_SEEDS.get(), Items.BEETROOT));
+            () -> new BasicCrop(GTItems.BEETROOT_SEEDS.get(), Items.BEETROOT, 3));
 
 }
