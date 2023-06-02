@@ -2,7 +2,7 @@ package com.cfrishausen.greenthumbs.registries;
 
 import com.cfrishausen.greenthumbs.GreenThumbs;
 import com.cfrishausen.greenthumbs.crop.ICropSpecies;
-import com.cfrishausen.greenthumbs.crop.BasicCrop;
+import com.cfrishausen.greenthumbs.crop.species.BasicCrop;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.registries.DeferredRegister;
@@ -20,7 +20,7 @@ public class GTCropSpecies {
             () -> new BasicCrop(GTItems.CARROT_SEEDS.get(), Items.CARROT));
 
     public static final RegistryObject<ICropSpecies> GT_WHEAT = CROP_SPECIES.register("gt_wheat",
-            () -> new BasicCrop(GTItems.WHEAT_SEEDS.get(), Items.WHEAT_SEEDS));
+            () -> new BasicCrop(GTItems.WHEAT_SEEDS.get(), Items.WHEAT));
 
     public static final RegistryObject<ICropSpecies> GT_POTATO = CROP_SPECIES.register("gt_potato",
             () -> new BasicCrop(GTItems.POTATO_SEEDS.get(), Items.POTATO));

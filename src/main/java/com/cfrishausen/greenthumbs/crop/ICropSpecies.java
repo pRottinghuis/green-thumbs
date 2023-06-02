@@ -2,7 +2,7 @@ package com.cfrishausen.greenthumbs.crop;
 
 import com.cfrishausen.greenthumbs.block.custom.GTSimpleCropBlock;
 import com.cfrishausen.greenthumbs.genetics.Genome;
-import com.cfrishausen.greenthumbs.genetics.genes.Gene;
+import com.cfrishausen.greenthumbs.item.custom.GTGenomeCropBlockItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -14,6 +14,7 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.Map;
 
@@ -26,7 +27,7 @@ public interface ICropSpecies {
     /**
      *  Add which genes this crop type should have
      */
-    Map<String, Gene> defineGenome();
+    Genome defineGenome();
 
     /**
      *
@@ -83,7 +84,20 @@ public interface ICropSpecies {
     /**
      * What does crop need to do on a tick
      */
-    public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random, GTSimpleCropBlock block, ICropEntity crop);
+    void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random, GTSimpleCropBlock block, ICropEntity crop);
+
+    /**
+     * Set the voxel shape for the crop
+     * Number of shapes in the array must match the max age + 1 of the crop
+     * @return
+     */
+    VoxelShape[] getVoxelShapes();
+
+    /**
+     * Used when figuring out clone block in creative ie middle mouse click
+     * @return what item needs to be cloned into the inventory
+     */
+    GTGenomeCropBlockItem getBaseItemId();
 
     int getMaxAge();
 }

@@ -2,7 +2,6 @@ package com.cfrishausen.greenthumbs.data;
 
 import com.cfrishausen.greenthumbs.crop.ICropEntity;
 import com.cfrishausen.greenthumbs.crop.ICropSpecies;
-import com.cfrishausen.greenthumbs.genetics.genes.Gene;
 import com.cfrishausen.greenthumbs.item.custom.GTGenomeCropBlockItem;
 import com.cfrishausen.greenthumbs.registries.GTCropSpecies;
 import com.cfrishausen.greenthumbs.registries.GTItems;
@@ -189,10 +188,10 @@ public class GTCropShapelessRecipeBuilder extends CraftingRecipeBuilder implemen
             String nbtString = "{\"greenthumbs.Info\": {\"greenthumbs.Genome\": {";
 
             // Add specific genes
-            Map<String, Gene> cropSpeciesGenes = cropSpecies.defineGenome();
+            Map<String, String> cropSpeciesGenes = cropSpecies.defineGenome().getGenes();
             for (String geneName : cropSpeciesGenes.keySet()) {
                 nbtString += "\"" + geneName + "\"" + ": "; // "growth-speed":
-                nbtString += "\"" + cropSpeciesGenes.get(geneName).toString() + "\", ";
+                nbtString += "\"" + cropSpeciesGenes.get(geneName) + "\", "; //"Gg"
             }
             // Remove ending comma and space
             nbtString = nbtString.substring(0, nbtString.length() - 2);

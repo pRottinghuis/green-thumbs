@@ -24,16 +24,10 @@ public class GTData {
 
         gen.addProvider(true, new GTRecipes(output));
         gen.addProvider(true, new GTItemModels(output, GreenThumbs.ID, helper));
+        gen.addProvider(true, new GTLanguageProvider(output, GreenThumbs.ID, "en_us"));
 
         var dataHelper = new DataHelper(GreenThumbs.ID, event);
 
-        //dataHelper.createEnglish(true, GTData::createTranslations);
-    }
-
-    private static void createTranslations(MKEnglishProvider english) {
-        english.add(GTItems.GT_DEBUG_STICK, "Debug Stick");
-        english.add(GTItems.CARROT_SEEDS, "Carrot Seeds");
-        english.add(GTItems.WHEAT_SEEDS, "Wheat Seeds");
     }
 
 }

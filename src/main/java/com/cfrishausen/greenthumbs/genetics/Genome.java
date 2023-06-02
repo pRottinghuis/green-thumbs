@@ -1,49 +1,98 @@
 package com.cfrishausen.greenthumbs.genetics;
 
-import com.cfrishausen.greenthumbs.GreenThumbs;
-import com.cfrishausen.greenthumbs.genetics.genes.Gene;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class Genome {
 
-    public static final String GENOME_TAG = GreenThumbs.ID + ".Genome";
     public static final String GROWTH_SPEED = "growth-speed";
+    public static final String TEMPERATURE_PREFERENCE = "temperature-preference";
 
-    public static final Map<String, Gene> GENES = new HashMap<>();
+    private final Map<String, String> GENES = new HashMap<>();
 
-    public void addGene(String name, Gene gene) {
-        GENES.put(name, gene);
+    public Genome(Map<String, String> geneMap) {
+        this.GENES.putAll(geneMap);
     }
 
-    public void setGenomeFromTag(CompoundTag tag) {
-        for (String geneName : GENES.keySet()) {
-            if (tag.contains(geneName)) {
-                // Update gene alleles with string from tag
-                GENES.get(geneName).setAllelePair(tag.getString(geneName));
-            }
-        }
+    public Genome(CompoundTag tag) {
+       for (String geneName : tag.getAllKeys()) {
+           GENES.put(geneName, tag.getString(geneName));
+       }
     }
 
     public CompoundTag writeTag() {
         CompoundTag geneTag = new CompoundTag();
         for (String geneName : GENES.keySet()) {
-            geneTag.putString(geneName, GENES.get(geneName).toString());
+            geneTag.putString(geneName, GENES.get(geneName));
         }
         return geneTag;
     }
 
-    public Gene getGene(String geneName) {
-        return this.GENES.get(geneName);
+    public Map<String, String> getGenes() {
+        return GENES;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof Genome otherGenome) {
-            return this.writeTag().equals(otherGenome.writeTag());
+    private boolean isRecessive(String alleles) {
+        Character allele1 = alleles.charAt(0);
+        Character allele2 = alleles.charAt(1);
+        return Character.isLowerCase(allele1) && Character.isLowerCase(allele2);
+    }
+
+    public float getGrowthSpeed(Block pBlock, BlockGetter pLevel, BlockPos pPos) {
+        float f = 1.0F;
+        BlockPos blockpos = pPos.below();
+
+        // Add an increase in growth rate when adjacent block poses can support a plant or are fertile (vanilla: in range of water)
+        for(int i = -1; i <= 1; ++i) {
+            for(int j = -1; j <= 1; ++j) {
+                float f1 = 0.0F;
+                BlockState blockstate = pLevel.getBlockState(blockpos.offset(i, 0, j));
+                if (blockstate.canSustainPlant(pLevel, blockpos.offset(i, 0, j), net.minecraft.core.Direction.UP, (net.minecraftforge.common.IPlantable) pBlock)) {
+                    f1 = 1.0F;
+                    if (blockstate.isFertile(pLevel, pPos.offset(i, 0, j))) {
+                        f1 = 3.0F;
+                    }
+                }
+
+                // Increase in growth speed is less from blockpos bonuses adjacent to the crop
+                if (i != 0 || j != 0) {
+                    f1 /= 4.0F;
+                }
+
+                f += f1;
+            }
         }
-        return false;
+
+        BlockPos blockpos1 = pPos.north();
+        BlockPos blockpos2 = pPos.south();
+        BlockPos blockpos3 = pPos.west();
+        BlockPos blockpos4 = pPos.east();
+        boolean flag = pLevel.getBlockState(blockpos3).is(pBlock) || pLevel.getBlockState(blockpos4).is(pBlock);
+        boolean flag1 = pLevel.getBlockState(blockpos1).is(pBlock) || pLevel.getBlockState(blockpos2).is(pBlock);
+        // Reduce if crop growth rate if surrounded by same crop in all directions
+        if (flag && flag1) {
+            f /= 2.0F;
+        } else {
+            // If next to one other crop of same type reduce growth rate
+            boolean flag2 = pLevel.getBlockState(blockpos3.north()).is(pBlock) || pLevel.getBlockState(blockpos4.north()).is(pBlock) || pLevel.getBlockState(blockpos4.south()).is(pBlock) || pLevel.getBlockState(blockpos3.south()).is(pBlock);
+            if (flag2) {
+                f /= 2.0F;
+            }
+        }
+
+        // Homozygous recessive gives growth rate boost
+        if (GENES.containsKey(GROWTH_SPEED)) {
+            if (isRecessive(GENES.get(GROWTH_SPEED))) {
+                f *= 4;
+            }
+        }
+
+        return f;
     }
 }

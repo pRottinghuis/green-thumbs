@@ -32,12 +32,9 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
     public static ModelProperty<Integer> AGE = new ModelProperty<>();
     public static ModelProperty<String> CROP_TYPE = new ModelProperty<>();
 
-    int MAX_AGE = 7;
-
-
     private int age;
 
-    private Genome genome = new Genome();
+    private Genome genome;
 
     public GTCropBlockEntity(BlockPos pos, BlockState state) {
         super(GTBlockEntities.GT_CROP_ENTITY.get(), pos, state);
@@ -81,7 +78,11 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
     }
 
     public void setAge(int age) {
+        if (this.age == age) {
+            return;
+        }
         this.age = age;
+        markUpdated();
     }
 
     public boolean isMaxAge() {
@@ -103,8 +104,8 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
     }
 
     public void markUpdated() {
-        requestModelDataUpdate();
         setChanged();
+        // server sends packet to client. client recieves entity data from getUpdateTag
         level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_ALL);
     }
 
@@ -123,6 +124,7 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
     public void handleUpdateTag(CompoundTag tag) {
         if (tag != null) {
             readStandardNBT(tag);
+            requestModelDataUpdate();
         }
     }
 
@@ -140,7 +142,7 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
         if (nbt.contains(NBTTags.INFO_TAG)) {
             CompoundTag saveTag = nbt.getCompound(NBTTags.INFO_TAG);
             if (saveTag.contains(NBTTags.GENOME_TAG)) {
-                this.genome.setGenomeFromTag(saveTag);
+                this.genome = new Genome(saveTag.getCompound(NBTTags.GENOME_TAG));
             }
             if (saveTag.contains(NBTTags.CROP_SPECIES_TAG)) {
                 this.cropSpecies = GTCropSpecies.CROP_SPECIES_REGISTRY.get().getValue(new ResourceLocation(saveTag.getString(NBTTags.CROP_SPECIES_TAG)));

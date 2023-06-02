@@ -1,10 +1,11 @@
-package com.cfrishausen.greenthumbs.crop;
+package com.cfrishausen.greenthumbs.crop.species;
 
 import com.cfrishausen.greenthumbs.block.custom.GTSimpleCropBlock;
 import com.cfrishausen.greenthumbs.block.entity.GTCropBlockEntity;
+import com.cfrishausen.greenthumbs.crop.ICropEntity;
+import com.cfrishausen.greenthumbs.crop.ICropSpecies;
+import com.cfrishausen.greenthumbs.crop.NBTTags;
 import com.cfrishausen.greenthumbs.genetics.Genome;
-import com.cfrishausen.greenthumbs.genetics.genes.Gene;
-import com.cfrishausen.greenthumbs.genetics.genes.GrowthSpeedGene;
 import com.cfrishausen.greenthumbs.item.custom.GTGenomeCropBlockItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -15,10 +16,12 @@ import net.minecraft.world.Containers;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,10 +51,11 @@ public class BasicCrop implements ICropSpecies {
     }
 
     @Override
-    public Map<String, Gene> defineGenome() {
-        Map<String, Gene> genes = new HashMap<>();
-        genes.put(Genome.GROWTH_SPEED, new GrowthSpeedGene("Gg"));
-        return genes;
+    public Genome defineGenome() {
+        Map<String, String> genes = new HashMap<>();
+        genes.put(Genome.GROWTH_SPEED, "Gg");
+        genes.put(Genome.TEMPERATURE_PREFERENCE, "Tt");
+        return new Genome(genes);
     }
 
     @Override
@@ -84,10 +88,12 @@ public class BasicCrop implements ICropSpecies {
         if (pState.getBlock() == block) //Forge: This function is called during world gen and placement, before this block is set, so if we are not 'here' then assume it's the pre-check.
             return pLevel.getBlockState(blockpos).canSustainPlant(pLevel, blockpos, Direction.UP, (GTSimpleCropBlock) block);
         if (pLevel.getBlockEntity(pPos) instanceof GTCropBlockEntity cropEntity) {
-            return cropEntity.getCropSpecies().mayPlaceOn(pLevel.getBlockState(blockpos));
+            return pLevel.getRawBrightness(pPos, 0) >= 8 && cropEntity.getCropSpecies().mayPlaceOn(pLevel.getBlockState(blockpos));
         }
         return false;
     }
+
+
 
     @Override
     public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random, GTSimpleCropBlock block, ICropEntity crop) {
@@ -96,15 +102,11 @@ public class BasicCrop implements ICropSpecies {
         if (level.getRawBrightness(pos, 0) >= 9) {
             int i = crop.getAge();
             if (i < crop.getMaxAge()) {
-                GrowthSpeedGene growthSpeedGene = (GrowthSpeedGene) crop.getGenome().getGene(Genome.GROWTH_SPEED);
-                if (growthSpeedGene != null) {
-                    float f = growthSpeedGene.getGrowthSpeed(block, level, pos);
-                    if (net.minecraftforge.common.ForgeHooks.onCropsGrowPre(level, pos, state, random.nextInt((int) (25.0F / f) + 1) == 0)) {
-                        crop.setAge(crop.getAge() + 1);
-                        net.minecraftforge.common.ForgeHooks.onCropsGrowPost(level, pos, state);
-                    }
+                float f = crop.getGenome().getGrowthSpeed(block, level, pos);
+                if (net.minecraftforge.common.ForgeHooks.onCropsGrowPre(level, pos, state, random.nextInt((int) (25.0F / f) + 1) == 0)) {
+                    crop.setAge(crop.getAge() + 1);
+                    net.minecraftforge.common.ForgeHooks.onCropsGrowPost(level, pos, state);
                 }
-
             }
         }
     }
@@ -132,7 +134,23 @@ public class BasicCrop implements ICropSpecies {
     }
 
     @Override
+    public VoxelShape[] getVoxelShapes() {
+        return new VoxelShape[]{Block.box(0.0D, 0.0D, 0.0D, 16.0D, 2.0D, 16.0D),
+                Block.box(0.0D, 0.0D, 0.0D, 16.0D, 4.0D, 16.0D),
+                Block.box(0.0D, 0.0D, 0.0D, 16.0D, 6.0D, 16.0D),
+                Block.box(0.0D, 0.0D, 0.0D, 16.0D, 8.0D, 16.0D),
+                Block.box(0.0D, 0.0D, 0.0D, 16.0D, 10.0D, 16.0D),
+                Block.box(0.0D, 0.0D, 0.0D, 16.0D, 12.0D, 16.0D),
+                Block.box(0.0D, 0.0D, 0.0D, 16.0D, 14.0D, 16.0D),
+                Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16.0D, 16.0D)};
+    }
+
+    @Override
     public int getMaxAge() {
         return this.maxAge;
+    }
+
+    public GTGenomeCropBlockItem getBaseItemId() {
+        return this.seed;
     }
 }

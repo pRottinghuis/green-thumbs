@@ -1,15 +1,11 @@
 package com.cfrishausen.greenthumbs.data;
 
-import com.cfrishausen.greenthumbs.crop.BasicCrop;
-import com.cfrishausen.greenthumbs.crop.ICropSpecies;
 import com.cfrishausen.greenthumbs.registries.GTCropSpecies;
 import com.cfrishausen.greenthumbs.registries.GTItems;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 
 import java.util.function.Consumer;

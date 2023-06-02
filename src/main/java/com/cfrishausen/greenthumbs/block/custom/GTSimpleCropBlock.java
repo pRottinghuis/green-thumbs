@@ -3,11 +3,13 @@ package com.cfrishausen.greenthumbs.block.custom;
 import com.cfrishausen.greenthumbs.block.entity.GTCropBlockEntity;
 import com.cfrishausen.greenthumbs.registries.GTItems;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
@@ -24,7 +26,7 @@ import net.minecraftforge.common.PlantType;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Type of crop with only one harvestable item and no seeds. The crop is replanted from the one harvestable item. Ex. carrots, potatoes
+ * Visual aspect of the crop.
  */
 public class GTSimpleCropBlock extends Block implements IPlantable, BonemealableBlock, EntityBlock {
 
@@ -63,10 +65,10 @@ public class GTSimpleCropBlock extends Block implements IPlantable, Bonemealable
 
 
     @Override
-    public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
-        BlockEntity entity = pLevel.getBlockEntity(pPos);
+    public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+        BlockEntity entity = level.getBlockEntity(pos);
         if (entity instanceof GTCropBlockEntity cropEntity) {
-            cropEntity.getCropSpecies().canSurvive(pState, pLevel, pPos, this);
+            return cropEntity.getCropSpecies().canSurvive(state, level, pos, this);
         }
         return false;
     }
@@ -138,4 +140,15 @@ public class GTSimpleCropBlock extends Block implements IPlantable, Bonemealable
         return new GTCropBlockEntity(pos, state);
     }
 
+    @Override
+    public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
+        BlockEntity entity = level.getBlockEntity(pos);
+        if (entity instanceof GTCropBlockEntity cropEntity) {
+            ItemStack stack = new ItemStack(cropEntity.getCropSpecies().getBaseItemId());
+            stack.setTag(cropEntity.getUpdateTag());
+            return stack;
+        } else {
+            return super.getCloneItemStack(level, pos, state);
+        }
+    }
 }

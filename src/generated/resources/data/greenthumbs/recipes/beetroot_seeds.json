@@ -8,6 +8,6 @@
   ],
   "result": {
     "item": "greenthumbs:beetroot_seeds",
-    "nbt": "{\"greenthumbs.Info\": {\"greenthumbs.Genome\": {\"growth-speed\": \"Gg\"}, \"greenthumbs.Age\": 0, \"greenthumbs.CropSpecies\": \"greenthumbs:gt_beetroot\"}}"
+    "nbt": "{\"greenthumbs.Info\": {\"greenthumbs.Genome\": {\"temperature-preference\": \"Tt\", \"growth-speed\": \"Gg\"}, \"greenthumbs.Age\": 0, \"greenthumbs.CropSpecies\": \"greenthumbs:gt_beetroot\"}}"
   }
 }
