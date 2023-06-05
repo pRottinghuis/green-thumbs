@@ -18,6 +18,8 @@ public interface ICropEntity {
 
     int getMaxAge();
 
+    ICropSpecies getCropSpecies();
+
     /**
      *  Update fields from nbt
      */

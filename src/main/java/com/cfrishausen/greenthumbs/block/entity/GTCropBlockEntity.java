@@ -90,17 +90,13 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
     }
 
     public void growCrops(Level pLevel) {
-        int i = this.getAge() + this.getBonemealAgeIncrease(pLevel);
+        int i = this.getAge() + this.cropSpecies.getBonemealAgeIncrease(pLevel);
         int j = this.getMaxAge();
         if (i > j) {
             i = j;
         }
         this.age = i;
         markUpdated();
-    }
-
-    private int getBonemealAgeIncrease(Level pLevel) {
-        return Mth.nextInt(pLevel.random, 2, 5);
     }
 
     public void markUpdated() {
@@ -168,7 +164,6 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
         // This is called client side: remember the current state of the values that we're interested in
         int oldAge = this.age;
         Genome oldGenome = this.genome;
-        ICropSpecies oldSpecies = this.cropSpecies;
 
         CompoundTag tag = pkt.getTag();
         // This will call loadClientData()
@@ -187,5 +182,11 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
 
     public Genome getGenome() {
         return genome;
+    }
+
+    @Override
+    public String toString() {
+        String result = "CropBlockEntity at : " + this.getBlockPos() + " ";
+        return result + this.getUpdateTag().toString();
     }
 }

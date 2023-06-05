@@ -3,6 +3,7 @@ package com.cfrishausen.greenthumbs.item.custom;
 import com.cfrishausen.greenthumbs.block.entity.GTCropBlockEntity;
 import com.cfrishausen.greenthumbs.crop.NBTTags;
 import com.cfrishausen.greenthumbs.genetics.Genome;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -38,7 +39,7 @@ public class GTDebugStick extends Item {
                     if (updateTag.contains(NBTTags.GENOME_TAG)) {
                         CompoundTag genomeTag = updateTag.getCompound(NBTTags.GENOME_TAG);
                         genomeTag.getAllKeys().forEach(geneKey -> {
-                            player.sendSystemMessage(Component.literal(geneKey + ": " + genomeTag.getString(geneKey)));
+                            player.sendSystemMessage(Component.literal(geneKey + ": " + genomeTag.getString(geneKey)).withStyle(style -> style.withColor(ChatFormatting.GREEN)));
                         });
                     }
                 }

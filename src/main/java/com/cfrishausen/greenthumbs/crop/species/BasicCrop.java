@@ -1,5 +1,6 @@
 package com.cfrishausen.greenthumbs.crop.species;
 
+import com.cfrishausen.greenthumbs.GreenThumbs;
 import com.cfrishausen.greenthumbs.block.custom.GTSimpleCropBlock;
 import com.cfrishausen.greenthumbs.block.entity.GTCropBlockEntity;
 import com.cfrishausen.greenthumbs.crop.ICropEntity;
@@ -11,44 +12,46 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class BasicCrop implements ICropSpecies {
 
+    private static final VoxelShape[] SHAPE_BY_AGE = new VoxelShape[]{Block.box(0.0D, 0.0D, 0.0D, 16.0D, 2.0D, 16.0D),
+            Block.box(0.0D, 0.0D, 0.0D, 16.0D, 4.0D, 16.0D),
+            Block.box(0.0D, 0.0D, 0.0D, 16.0D, 6.0D, 16.0D),
+            Block.box(0.0D, 0.0D, 0.0D, 16.0D, 8.0D, 16.0D),
+            Block.box(0.0D, 0.0D, 0.0D, 16.0D, 10.0D, 16.0D),
+            Block.box(0.0D, 0.0D, 0.0D, 16.0D, 12.0D, 16.0D),
+            Block.box(0.0D, 0.0D, 0.0D, 16.0D, 14.0D, 16.0D),
+            Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16.0D, 16.0D)};
+
     private GTGenomeCropBlockItem seed;
     private Item crop;
-    private int maxAge;
+    private final int MAX_AGE = 7;
 
-    public BasicCrop(GTGenomeCropBlockItem seeds, Item crop, int maxAge) {
+    public BasicCrop(GTGenomeCropBlockItem seeds, Item crop) {
         this.seed =seeds;
         this.crop = crop;
-        if (maxAge > 0) {
-            this.maxAge = maxAge;
-        } else {
-            this.maxAge = 7;
-        }
     }
 
     /**
      * used for default age 7 crop
      */
-    public BasicCrop(GTGenomeCropBlockItem seeds, Item crop) {
-        this(seeds, crop, 7);
-    }
 
     @Override
     public Genome defineGenome() {
@@ -96,15 +99,15 @@ public class BasicCrop implements ICropSpecies {
 
 
     @Override
-    public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random, GTSimpleCropBlock block, ICropEntity crop) {
+    public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random, GTSimpleCropBlock block, ICropEntity cropEntity) {
         if (!level.isAreaLoaded(pos, 1))
             return; // Forge: prevent loading unloaded chunks when checking neighbor's light
         if (level.getRawBrightness(pos, 0) >= 9) {
-            int i = crop.getAge();
-            if (i < crop.getMaxAge()) {
-                float f = crop.getGenome().getGrowthSpeed(block, level, pos);
+            int i = cropEntity.getAge();
+            if (i < cropEntity.getMaxAge()) {
+                float f = cropEntity.getGenome().getGrowthSpeed(block, level, pos);
                 if (net.minecraftforge.common.ForgeHooks.onCropsGrowPre(level, pos, state, random.nextInt((int) (25.0F / f) + 1) == 0)) {
-                    crop.setAge(crop.getAge() + 1);
+                    cropEntity.setAge(cropEntity.getAge() + 1);
                     net.minecraftforge.common.ForgeHooks.onCropsGrowPost(level, pos, state);
                 }
             }
@@ -134,23 +137,25 @@ public class BasicCrop implements ICropSpecies {
     }
 
     @Override
-    public VoxelShape[] getVoxelShapes() {
-        return new VoxelShape[]{Block.box(0.0D, 0.0D, 0.0D, 16.0D, 2.0D, 16.0D),
-                Block.box(0.0D, 0.0D, 0.0D, 16.0D, 4.0D, 16.0D),
-                Block.box(0.0D, 0.0D, 0.0D, 16.0D, 6.0D, 16.0D),
-                Block.box(0.0D, 0.0D, 0.0D, 16.0D, 8.0D, 16.0D),
-                Block.box(0.0D, 0.0D, 0.0D, 16.0D, 10.0D, 16.0D),
-                Block.box(0.0D, 0.0D, 0.0D, 16.0D, 12.0D, 16.0D),
-                Block.box(0.0D, 0.0D, 0.0D, 16.0D, 14.0D, 16.0D),
-                Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16.0D, 16.0D)};
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context, ICropEntity cropEntity) {
+        if (this.SHAPE_BY_AGE[cropEntity.getAge()] != null) {
+            return this.SHAPE_BY_AGE[cropEntity.getAge()];
+        }
+        GreenThumbs.LOGGER.warn("BasicCrop species does not have a voxel shape for {} for age {}", cropEntity, cropEntity.getAge());
+        return this.SHAPE_BY_AGE[0];
     }
 
     @Override
     public int getMaxAge() {
-        return this.maxAge;
+        return this.MAX_AGE;
     }
 
     public GTGenomeCropBlockItem getBaseItemId() {
         return this.seed;
+    }
+
+    @Override
+    public int getBonemealAgeIncrease(Level level) {
+        return Mth.nextInt(level.random, 2, 5);
     }
 }

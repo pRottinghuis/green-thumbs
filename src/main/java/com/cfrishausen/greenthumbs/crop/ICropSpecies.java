@@ -3,20 +3,21 @@ package com.cfrishausen.greenthumbs.crop;
 import com.cfrishausen.greenthumbs.block.custom.GTSimpleCropBlock;
 import com.cfrishausen.greenthumbs.genetics.Genome;
 import com.cfrishausen.greenthumbs.item.custom.GTGenomeCropBlockItem;
+import com.cfrishausen.greenthumbs.registries.GTCropSpecies;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-
-import java.util.Map;
 
 /**
  * ICropSpecies defines functionality for making a new crop species. Each crop species contains functionality that is unique to a certain crop.
@@ -73,6 +74,7 @@ public interface ICropSpecies {
         cropStack.getOrCreateTag().put(NBTTags.INFO_TAG, infoTag);
         infoTag.put(NBTTags.GENOME_TAG, crop.getGenome().writeTag());
         infoTag.putInt(NBTTags.AGE_TAG, 0);
+        infoTag.putString(NBTTags.CROP_SPECIES_TAG, GTCropSpecies.CROP_SPECIES_REGISTRY.get().getKey(crop.getCropSpecies()).toString());
         return cropStack;
     }
 
@@ -84,14 +86,14 @@ public interface ICropSpecies {
     /**
      * What does crop need to do on a tick
      */
-    void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random, GTSimpleCropBlock block, ICropEntity crop);
+    void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random, GTSimpleCropBlock block, ICropEntity cropEntity);
 
     /**
      * Set the voxel shape for the crop
      * Number of shapes in the array must match the max age + 1 of the crop
      * @return
      */
-    VoxelShape[] getVoxelShapes();
+    VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context, ICropEntity cropEntity);
 
     /**
      * Used when figuring out clone block in creative ie middle mouse click
@@ -100,4 +102,6 @@ public interface ICropSpecies {
     GTGenomeCropBlockItem getBaseItemId();
 
     int getMaxAge();
+
+    int getBonemealAgeIncrease(Level level);
 }

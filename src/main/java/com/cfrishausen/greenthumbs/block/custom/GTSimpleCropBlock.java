@@ -3,7 +3,6 @@ package com.cfrishausen.greenthumbs.block.custom;
 import com.cfrishausen.greenthumbs.block.entity.GTCropBlockEntity;
 import com.cfrishausen.greenthumbs.registries.GTItems;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
@@ -37,9 +36,9 @@ public class GTSimpleCropBlock extends Block implements IPlantable, Bonemealable
     }
 
     @Override
-    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
-        if (pLevel.getBlockEntity(pPos) instanceof GTCropBlockEntity cropBlock) {
-            return SHAPE_BY_AGE[cropBlock.getAge()];
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        if (level.getBlockEntity(pos) instanceof GTCropBlockEntity cropEntity) {
+            return cropEntity.getCropSpecies().getShape(state, level, pos, context, cropEntity);
         }
         return SHAPE_BY_AGE[0];
     }
