@@ -8,6 +8,6 @@
   ],
   "result": {
     "item": "greenthumbs:wheat_seeds",
-    "nbt": "{\"greenthumbs.Info\": {\"greenthumbs.Genome\": {\"temperature-preference\": \"Tt\", \"growth-speed\": \"Gg\"}, \"greenthumbs.Age\": 0, \"greenthumbs.CropSpecies\": \"greenthumbs:gt_wheat\"}}"
+    "nbt": "{\"greenthumbs.Info\": {\"greenthumbs.Genome\": {\"temperature-preference\": \"Tt\", \"mutativity\": \"Mm\", \"growth-speed\": \"Gg\"}, \"greenthumbs.Age\": 0, \"greenthumbs.CropSpecies\": \"greenthumbs:gt_wheat\"}}"
   }
 }

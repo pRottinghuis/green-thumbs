@@ -17,9 +17,14 @@ public class GTItems {
     public static final RegistryObject<Item> GT_DEBUG_STICK = ITEMS.register("gt_debug_stick", () -> new GTDebugStick(new Item.Properties()));
 
     public static final RegistryObject<GTGenomeCropBlockItem> CARROT_SEEDS = registerGenomeBlockItem("carrot_seeds", GTBlocks.GT_CROP_BLOCK);
+    public static final RegistryObject<GTGenomeCropBlockItem> CARROT_CUTTING = registerGenomeBlockItem("carrot_cutting", GTBlocks.GT_CROP_BLOCK);
     public static final RegistryObject<GTGenomeCropBlockItem> WHEAT_SEEDS = registerGenomeBlockItem("wheat_seeds", GTBlocks.GT_CROP_BLOCK);
+    public static final RegistryObject<GTGenomeCropBlockItem> WHEAT_CUTTING = registerGenomeBlockItem("wheat_cutting", GTBlocks.GT_CROP_BLOCK);
+
     public static final RegistryObject<GTGenomeCropBlockItem> POTATO_SEEDS = registerGenomeBlockItem("potato_seeds", GTBlocks.GT_CROP_BLOCK);
+    public static final RegistryObject<GTGenomeCropBlockItem> POTATO_CUTTING = registerGenomeBlockItem("potato_cutting", GTBlocks.GT_CROP_BLOCK);
     public static final RegistryObject<GTGenomeCropBlockItem> BEETROOT_SEEDS = registerGenomeBlockItem("beetroot_seeds", GTBlocks.GT_CROP_BLOCK);
+    public static final RegistryObject<GTGenomeCropBlockItem> BEETROOT_CUTTING = registerGenomeBlockItem("beetroot_cutting", GTBlocks.GT_CROP_BLOCK);
 
 
     public static RegistryObject<GTGenomeCropBlockItem> registerGenomeBlockItem(String path, RegistryObject<? extends Block> block) {

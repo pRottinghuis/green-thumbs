@@ -2,6 +2,7 @@ package com.cfrishausen.greenthumbs.genetics;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -13,6 +14,8 @@ public class Genome {
 
     public static final String GROWTH_SPEED = "growth-speed";
     public static final String TEMPERATURE_PREFERENCE = "temperature-preference";
+
+    public static final String MUTATIVITY = "mutativity";
 
     private final Map<String, String> GENES = new HashMap<>();
 
@@ -30,6 +33,48 @@ public class Genome {
         CompoundTag geneTag = new CompoundTag();
         for (String geneName : GENES.keySet()) {
             geneTag.putString(geneName, GENES.get(geneName));
+        }
+        return geneTag;
+    }
+
+    /**
+     * Pick random allele in each gene and assign it a random allele.
+     * Simulates reproduction through pollination would have a genome where each gene has one allele from this plant and another random one from another plant.
+     */
+    public CompoundTag writeReproductionTag(RandomSource random) {
+        CompoundTag geneTag = new CompoundTag();
+        for (String geneName : GENES.keySet()) {
+            char[] alleles = GENES.get(geneName).toCharArray();
+            int posForNewAllele = random.nextInt(2);
+            if (random.nextBoolean()) {
+                alleles[posForNewAllele] = Character.toUpperCase(alleles[posForNewAllele]);
+            } else {
+                alleles[posForNewAllele] = Character.toLowerCase(alleles[posForNewAllele]);
+            }
+            geneTag.putString(geneName, String.valueOf(alleles));
+        }
+        return geneTag;
+    }
+
+    public CompoundTag writeCuttingTag(RandomSource random) {
+        CompoundTag geneTag = new CompoundTag();
+        for (String geneName : GENES.keySet()) {
+            String gene = GENES.get(geneName);
+            // Probability of a gene mutating
+            if (random.nextDouble() < mutationChance()) {
+                // Pick allele to mutate
+                int alleleForMutation = random.nextInt(2);
+                char[] alleles = gene.toCharArray();
+                // Swap case of allele for mutation
+                if (Character.isUpperCase(alleles[alleleForMutation])) {
+                    alleles[alleleForMutation] = Character.toLowerCase(alleles[alleleForMutation]);
+                } else {
+                    alleles[alleleForMutation] = Character.toUpperCase(alleles[alleleForMutation]);
+                }
+                geneTag.putString(geneName, String.valueOf(alleles));
+            } else {
+                geneTag.putString(geneName, GENES.get(geneName));
+            }
         }
         return geneTag;
     }
@@ -94,5 +139,15 @@ public class Genome {
         }
 
         return f;
+    }
+
+    public double mutationChance() {
+        // % how likely is to mutate
+        double mutationChance = 0.7;
+        if (isRecessive(GENES.get(MUTATIVITY))) {
+            // mutation chance is reduced by __ % when recessive trait is expressed
+            mutationChance *= 0.5;
+        }
+        return mutationChance;
     }
 }

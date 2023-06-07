@@ -19,5 +19,10 @@ public class GTLanguageProvider extends LanguageProvider {
         this.add(GTItems.POTATO_SEEDS.get(), "Potato Seeds");
         this.add(GTItems.BEETROOT_SEEDS.get(), "Beetroot Seeds");
 
+        this.add(GTItems.WHEAT_CUTTING.get(), "Wheat Cutting");
+        this.add(GTItems.CARROT_CUTTING.get(), "Carrot Cutting");
+        this.add(GTItems.POTATO_CUTTING.get(), "Potato Cutting");
+        this.add(GTItems.BEETROOT_CUTTING.get(), "Beetroot Cutting");
+
     }
 }

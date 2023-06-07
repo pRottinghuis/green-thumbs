@@ -21,8 +21,8 @@ public class BeetrootCrop extends BasicCrop{
 
     private static final VoxelShape[] SHAPE_BY_AGE = new VoxelShape[]{Block.box(0.0D, 0.0D, 0.0D, 16.0D, 2.0D, 16.0D), Block.box(0.0D, 0.0D, 0.0D, 16.0D, 4.0D, 16.0D), Block.box(0.0D, 0.0D, 0.0D, 16.0D, 6.0D, 16.0D), Block.box(0.0D, 0.0D, 0.0D, 16.0D, 8.0D, 16.0D)};
 
-    public BeetrootCrop(GTGenomeCropBlockItem seeds, Item crop) {
-        super(seeds, crop);
+    public BeetrootCrop(GTGenomeCropBlockItem seeds, Item crop, GTGenomeCropBlockItem cutting) {
+        super(seeds, crop, cutting);
     }
 
     @Override

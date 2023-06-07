@@ -19,6 +19,7 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
@@ -43,10 +44,12 @@ public class BasicCrop implements ICropSpecies {
     private GTGenomeCropBlockItem seed;
     private Item crop;
     private final int MAX_AGE = 7;
+    private GTGenomeCropBlockItem cutting;
 
-    public BasicCrop(GTGenomeCropBlockItem seeds, Item crop) {
+    public BasicCrop(GTGenomeCropBlockItem seeds, Item crop, GTGenomeCropBlockItem cutting) {
         this.seed =seeds;
         this.crop = crop;
+        this.cutting = cutting;
     }
 
     /**
@@ -58,17 +61,18 @@ public class BasicCrop implements ICropSpecies {
         Map<String, String> genes = new HashMap<>();
         genes.put(Genome.GROWTH_SPEED, "Gg");
         genes.put(Genome.TEMPERATURE_PREFERENCE, "Tt");
+        genes.put(Genome.MUTATIVITY, "Mm");
         return new Genome(genes);
     }
 
     @Override
-    public ItemStack allAgeDrop(ICropEntity crop) {
-        return getStackWithReplantTag(crop, this.seed);
+    public ItemStack allAgeDrop(ICropEntity crop, RandomSource random) {
+        return getStackWithReplantTag(crop, this.seed, random);
     }
 
     @Override
-    public ItemStack maxAgeDrop(ICropEntity crop) {
-        return getStackWithReplantTag(crop, this.crop);
+    public ItemStack maxAgeDrop(ICropEntity crop, RandomSource random) {
+        return new ItemStack(this.crop);
     }
 
     @Override
@@ -115,10 +119,10 @@ public class BasicCrop implements ICropSpecies {
     }
 
     // TODO add fortune drops
-    public ItemStack drops(ICropEntity crop, Level level, BlockPos pos, boolean quickReplant) {
+    public ItemStack drops(ICropEntity cropEntity, Level level, BlockPos pos, boolean quickReplant) {
         SimpleContainer drops = new SimpleContainer(2);
         // default item that all crops drop regardless of age
-        ItemStack allAgeDropStack = allAgeDrop(crop);
+        ItemStack allAgeDropStack = allAgeDrop(cropEntity, level.getRandom());
         ItemStack cropReplantStack = null;
         if (quickReplant) {
             // Set crop for return and reduce drop stack
@@ -129,8 +133,8 @@ public class BasicCrop implements ICropSpecies {
         }
         drops.setItem(0, allAgeDropStack);
         // Add crop max age drop
-        if (crop.isMaxAge()) {
-            drops.setItem(1, maxAgeDrop(crop));
+        if (cropEntity.isMaxAge()) {
+            drops.setItem(1, maxAgeDrop(cropEntity, level.getRandom()));
         }
         Containers.dropContents(level, pos, drops);
         return cropReplantStack;
@@ -157,5 +161,20 @@ public class BasicCrop implements ICropSpecies {
     @Override
     public int getBonemealAgeIncrease(Level level) {
         return Mth.nextInt(level.random, 2, 5);
+    }
+
+    @Override
+    public GTGenomeCropBlockItem getSeed() {
+        return this.seed;
+    }
+
+    @Override
+    public ItemLike getCrop() {
+        return this.crop;
+    }
+
+    @Override
+    public GTGenomeCropBlockItem getCutting() {
+        return this.cutting;
     }
 }

@@ -72,7 +72,7 @@ public class GTGenomeCropBlockItem extends ItemNameBlockItem {
             ICropSpecies cropSpecies = GTCropSpecies.CROP_SPECIES_REGISTRY.get().getValue(new ResourceLocation(saveTag.getString(NBTTags.CROP_SPECIES_TAG)));
             return cropSpecies.canSurvive(pState, pContext.getLevel(), pContext.getClickedPos(), this.getBlock());
         } else {
-            player.sendSystemMessage(Component.literal("Seed has no genome").withStyle(style -> style.withColor(ChatFormatting.RED)));
+            player.sendSystemMessage(Component.literal("Seed has no species").withStyle(style -> style.withColor(ChatFormatting.RED)));
         }
         return false;
     }

@@ -11,6 +11,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
@@ -49,12 +50,12 @@ public interface ICropSpecies {
     /**
      * @return Item stack of what crop should drop when broken at all ages and that is meant for re-planting the crop
      */
-    ItemStack allAgeDrop(ICropEntity crop);
+    ItemStack allAgeDrop(ICropEntity crop, RandomSource random);
 
     /**
      * @return Item stack of what should drop when crop broken at max age
      */
-    ItemStack maxAgeDrop(ICropEntity crop);
+    ItemStack maxAgeDrop(ICropEntity crop, RandomSource random);
 
 
     /**
@@ -68,11 +69,21 @@ public interface ICropSpecies {
      * @param item  What item to make item stack for
      * @return New item stack with genome tag from the crop entity
      */
-    default ItemStack getStackWithReplantTag(ICropEntity crop, Item item) {
+    default ItemStack getStackWithReplantTag(ICropEntity crop, Item item, RandomSource random) {
         ItemStack cropStack = new ItemStack(item, 1);
         CompoundTag infoTag = new CompoundTag();
         cropStack.getOrCreateTag().put(NBTTags.INFO_TAG, infoTag);
-        infoTag.put(NBTTags.GENOME_TAG, crop.getGenome().writeTag());
+        infoTag.put(NBTTags.GENOME_TAG, crop.getGenome().writeReproductionTag(random));
+        infoTag.putInt(NBTTags.AGE_TAG, 0);
+        infoTag.putString(NBTTags.CROP_SPECIES_TAG, GTCropSpecies.CROP_SPECIES_REGISTRY.get().getKey(crop.getCropSpecies()).toString());
+        return cropStack;
+    }
+
+    default ItemStack getStackWithCuttingTag(ICropEntity crop, Item item, RandomSource random) {
+        ItemStack cropStack = new ItemStack(item, 1);
+        CompoundTag infoTag = new CompoundTag();
+        cropStack.getOrCreateTag().put(NBTTags.INFO_TAG, infoTag);
+        infoTag.put(NBTTags.GENOME_TAG, crop.getGenome().writeCuttingTag(random));
         infoTag.putInt(NBTTags.AGE_TAG, 0);
         infoTag.putString(NBTTags.CROP_SPECIES_TAG, GTCropSpecies.CROP_SPECIES_REGISTRY.get().getKey(crop.getCropSpecies()).toString());
         return cropStack;
@@ -104,4 +115,10 @@ public interface ICropSpecies {
     int getMaxAge();
 
     int getBonemealAgeIncrease(Level level);
+
+    GTGenomeCropBlockItem getSeed();
+
+    ItemLike getCrop();
+
+    GTGenomeCropBlockItem getCutting();
 }

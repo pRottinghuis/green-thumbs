@@ -1,13 +1,14 @@
 package com.cfrishausen.greenthumbs.block.custom;
 
 import com.cfrishausen.greenthumbs.block.entity.GTCropBlockEntity;
+import com.cfrishausen.greenthumbs.crop.ICropSpecies;
 import com.cfrishausen.greenthumbs.registries.GTItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.*;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -22,6 +23,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.PlantType;
+import net.minecraftforge.common.Tags;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -44,21 +46,36 @@ public class GTSimpleCropBlock extends Block implements IPlantable, Bonemealable
     }
 
     @Override
-    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
-        if (!pLevel.isClientSide()) {
-            boolean isDebugStick = pPlayer.getItemInHand(InteractionHand.MAIN_HAND).is(GTItems.GT_DEBUG_STICK.get());
-            // Allow debug stick to work on grown plant without quick replant
-            if (!isDebugStick) {
-                // quick replant from harvest implementation
-                BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if (!level.isClientSide()) {
+            ItemStack handStack = player.getMainHandItem();
+
+            if (handStack.is(Tags.Items.SHEARS)) {
+                BlockEntity blockEntity = level.getBlockEntity(pos);
                 if (blockEntity instanceof GTCropBlockEntity cropEntity) {
                     if (cropEntity.isMaxAge()) {
-                        cropEntity.getCropSpecies().quickReplant(pState, pLevel, pPos, cropEntity);
+                        SimpleContainer drops = new SimpleContainer(1);
+                        ICropSpecies cropSpecies = cropEntity.getCropSpecies();
+                        ItemStack cuttingStack = cropSpecies.getStackWithCuttingTag(cropEntity, cropSpecies.getCutting(), level.getRandom());
+                        drops.addItem(cuttingStack);
+                        cropEntity.setAge(0);
+                        Containers.dropContents(level, pos, drops);
+                    }
+                }
+            } else {
+                // Don't Quick Replant on debug stick
+                if (!handStack.is(GTItems.GT_DEBUG_STICK.get())) {
+                    // quick replant from harvest implementation
+                    BlockEntity blockEntity = level.getBlockEntity(pos);
+                    if (blockEntity instanceof GTCropBlockEntity cropEntity) {
+                        if (cropEntity.isMaxAge()) {
+                            cropEntity.getCropSpecies().quickReplant(state, level, pos, cropEntity);
+                        }
                     }
                 }
             }
         }
-        return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
+        return super.use(state, level, pos, player, hand, hit);
     }
 
 
