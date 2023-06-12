@@ -6,9 +6,11 @@ import com.cfrishausen.greenthumbs.crop.NBTTags;
 import com.cfrishausen.greenthumbs.genetics.Genome;
 import com.cfrishausen.greenthumbs.registries.GTCropSpecies;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -47,20 +49,26 @@ public class GTGenomeCropBlockItem extends ItemNameBlockItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltip, TooltipFlag pFlag) {
-        if (pStack.hasTag()) {
-            CompoundTag tag = pStack.getTag();
-            if (tag.contains(NBTTags.INFO_TAG)) {
-                CompoundTag genomeTag = tag.getCompound(NBTTags.INFO_TAG).getCompound(NBTTags.GENOME_TAG);
-                // Add genes for tooltip based on what is in nbt tag
-                for (String genomeTagKey : genomeTag.getAllKeys()) {
-                    String geneStr = genomeTag.getString(genomeTagKey);
-                    pTooltip.add(Component.literal(genomeTagKey + ": " + geneStr).withStyle(style -> style.withColor(ChatFormatting.GREEN)));
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltips, TooltipFlag flag) {
+        if (level != null && level.isClientSide()) {
+            if (Screen.hasShiftDown()) {
+                if (stack.hasTag()) {
+                    CompoundTag tag = stack.getTag();
+                    if (tag.contains(NBTTags.INFO_TAG)) {
+                        CompoundTag genomeTag = tag.getCompound(NBTTags.INFO_TAG).getCompound(NBTTags.GENOME_TAG);
+                        // Add genes for tooltip based on what is in nbt tag
+                        for (String genomeTagKey : genomeTag.getAllKeys()) {
+                            String geneStr = genomeTag.getString(genomeTagKey);
+                            tooltips.add(Component.translatable(genomeTagKey).append(Component.literal(": " + geneStr)).withStyle(style -> style.withColor(ChatFormatting.GREEN)));
+                        }
+                    }
                 }
             }
         }
-        super.appendHoverText(pStack, pLevel, pTooltip, pFlag);
+        super.appendHoverText(stack, level, tooltips, flag);
     }
+
+
 
     @Override
     protected boolean canPlace(BlockPlaceContext pContext, BlockState pState) {

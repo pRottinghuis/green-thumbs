@@ -1,4 +1,5 @@
 {
+  "growth-speed": "Growth Speed",
   "item.greenthumbs.beetroot_cutting": "Beetroot Cutting",
   "item.greenthumbs.beetroot_seeds": "Beetroot Seeds",
   "item.greenthumbs.carrot_cutting": "Carrot Cutting",
@@ -7,5 +8,7 @@
   "item.greenthumbs.potato_cutting": "Potato Cutting",
   "item.greenthumbs.potato_seeds": "Potato Seeds",
   "item.greenthumbs.wheat_cutting": "Wheat Cutting",
-  "item.greenthumbs.wheat_seeds": "Wheat Seeds"
+  "item.greenthumbs.wheat_seeds": "Wheat Seeds",
+  "mutativity": "Mutativity",
+  "temperature-preference": "Temperature Preference"
 }

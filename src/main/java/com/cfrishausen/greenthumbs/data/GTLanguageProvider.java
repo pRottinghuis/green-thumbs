@@ -1,5 +1,6 @@
 package com.cfrishausen.greenthumbs.data;
 
+import com.cfrishausen.greenthumbs.genetics.Genome;
 import com.cfrishausen.greenthumbs.registries.GTItems;
 import net.minecraft.Util;
 import net.minecraft.data.PackOutput;
@@ -23,6 +24,10 @@ public class GTLanguageProvider extends LanguageProvider {
         this.add(GTItems.CARROT_CUTTING.get(), "Carrot Cutting");
         this.add(GTItems.POTATO_CUTTING.get(), "Potato Cutting");
         this.add(GTItems.BEETROOT_CUTTING.get(), "Beetroot Cutting");
+
+        this.add(Genome.MUTATIVITY, "Mutativity");
+        this.add(Genome.TEMPERATURE_PREFERENCE, "Temperature Preference");
+        this.add(Genome.GROWTH_SPEED, "Growth Speed");
 
     }
 }
