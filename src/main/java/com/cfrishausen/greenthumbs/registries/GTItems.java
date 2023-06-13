@@ -4,6 +4,7 @@ import com.cfrishausen.greenthumbs.GreenThumbs;
 import com.cfrishausen.greenthumbs.crop.ICropSpecies;
 import com.cfrishausen.greenthumbs.item.custom.GTDebugStick;
 import com.cfrishausen.greenthumbs.item.custom.GTGenomeCropBlockItem;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.*;
@@ -26,6 +27,7 @@ public class GTItems {
     public static final RegistryObject<GTGenomeCropBlockItem> BEETROOT_SEEDS = registerGenomeBlockItem("beetroot_seeds", GTBlocks.GT_CROP_BLOCK);
     public static final RegistryObject<GTGenomeCropBlockItem> BEETROOT_CUTTING = registerGenomeBlockItem("beetroot_cutting", GTBlocks.GT_CROP_BLOCK);
 
+    public static final RegistryObject<BlockItem> SEED_SPLICING_STATION = ITEMS.register("seed_splicing_station", () -> new BlockItem(GTBlocks.SEED_SPLICING_STATION.get(), new Item.Properties()));
 
     public static RegistryObject<GTGenomeCropBlockItem> registerGenomeBlockItem(String path, RegistryObject<? extends Block> block) {
         return ITEMS.register(path, () -> new GTGenomeCropBlockItem(block.get(), new Item.Properties()));

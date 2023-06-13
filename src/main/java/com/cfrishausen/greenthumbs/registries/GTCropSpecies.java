@@ -11,6 +11,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
 import net.minecraftforge.registries.RegistryObject;
+import org.apache.logging.log4j.core.pattern.AbstractStyleNameConverter;
 
 import java.util.function.Supplier;
 
@@ -30,4 +31,8 @@ public class GTCropSpecies {
     public static final RegistryObject<ICropSpecies> GT_BEETROOT = CROP_SPECIES.register("gt_beetroot",
             () -> new BeetrootCrop(GTItems.BEETROOT_SEEDS.get(), Items.BEETROOT, GTItems.BEETROOT_CUTTING.get()));
 
+
+    public static ICropSpecies getSpecies(ResourceLocation key) {
+        return CROP_SPECIES_REGISTRY.get().getValue(key);
+    }
 }

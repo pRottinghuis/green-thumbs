@@ -1,7 +1,12 @@
 package com.cfrishausen.greenthumbs.genetics;
 
+import com.cfrishausen.greenthumbs.GreenThumbs;
+import com.cfrishausen.greenthumbs.crop.ICropSpecies;
+import com.cfrishausen.greenthumbs.crop.NBTTags;
+import com.cfrishausen.greenthumbs.registries.GTCropSpecies;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
@@ -79,6 +84,32 @@ public class Genome {
         return geneTag;
     }
 
+    public static CompoundTag fullSpliceTag(CompoundTag seed1tag, CompoundTag seed2tag) {
+        CompoundTag splicedTag = new CompoundTag();
+        if (seed1tag.contains(NBTTags.INFO_TAG) && seed2tag.contains(NBTTags.INFO_TAG)) {
+            if (seedsFromSameGenome(seed1tag, seed2tag)) {
+                // Splice seed 2 genome onto seed 1 genome
+                CompoundTag seed1genomeTag = seed1tag.getCompound(NBTTags.INFO_TAG).getCompound(NBTTags.GENOME_TAG);
+                CompoundTag seed2genomeTag = seed2tag.getCompound(NBTTags.INFO_TAG).getCompound(NBTTags.GENOME_TAG);
+                seed1genomeTag.getAllKeys().forEach((geneName) -> {
+                    String splicedAlleles = seed1genomeTag.getString(geneName).substring(0, 1) + seed2genomeTag.getString(geneName).substring(1, 2);
+                    seed1genomeTag.putString(geneName, splicedAlleles);
+                });
+                // set return tag to copy of seed 1 tag after genome has been spliced on to it
+                splicedTag = seed1tag;
+            }
+        } else {
+            GreenThumbs.LOGGER.warn("Tried splicing seeds with incomplete tags");
+        }
+        return splicedTag;
+    }
+
+    private static boolean seedsFromSameGenome(CompoundTag seed1tag, CompoundTag seed2tag) {
+        ICropSpecies species1 = GTCropSpecies.getSpecies(new ResourceLocation(seed1tag.getCompound(NBTTags.INFO_TAG).getString(NBTTags.CROP_SPECIES_TAG)));
+        ICropSpecies species2 = GTCropSpecies.getSpecies(new ResourceLocation(seed2tag.getCompound(NBTTags.INFO_TAG).getString(NBTTags.CROP_SPECIES_TAG)));
+        return species1.defineGenome().equals(species2.defineGenome());
+    }
+
     public Map<String, String> getGenes() {
         return GENES;
     }
@@ -149,5 +180,16 @@ public class Genome {
             mutationChance *= 0.5;
         }
         return mutationChance;
+    }
+
+    /**
+     * Compare gene entries. Same entries means same genome
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Genome other) {
+            return this.getGenes().equals(other.getGenes());
+        }
+        return false;
     }
 }

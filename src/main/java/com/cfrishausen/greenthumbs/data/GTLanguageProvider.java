@@ -13,7 +13,8 @@ public class GTLanguageProvider extends LanguageProvider {
 
     @Override
     protected void addTranslations() {
-        this.add(GTItems.GT_DEBUG_STICK.get().getDescriptionId(), "Green Thumbs Debug Stick");
+        this.addItem(GTItems.GT_DEBUG_STICK, "Green Thumbs Debug Stick");
+        this.addItem(GTItems.SEED_SPLICING_STATION, "Seed Splicing Station");
 
         this.add(GTItems.WHEAT_SEEDS.get(), "Wheat Seeds");
         this.add(GTItems.CARROT_SEEDS.get(), "Carrot Seeds");
@@ -28,6 +29,8 @@ public class GTLanguageProvider extends LanguageProvider {
         this.add(Genome.MUTATIVITY, "Mutativity");
         this.add(Genome.TEMPERATURE_PREFERENCE, "Temperature Preference");
         this.add(Genome.GROWTH_SPEED, "Growth Speed");
+
+
 
     }
 }

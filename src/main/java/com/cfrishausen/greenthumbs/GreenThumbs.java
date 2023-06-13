@@ -5,10 +5,9 @@ import com.cfrishausen.greenthumbs.crop.ICropSpecies;
 import com.cfrishausen.greenthumbs.crop.NBTTags;
 import com.cfrishausen.greenthumbs.event.EventHandler;
 import com.cfrishausen.greenthumbs.item.custom.GTGenomeCropBlockItem;
-import com.cfrishausen.greenthumbs.registries.GTBlockEntities;
-import com.cfrishausen.greenthumbs.registries.GTBlocks;
-import com.cfrishausen.greenthumbs.registries.GTCropSpecies;
-import com.cfrishausen.greenthumbs.registries.GTItems;
+import com.cfrishausen.greenthumbs.registries.*;
+import com.cfrishausen.greenthumbs.screen.SeedSplicingStationScreen;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -18,8 +17,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
@@ -44,6 +45,7 @@ public class GreenThumbs
         GTItems.ITEMS.register(modEventBus);
         GTBlockEntities.BLOCK_ENTITIES.register(modEventBus);
         GTCropSpecies.CROP_SPECIES.register(modEventBus);
+        GTMenuTypes.register(modEventBus);
 
         EventHandler.register();
 
@@ -52,12 +54,22 @@ public class GreenThumbs
         modEventBus.addListener(GreenThumbs::addCreativeTab);
     }
 
+    @Mod.EventBusSubscriber(modid = ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+    public static class ClientModEvents {
+        @SubscribeEvent
+        public static void onClientSetup(FMLClientSetupEvent event) {
+
+            MenuScreens.register(GTMenuTypes.SEED_SPLICING_STATION_MENU.get(), SeedSplicingStationScreen::new);
+        }
+    }
+
     private static void addCreativeTab(CreativeModeTabEvent.Register event) {
         event.registerCreativeModeTab(new ResourceLocation(ID, ID), builder -> {
             builder.icon(() -> new ItemStack(GTItems.CARROT_SEEDS.get()));
             builder.title(Component.literal("Green Thumbs"));
             builder.displayItems((params, output) -> {
                 output.accept(GTItems.GT_DEBUG_STICK.get());
+                output.accept(GTItems.SEED_SPLICING_STATION.get());
                 output.accept(getStackWithTag(GTItems.WHEAT_SEEDS.get(), GTCropSpecies.GT_WHEAT.get()));
                 output.accept(getStackWithTag(GTItems.BEETROOT_SEEDS.get(), GTCropSpecies.GT_BEETROOT.get()));
                 output.accept(getStackWithTag(GTItems.CARROT_SEEDS.get(), GTCropSpecies.GT_CARROT.get()));
@@ -71,8 +83,13 @@ public class GreenThumbs
         });
     }
 
-    private static ItemStack getStackWithTag(Item item, ICropSpecies species) {
+    public static ItemStack getStackWithTag(Item item, ICropSpecies species) {
         ItemStack stack = new ItemStack(item);
+        stack.setTag(getStandardTag(species));
+        return stack;
+    }
+
+    public static CompoundTag getStandardTag(ICropSpecies species) {
         CompoundTag infoTag = new CompoundTag();
         CompoundTag saveTag = new CompoundTag();
 
@@ -80,7 +97,6 @@ public class GreenThumbs
         saveTag.put(NBTTags.GENOME_TAG, species.defineGenome().writeTag());
         saveTag.putInt(NBTTags.AGE_TAG, 0);
         saveTag.putString(NBTTags.CROP_SPECIES_TAG, GTCropSpecies.CROP_SPECIES_REGISTRY.get().getKey(species).toString());
-        stack.setTag(infoTag);
-        return stack;
+        return infoTag;
     }
 }
