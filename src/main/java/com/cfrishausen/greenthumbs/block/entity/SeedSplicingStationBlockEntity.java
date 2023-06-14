@@ -19,6 +19,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -183,15 +184,10 @@ public class SeedSplicingStationBlockEntity extends BlockEntity implements MenuP
     }
 
     private static boolean sameSpecies(SimpleContainer inventory) {
-        CompoundTag seed1Tag = inventory.getItem(0).getTag();
-        CompoundTag seed2Tag = inventory.getItem(0).getTag();
+        Item seed1 = inventory.getItem(0).getItem();
+        Item seed2 = inventory.getItem(1).getItem();
 
-        if (seed1Tag.contains(NBTTags.INFO_TAG) && seed1Tag.contains(NBTTags.INFO_TAG)) {
-            String species1 =  seed1Tag.getCompound(NBTTags.INFO_TAG).getString(NBTTags.CROP_SPECIES_TAG);
-            String species2 =  seed2Tag.getCompound(NBTTags.INFO_TAG).getString(NBTTags.CROP_SPECIES_TAG);
-            return species1.equals(species2);
-        }
-        return false;
+        return seed1.equals(seed2);
     }
 
     private static boolean outputSlotEmpty(SimpleContainer inventory) {
