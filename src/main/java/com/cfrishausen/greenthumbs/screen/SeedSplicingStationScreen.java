@@ -3,6 +3,7 @@ package com.cfrishausen.greenthumbs.screen;
 import com.cfrishausen.greenthumbs.GreenThumbs;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
@@ -24,16 +25,18 @@ public class SeedSplicingStationScreen extends AbstractContainerScreen<SeedSplic
     }
 
     @Override
-    protected void renderBg(PoseStack pPoseStack, float pPartialTick, int pMouseX, int pMouseY) {
+    protected void renderBg(PoseStack poseStack, float partialTick, int mouseX, int mouseY) {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, TEXTURE);
         int x = (width - imageWidth) / 2;
         int y = (height - imageHeight) / 2;
+        this.blit(poseStack, x, y, 0, 0, imageWidth, imageHeight);
 
-        this.blit(pPoseStack, x, y, 0, 0, imageWidth, imageHeight);
+        drawCenteredString(poseStack, this.font, "Splice", x + 123, y + 64, 0x373737);
 
-        renderProgressArrow(pPoseStack, x, y);
+
+        renderProgressArrow(poseStack, x, y);
     }
 
     private void renderProgressArrow(PoseStack pPoseStack, int x, int y) {
@@ -45,9 +48,16 @@ public class SeedSplicingStationScreen extends AbstractContainerScreen<SeedSplic
     }
 
     @Override
-    public void render(PoseStack pPoseStack, int mouseX, int mouseY, float delta) {
-        renderBackground(pPoseStack);
-        super.render(pPoseStack, mouseX, mouseY, delta);
-        renderTooltip(pPoseStack, mouseX, mouseY);
+    public void render(PoseStack poseStack, int mouseX, int mouseY, float delta) {
+        int x = (width - imageWidth) / 2;
+        int y = (height - imageHeight) / 2;
+
+        renderBackground(poseStack);
+        if (isHovering(113, 60, 21, 10, mouseX, mouseY)) {
+            blit(poseStack, x + 113, y + 60, 176, 31, 21, 10);
+        }
+        super.render(poseStack, mouseX, mouseY, delta);
+        renderTooltip(poseStack, mouseX, mouseY);
+
     }
 }
