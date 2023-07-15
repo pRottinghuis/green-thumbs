@@ -8,6 +8,7 @@ import com.cfrishausen.greenthumbs.registries.GTBlockEntities;
 import com.cfrishausen.greenthumbs.registries.GTBlocks;
 import com.cfrishausen.greenthumbs.registries.GTCropSpecies;
 import com.cfrishausen.greenthumbs.screen.SeedSplicingStationMenu;
+import com.cfrishausen.greenthumbs.screen.SeedSplicingStationScreen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -40,6 +41,26 @@ public class SeedSplicingStationBlockEntity extends BlockEntity implements MenuP
         protected void onContentsChanged(int slot) {
             setChanged();
         }
+
+        @Override
+        public boolean isItemValid(int slot, @NotNull ItemStack stack) {
+            if (slot == 0 || slot == 1) {
+                if (stack.getItem().asItem() instanceof GTGenomeCropBlockItem) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public int getSlotLimit(int slot) {
+            return 1;
+        }
+
+        @Override
+        protected int getStackLimit(int slot, @NotNull ItemStack stack) {
+            return 1;
+        }
     };
 
     private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
@@ -50,6 +71,8 @@ public class SeedSplicingStationBlockEntity extends BlockEntity implements MenuP
     // Needs to be set by a ContainerData so cannot be final
     private int maxProgress = 78;
 
+    private int buttonClicked = 0;
+
     public SeedSplicingStationBlockEntity(BlockPos pos, BlockState state) {
         super(GTBlockEntities.SEED_SPLICING_STATION_BLOCK_ENTITY.get(), pos, state);
         this.data = new ContainerData() {
@@ -58,6 +81,7 @@ public class SeedSplicingStationBlockEntity extends BlockEntity implements MenuP
                 return switch (index) {
                     case 0 -> SeedSplicingStationBlockEntity.this.progress;
                     case 1 -> SeedSplicingStationBlockEntity.this.maxProgress;
+                    case 2 -> SeedSplicingStationBlockEntity.this.buttonClicked;
                     default -> 0;
                 };
             }
@@ -67,12 +91,13 @@ public class SeedSplicingStationBlockEntity extends BlockEntity implements MenuP
                 switch (index) {
                     case 0 -> SeedSplicingStationBlockEntity.this.progress = value;
                     case 1 -> SeedSplicingStationBlockEntity.this.maxProgress = value;
+                    case 2 -> SeedSplicingStationBlockEntity.this.buttonClicked = value;
                 }
             }
 
             @Override
             public int getCount() {
-                return 2;
+                return 3;
             }
         };
     }
@@ -113,6 +138,7 @@ public class SeedSplicingStationBlockEntity extends BlockEntity implements MenuP
     protected void saveAdditional(CompoundTag nbt) {
         nbt.put("inventory", itemHandler.serializeNBT());
         nbt.putInt("seed_splicing_station.progress", this.progress);
+        nbt.putInt("seed_splicing_station.buttonClicked", this.buttonClicked);
 
         super.saveAdditional(nbt);
     }
@@ -122,6 +148,7 @@ public class SeedSplicingStationBlockEntity extends BlockEntity implements MenuP
         super.load(nbt);
         itemHandler.deserializeNBT(nbt.getCompound("inventory"));
         progress = nbt.getInt("seed_splicing_station.progress");
+        buttonClicked = nbt.getInt("seed_splicing_station.buttonClicked");
     }
 
     public void drops() {
@@ -138,10 +165,9 @@ public class SeedSplicingStationBlockEntity extends BlockEntity implements MenuP
             return;
         }
 
-            if(hasRecipe(pEntity)) {
+        if(hasRecipe(getInventoryCopy(pEntity)) && pEntity.buttonClicked != 0) {
             pEntity.progress++;
             setChanged(level, pos, state);
-
             if(pEntity.progress >= pEntity.maxProgress) {
                 craftItem(pEntity);
             }
@@ -153,11 +179,12 @@ public class SeedSplicingStationBlockEntity extends BlockEntity implements MenuP
 
     private void resetProgress() {
         this.progress = 0;
+        this.buttonClicked = 0;
     }
 
     private static void craftItem(SeedSplicingStationBlockEntity pEntity) {
 
-        if(hasRecipe(pEntity)) {
+        if(hasRecipe(getInventoryCopy(pEntity))) {
             ItemStack seed1 = pEntity.itemHandler.getStackInSlot(0);
             ItemStack seed2 = pEntity.itemHandler.getStackInSlot(1);
 
@@ -172,15 +199,19 @@ public class SeedSplicingStationBlockEntity extends BlockEntity implements MenuP
         }
     }
 
-    private static boolean hasRecipe(SeedSplicingStationBlockEntity entity) {
+    public static boolean hasRecipe(SimpleContainer inventory) {
+
+        boolean hasGenomeBlockItems = inventory.getItem(0).getItem() instanceof GTGenomeCropBlockItem && inventory.getItem(1).getItem() instanceof GTGenomeCropBlockItem;
+
+        return hasGenomeBlockItems && sameSpecies(inventory) && outputSlotEmpty(inventory);
+    }
+
+    private static SimpleContainer getInventoryCopy(SeedSplicingStationBlockEntity entity) {
         SimpleContainer inventory = new SimpleContainer(entity.itemHandler.getSlots());
         for (int i = 0; i < entity.itemHandler.getSlots(); i++) {
             inventory.setItem(i, entity.itemHandler.getStackInSlot(i));
         }
-
-        boolean hasGenomeBlockItems = entity.itemHandler.getStackInSlot(0).getItem() instanceof GTGenomeCropBlockItem && entity.itemHandler.getStackInSlot(1).getItem() instanceof GTGenomeCropBlockItem;
-
-        return hasGenomeBlockItems && sameSpecies(inventory) && outputSlotEmpty(inventory);
+        return inventory;
     }
 
     private static boolean sameSpecies(SimpleContainer inventory) {

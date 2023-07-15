@@ -4,6 +4,10 @@ import com.cfrishausen.greenthumbs.block.entity.SeedSplicingStationBlockEntity;
 import com.cfrishausen.greenthumbs.registries.GTBlocks;
 import com.cfrishausen.greenthumbs.registries.GTMenuTypes;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
@@ -21,8 +25,13 @@ public class SeedSplicingStationMenu extends AbstractContainerMenu {
     private final Level level;
     private final ContainerData data;
 
+    private SlotItemHandler seedSlot1;
+    private SlotItemHandler seedSlot2;
+
+    private SlotItemHandler outputSlot;
+
     public SeedSplicingStationMenu(int id, Inventory inv, FriendlyByteBuf extraData) {
-        this(id, inv, inv.player.level.getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(2));
+        this(id, inv, inv.player.level.getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(3));
     }
 
     public SeedSplicingStationMenu(int id, Inventory inv, BlockEntity entity, ContainerData data) {
@@ -35,15 +44,32 @@ public class SeedSplicingStationMenu extends AbstractContainerMenu {
         addPlayerInventory(inv);
         addPlayerHotbar(inv);
 
+
+
         this.blockEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(handler -> {
             // input seed  1 and 2
-            this.addSlot(new SlotItemHandler(handler, 0, 56, 17));
-            this.addSlot(new SlotItemHandler(handler, 1, 56, 53));
+            this.addSlot(this.seedSlot1 = new SlotItemHandler(handler, 0, 24, 22));
+            this.addSlot(this.seedSlot2 = new SlotItemHandler(handler, 1, 24, 58));
             // output seed
-            this.addSlot(new SlotItemHandler(handler, 2, 116, 35));
+            this.addSlot(this.outputSlot = new SlotItemHandler(handler, 2, 134, 40));
         });
 
         addDataSlots(data);
+    }
+
+    @Override
+    public boolean clickMenuButton(Player player, int pId) {
+        SimpleContainer inventory = new SimpleContainer(3);
+        inventory.setItem(0, seedSlot1.getItem());
+        inventory.setItem(1, seedSlot2.getItem());
+        inventory.setItem(2, outputSlot.getItem());
+        if (SeedSplicingStationBlockEntity.hasRecipe(inventory)) {
+            // Tell entity that the button is clicked
+            data.set(2, 1);
+            player.playSound(SoundEvents.UI_BUTTON_CLICK.get(), 1.0F, 1.0F);
+            return true;
+        }
+        return false;
     }
 
     public boolean isCrafting() {
@@ -53,7 +79,7 @@ public class SeedSplicingStationMenu extends AbstractContainerMenu {
     public int getScaledProgress() {
         int progress = this.data.get(0);
         int maxProgress = this.data.get(1);  // Max Progress
-        int progressArrowSize = 24; // This is the width in pixels of your arrow
+        int progressArrowSize = 60; // This is the width in pixels of your arrow
 
         return maxProgress != 0 && progress != 0 ? progress * progressArrowSize / maxProgress : 0;
     }
@@ -119,14 +145,14 @@ public class SeedSplicingStationMenu extends AbstractContainerMenu {
     private void addPlayerInventory(Inventory playerInventory) {
         for (int i = 0; i < 3; ++i) {
             for (int l = 0; l < 9; ++l) {
-                this.addSlot(new Slot(playerInventory, l + i * 9 + 9, 8 + l * 18, 84 + i * 18));
+                this.addSlot(new Slot(playerInventory, l + i * 9 + 9, 8 + l * 18, 98 + i * 18));
             }
         }
     }
 
     private void addPlayerHotbar(Inventory playerInventory) {
         for (int i = 0; i < 9; ++i) {
-            this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 142));
+            this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 156));
         }
     }
 }
