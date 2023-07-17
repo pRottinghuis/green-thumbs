@@ -1,9 +1,15 @@
 package com.cfrishausen.greenthumbs.screen;
 
 import com.cfrishausen.greenthumbs.block.entity.SeedSplicingStationBlockEntity;
+import com.cfrishausen.greenthumbs.genetics.Genome;
+import com.cfrishausen.greenthumbs.item.custom.GTGenomeCropBlockItem;
 import com.cfrishausen.greenthumbs.registries.GTBlocks;
 import com.cfrishausen.greenthumbs.registries.GTMenuTypes;
+import com.google.common.collect.Lists;
+import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -16,6 +22,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
+
+import java.util.List;
 
 
 // Credit: Tutorials By Kaupenjoe | https://github.com/Tutorials-By-Kaupenjoe/Forge-Tutorial-1.19/tree/22-blockEntities
@@ -59,15 +67,22 @@ public class SeedSplicingStationMenu extends AbstractContainerMenu {
 
     @Override
     public boolean clickMenuButton(Player player, int pId) {
-        SimpleContainer inventory = new SimpleContainer(3);
-        inventory.setItem(0, seedSlot1.getItem());
-        inventory.setItem(1, seedSlot2.getItem());
-        inventory.setItem(2, outputSlot.getItem());
-        if (SeedSplicingStationBlockEntity.hasRecipe(inventory)) {
-            // Tell entity that the button is clicked
-            data.set(2, 1);
-            player.playSound(SoundEvents.UI_BUTTON_CLICK.get(), 1.0F, 1.0F);
-            return true;
+        if (hasRecipe()) {
+            // indicate non creative-like GameType and then check for high enough level
+
+            // Creative doesn't deal with xp
+            if (player.getAbilities().instabuild) {
+                data.set(2, 1);
+                player.playSound(SoundEvents.UI_BUTTON_CLICK.get(), 1.0F, 1.0F);
+                return true;
+            } else {
+                if (player.experienceLevel >= 3) {
+                    data.set(2, 1);
+                    player.experienceLevel -= 3;
+                    player.playSound(SoundEvents.UI_BUTTON_CLICK.get(), 1.0F, 1.0F);
+                    return true;
+                }
+            }
         }
         return false;
     }
@@ -154,5 +169,27 @@ public class SeedSplicingStationMenu extends AbstractContainerMenu {
         for (int i = 0; i < 9; ++i) {
             this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 156));
         }
+    }
+
+    public boolean hasRecipe() {
+        SimpleContainer inventory = new SimpleContainer(3);
+        inventory.setItem(0, seedSlot1.getItem());
+        inventory.setItem(1, seedSlot2.getItem());
+        inventory.setItem(2, outputSlot.getItem());
+        return SeedSplicingStationBlockEntity.hasRecipe(inventory);
+    }
+
+
+    public List<Component> getToolTipList() {
+        List<Component> componentList = Lists.newArrayList();
+        ItemStack seed1 = seedSlot1.getItem();
+        ItemStack seed2 = seedSlot2.getItem();
+        // Add name of item
+        componentList.add(Component.translatable(seed1.getDescriptionId()).withStyle(ChatFormatting.WHITE));
+        // Get what the tag of the spliced item will be from genome
+        CompoundTag probableSpliceTag = Genome.fullSpliceTag(seed1.getTag(), seed2.getTag());
+        // GTGenomeCropBlockItem already has functionality for getting the tool tip we need for the possible resultant seed.
+        componentList.addAll(GTGenomeCropBlockItem.getToolTips(probableSpliceTag));
+        return componentList;
     }
 }

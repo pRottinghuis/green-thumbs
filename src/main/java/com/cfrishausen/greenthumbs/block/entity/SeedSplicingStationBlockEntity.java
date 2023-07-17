@@ -61,6 +61,14 @@ public class SeedSplicingStationBlockEntity extends BlockEntity implements MenuP
         protected int getStackLimit(int slot, @NotNull ItemStack stack) {
             return 1;
         }
+
+        @Override
+        public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
+            if (isCrafting()) {
+                return ItemStack.EMPTY;
+            }
+            return super.extractItem(slot, amount, simulate);
+        }
     };
 
     private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
@@ -190,12 +198,14 @@ public class SeedSplicingStationBlockEntity extends BlockEntity implements MenuP
 
             CompoundTag splicedTag = Genome.fullSpliceTag(seed1.getTag(), seed2.getTag());
 
-            pEntity.itemHandler.extractItem(0, 1, false);
-            pEntity.itemHandler.extractItem(1, 1, false);
             ItemStack outputStack = new ItemStack(seed1.getItem(), 1);
             outputStack.setTag(splicedTag);
             pEntity.itemHandler.setStackInSlot(2, outputStack);
             pEntity.resetProgress();
+
+            // seeds need to extract after progress is reset because itemstackhandler prevents extract while data is indicating crafting
+            pEntity.itemHandler.extractItem(0, 1, false);
+            pEntity.itemHandler.extractItem(1, 1, false);
         }
     }
 
@@ -222,7 +232,11 @@ public class SeedSplicingStationBlockEntity extends BlockEntity implements MenuP
     }
 
     private static boolean outputSlotEmpty(SimpleContainer inventory) {
-        return inventory.getItem(3).isEmpty();
+        return inventory.getItem(2).isEmpty();
+    }
+
+    private boolean isCrafting() {
+        return this.data.get(2) != 0;
     }
 
 }

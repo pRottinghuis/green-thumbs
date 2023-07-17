@@ -1,6 +1,7 @@
 package com.cfrishausen.greenthumbs.screen;
 
 import com.cfrishausen.greenthumbs.GreenThumbs;
+import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
@@ -9,6 +10,9 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.level.GameType;
+
+import java.util.List;
 
 public class SeedSplicingStationScreen extends AbstractContainerScreen<SeedSplicingStationMenu> {
 
@@ -27,7 +31,7 @@ public class SeedSplicingStationScreen extends AbstractContainerScreen<SeedSplic
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if(isHovering(132, 65, 19, 8, mouseX, mouseY) && this.menu.clickMenuButton(this.minecraft.player, 0)) {
+        if(isHovering(117, 70, 50, 15, mouseX, mouseY) && this.menu.clickMenuButton(this.minecraft.player, 0)) {
             this.minecraft.gameMode.handleInventoryButtonClick((this.menu).containerId, 0);
             return true;
         }
@@ -39,29 +43,53 @@ public class SeedSplicingStationScreen extends AbstractContainerScreen<SeedSplic
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, TEXTURE);
-        int x = (this.width - this.imageWidth) / 2;
-        int y = (this.height - this.imageHeight) / 2;
-        this.blit(poseStack, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
-        // Hover on start button
-        if (isHovering(132, 65, 19, 8, mouseX, mouseY)) {
-            blit(poseStack, x + 132, y + 65, 176, 31, 20, 10);
+        this.blit(poseStack, leftPos, topPos, 0, 0, this.imageWidth, this.imageHeight);
+        if (this.menu.hasRecipe()) {
+            // show seed silhouette
+            blit(poseStack, leftPos + 134, topPos + 40, 176, 45, 16, 16);
+
+            // Show button in ready to activate state
+            blit(poseStack, leftPos + 117, topPos + 70, 176, 30, 50, 15);
+
+            // Hover on splice button
+            if (isHovering(117, 70, 50, 15, mouseX, mouseY)) {
+                if (!this.menu.isCrafting()) {
+                    blit(poseStack, leftPos + 117, topPos + 70, 176, 0, 50, 15);
+                }
+            }
+
+            // Show pressed if crafting otherwise show hover
+            if (this.menu.isCrafting()) {
+                blit(poseStack, leftPos + 117, topPos + 70, 176, 0, 50, 15);
+            } else {
+                if (isHovering(117, 70, 50, 15, mouseX, mouseY)) {
+                    blit(poseStack, leftPos + 117, topPos + 70, 176, 15, 50, 15);
+                }
+            }
+
+
+            // show lit up xp cost if player in creative or has enough xp or during crafting
+            if (this.minecraft.player.getAbilities().instabuild || this.minecraft.player.experienceLevel >= 3 || this.menu.isCrafting()) {
+                blit(poseStack, leftPos + 151, topPos + 72, 176, 61, 13, 11);
+            }
+
         }
 
-        renderProgressArrow(poseStack, x, y);
+        renderProgressArrow(poseStack);
     }
 
-    private void renderProgressArrow(PoseStack pPoseStack, int x, int y) {
+    private void renderProgressArrow(PoseStack pPoseStack) {
         if(menu.isCrafting()) {
 
             // (posStack, x of draw, y of draw, x where to get, y where to get, width of what getting, height of what getting)
             // move colored strand right
-            blit(pPoseStack, x + 55, y + 36, 60 - menu.getScaledProgress(), 204, menu.getScaledProgress(), 24);
+            blit(pPoseStack, leftPos + 55, topPos + 36, 60 - menu.getScaledProgress(), 204, menu.getScaledProgress(), 24);
             // move grey strand right
-            blit(pPoseStack, x + 55 + menu.getScaledProgress(), y + 36, 0, 180, 60 - menu.getScaledProgress(), 24);
+            blit(pPoseStack, leftPos + 55 + menu.getScaledProgress(), topPos + 36, 0, 180, 60 - menu.getScaledProgress(), 24);
         } else {
             // Grey strand
-            blit(pPoseStack, x + 55, y + 36, 0, 180, 60, 24);
+            blit(pPoseStack, leftPos + 55, topPos + 36, 0, 180, 60, 24);
         }
     }
 
@@ -70,10 +98,9 @@ public class SeedSplicingStationScreen extends AbstractContainerScreen<SeedSplic
         renderBackground(poseStack);
         super.render(poseStack, mouseX, mouseY, delta);
         renderTooltip(poseStack, mouseX, mouseY);
-
-        if (isHovering(134, 40, 16, 16, mouseX, mouseY)) {
-
+        if (this.menu.hasRecipe() && isHovering(134, 40, 16, 16, mouseX, mouseY)) {
+            List<Component> componentList = this.menu.getToolTipList();
+            this.renderComponentTooltip(poseStack, componentList, mouseX, mouseY);
         }
-
     }
 }

@@ -5,7 +5,9 @@ import com.cfrishausen.greenthumbs.crop.ICropSpecies;
 import com.cfrishausen.greenthumbs.crop.NBTTags;
 import com.cfrishausen.greenthumbs.genetics.Genome;
 import com.cfrishausen.greenthumbs.registries.GTCropSpecies;
+import com.google.common.collect.Lists;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -53,19 +55,26 @@ public class GTGenomeCropBlockItem extends ItemNameBlockItem {
         if (level != null && level.isClientSide()) {
             if (Screen.hasShiftDown()) {
                 if (stack.hasTag()) {
-                    CompoundTag tag = stack.getTag();
-                    if (tag.contains(NBTTags.INFO_TAG)) {
-                        CompoundTag genomeTag = tag.getCompound(NBTTags.INFO_TAG).getCompound(NBTTags.GENOME_TAG);
-                        // Add genes for tooltip based on what is in nbt tag
-                        for (String genomeTagKey : genomeTag.getAllKeys()) {
-                            String geneStr = genomeTag.getString(genomeTagKey);
-                            tooltips.add(Component.translatable(genomeTagKey).append(Component.literal(": " + geneStr)).withStyle(style -> style.withColor(ChatFormatting.GREEN)));
-                        }
-                    }
+                    tooltips.addAll(getToolTips(stack.getTag()));
                 }
+            } else {
+                tooltips.add(Component.literal("<Hold Shift>").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
             }
         }
         super.appendHoverText(stack, level, tooltips, flag);
+    }
+
+    public static List<Component> getToolTips(CompoundTag tag) {
+        List<Component> tooltips = Lists.newArrayList();
+        if (tag.contains(NBTTags.INFO_TAG)) {
+            CompoundTag genomeTag = tag.getCompound(NBTTags.INFO_TAG).getCompound(NBTTags.GENOME_TAG);
+            // Add genes for tooltip based on what is in nbt tag
+            for (String genomeTagKey : genomeTag.getAllKeys()) {
+                String geneStr = genomeTag.getString(genomeTagKey);
+                tooltips.add(Component.translatable(genomeTagKey).append(Component.literal(": " + geneStr)).withStyle(ChatFormatting.GREEN));
+            }
+        }
+        return tooltips;
     }
 
 
