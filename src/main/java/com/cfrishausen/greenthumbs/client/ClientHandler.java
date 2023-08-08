@@ -2,8 +2,10 @@ package com.cfrishausen.greenthumbs.client;
 
 import com.cfrishausen.greenthumbs.client.model.block.GTBakedModel;
 import com.cfrishausen.greenthumbs.crop.ICropSpecies;
+import com.cfrishausen.greenthumbs.crop.state.CropState;
 import com.cfrishausen.greenthumbs.registries.GTBlocks;
 import com.cfrishausen.greenthumbs.registries.GTCropSpecies;
+import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockModelShaper;
@@ -19,6 +21,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ClientHandler {
     public static void registerEvents() {
@@ -37,34 +40,17 @@ public class ClientHandler {
     public static void registerBakedModels(ModelEvent.ModifyBakingResult event) {
         Map<ResourceLocation, BakedModel> eventModels = event.getModels();
 
-        // This baked model stores all crop type models and corresponding age models
+        Map<CropState, BakedModel> statesToModel = GTCropSpecies.CROP_SPECIES_REGISTRY.get().getValues().stream().map(ICropSpecies::getModelMap).flatMap(map -> {
+            return map.entrySet().stream();
+        }).map(entry -> {
+            return Pair.of(entry.getKey(), eventModels.get(entry.getValue()));
+        }).filter(pair -> {
+            return pair.second() != null;
+        }).collect(Collectors.toMap(Pair::first, Pair::second));
+
+        // Stores models for each crop species
         GTBakedModel gtBakedModel = new GTBakedModel();
-
-        copyCropBaked(gtBakedModel, eventModels, GTCropSpecies.GT_CARROT.get(), Blocks.CARROTS);
-        copyCropBaked(gtBakedModel, eventModels, GTCropSpecies.GT_WHEAT.get(), Blocks.WHEAT);
-        copyCropBaked(gtBakedModel, eventModels, GTCropSpecies.GT_BEETROOT.get(), Blocks.BEETROOTS);
-        copyCropBaked(gtBakedModel, eventModels, GTCropSpecies.GT_POTATO.get(), Blocks.POTATOES);
-    }
-
-    /**
-     * Helper to copy all ages of a existing minecraft model into ICropSpecies models
-     * @param gtBakedModel IDynamicBakedModel that holds all the model info for Green Thumbs crops
-     * @param eventModels Registry of existing models
-     * @param cropSpecies What species of crop these models need to be made for
-     * @param block What Minecraft block to copy models over from
-     */
-    public static void copyCropBaked(GTBakedModel gtBakedModel, Map<ResourceLocation, BakedModel> eventModels, ICropSpecies cropSpecies, Block block) {
-        ArrayList<BakedModel> bakedModels = new ArrayList<>();
-        // Get baked model for each age of crop
-        int maxAge = cropSpecies.getMaxAge();
-        for (int age = 0; age <= maxAge; age++) {
-            ResourceLocation location = BlockModelShaper.stateToModelLocation(block.defaultBlockState().setValue(IntegerProperty.create("age", 0, maxAge), age));
-            bakedModels.add(eventModels.get(location));
-        }
-        //
-        gtBakedModel.addModels(GTCropSpecies.CROP_SPECIES_REGISTRY.get().getKey(cropSpecies).toString(), bakedModels.toArray(new BakedModel[0]));
-
-        // Replace/Update our model in register of baked models
+        gtBakedModel.addModels(statesToModel);
         eventModels.put(BlockModelShaper.stateToModelLocation(GTBlocks.GT_CROP_BLOCK.get().defaultBlockState()), gtBakedModel);
     }
 }

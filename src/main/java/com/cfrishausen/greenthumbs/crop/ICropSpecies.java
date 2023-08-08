@@ -1,6 +1,8 @@
 package com.cfrishausen.greenthumbs.crop;
 
 import com.cfrishausen.greenthumbs.block.custom.GTSimpleCropBlock;
+import com.cfrishausen.greenthumbs.client.ICropSpeciesExtensions;
+import com.cfrishausen.greenthumbs.crop.state.CropState;
 import com.cfrishausen.greenthumbs.genetics.Genome;
 import com.cfrishausen.greenthumbs.item.custom.GTGenomeCropBlockItem;
 import com.cfrishausen.greenthumbs.registries.GTCropSpecies;
@@ -17,14 +19,19 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * ICropSpecies defines functionality for making a new crop species. Each crop species contains functionality that is unique to a certain crop.
  * For example Carrots drop something other than wheat does. Maybe some crop species need different conditions to survive ect.
  */
-public interface ICropSpecies {
+public interface ICropSpecies extends ICropSpeciesExtensions {
 
     /**
      *  Add which genes this crop type should have
@@ -121,4 +128,17 @@ public interface ICropSpecies {
     ItemLike getCrop();
 
     GTGenomeCropBlockItem getCutting();
+
+
+    CropState defaultCropState();
+
+    void createBlockStateDefinition(StateDefinition.Builder<ICropSpecies, CropState> builder);
+
+    void registerDefaultState(CropState state);
+
+    boolean doesQuickReplant();
+
+    @NotNull
+    IntegerProperty getAgeProperty();
+
 }

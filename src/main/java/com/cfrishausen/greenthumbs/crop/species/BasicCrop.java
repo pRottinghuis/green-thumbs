@@ -6,8 +6,11 @@ import com.cfrishausen.greenthumbs.block.entity.GTCropBlockEntity;
 import com.cfrishausen.greenthumbs.crop.ICropEntity;
 import com.cfrishausen.greenthumbs.crop.ICropSpecies;
 import com.cfrishausen.greenthumbs.crop.NBTTags;
+import com.cfrishausen.greenthumbs.crop.state.CropState;
 import com.cfrishausen.greenthumbs.genetics.Genome;
 import com.cfrishausen.greenthumbs.item.custom.GTGenomeCropBlockItem;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -24,15 +27,23 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class BasicCrop implements ICropSpecies {
 
-    private static final VoxelShape[] SHAPE_BY_AGE = new VoxelShape[]{Block.box(0.0D, 0.0D, 0.0D, 16.0D, 2.0D, 16.0D),
+    public static final IntegerProperty AGE = BlockStateProperties.AGE_7;
+    protected final StateDefinition<ICropSpecies, CropState> cropStateDef;
+    private CropState defaultCropState;
+    private static final VoxelShape[] SHAPE_BY_AGE = new VoxelShape[]{
+            Block.box(0.0D, 0.0D, 0.0D, 16.0D, 2.0D, 16.0D),
             Block.box(0.0D, 0.0D, 0.0D, 16.0D, 4.0D, 16.0D),
             Block.box(0.0D, 0.0D, 0.0D, 16.0D, 6.0D, 16.0D),
             Block.box(0.0D, 0.0D, 0.0D, 16.0D, 8.0D, 16.0D),
@@ -42,20 +53,39 @@ public class BasicCrop implements ICropSpecies {
             Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16.0D, 16.0D)};
 
     private GTGenomeCropBlockItem seed;
-    private Item crop;
-    private final int MAX_AGE = 7;
+    private final Item crop;
     private GTGenomeCropBlockItem cutting;
 
-    public BasicCrop(GTGenomeCropBlockItem seeds, Item crop, GTGenomeCropBlockItem cutting) {
-        this.seed =seeds;
+    // name of model file to look in
+    private final String pathName;
+
+    public BasicCrop(String pathName, GTGenomeCropBlockItem seed, Item crop, GTGenomeCropBlockItem cutting) {
+        this.pathName = pathName;
+        this.seed = seed;
         this.crop = crop;
         this.cutting = cutting;
+        StateDefinition.Builder<ICropSpecies, CropState> builder = new StateDefinition.Builder<>(this);
+        this.createBlockStateDefinition(builder);
+        this.cropStateDef = builder.create(ICropSpecies::defaultCropState, CropState::new);
+        this.registerDefaultState(this.cropStateDef.any());
+    }
+
+    public final CropState defaultCropState() {
+        return this.defaultCropState;
+    }
+
+    public void createBlockStateDefinition(StateDefinition.Builder<ICropSpecies, CropState> builder) {
+        builder.add(getAgeProperty());
+
+    }
+
+    public void registerDefaultState(CropState state) {
+        this.defaultCropState = state;
     }
 
     /**
      * used for default age 7 crop
      */
-
     @Override
     public Genome defineGenome() {
         Map<String, String> genes = new HashMap<>();
@@ -77,6 +107,9 @@ public class BasicCrop implements ICropSpecies {
 
     @Override
     public void quickReplant(BlockState pState, Level pLevel, BlockPos pPos, ICropEntity crop) {
+        if (!doesQuickReplant()) {
+            return;
+        }
         ItemStack replantItem = drops(crop, pLevel, pPos, true);
         if (replantItem != null) {
             CompoundTag infoTag = replantItem.getTag();
@@ -87,6 +120,11 @@ public class BasicCrop implements ICropSpecies {
                 pLevel.sendBlockUpdated(pPos, pState, pState, Block.UPDATE_ALL);
             }
         }
+    }
+
+    @Override
+    public boolean doesQuickReplant() {
+        return true;
     }
 
     @Override
@@ -151,7 +189,7 @@ public class BasicCrop implements ICropSpecies {
 
     @Override
     public int getMaxAge() {
-        return this.MAX_AGE;
+        return 7;
     }
 
     public GTGenomeCropBlockItem getBaseItemId() {
@@ -176,5 +214,19 @@ public class BasicCrop implements ICropSpecies {
     @Override
     public GTGenomeCropBlockItem getCutting() {
         return this.cutting;
+    }
+
+    @Override
+    public @NotNull IntegerProperty getAgeProperty() {
+        return AGE;
+    }
+
+    @Override
+    public Map<CropState, ModelResourceLocation> getModelMap() {
+        Map<CropState, ModelResourceLocation> modelMap = new HashMap<>();
+        for (int age = 0; age <= getMaxAge(); age++) {
+            modelMap.put(defaultCropState.setValue(AGE, age), ModelResourceLocation.vanilla(pathName, "age=" + age));
+        }
+        return modelMap;
     }
 }

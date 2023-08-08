@@ -3,11 +3,14 @@ package com.cfrishausen.greenthumbs.block.entity;
 import com.cfrishausen.greenthumbs.crop.ICropEntity;
 import com.cfrishausen.greenthumbs.crop.ICropSpecies;
 import com.cfrishausen.greenthumbs.crop.NBTTags;
+import com.cfrishausen.greenthumbs.crop.state.CropState;
 import com.cfrishausen.greenthumbs.genetics.Genome;
 import com.cfrishausen.greenthumbs.registries.GTBlockEntities;
 import com.cfrishausen.greenthumbs.registries.GTCropSpecies;
+import com.google.common.collect.Comparators;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -18,34 +21,37 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.client.model.data.ModelProperty;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Comparator;
+
 public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
 
     // See example @ https://www.mcjty.eu/docs/1.18/ep3
 
-    private ICropSpecies cropSpecies;
+    private CropState cropState;
+
+    private ICropSpecies cropSpecies = null;
 
     public static ModelProperty<Integer> AGE = new ModelProperty<>();
     public static ModelProperty<String> CROP_TYPE = new ModelProperty<>();
 
-    private int age;
+    public static ModelProperty<CropState> CROP_STATE = new ModelProperty<>();
 
     private Genome genome;
 
     public GTCropBlockEntity(BlockPos pos, BlockState state) {
         super(GTBlockEntities.GT_CROP_ENTITY.get(), pos, state);
-        age = 0;
     }
 
     @Override
     public @NotNull ModelData getModelData() {
         return ModelData.builder()
-                .with(AGE, age)
-                .with(CROP_TYPE, GTCropSpecies.CROP_SPECIES_REGISTRY.get().getKey(cropSpecies).toString())
+                .with(CROP_STATE, cropState)
                 .build();
     }
 
@@ -69,24 +75,29 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
         readStandardNBT(nbt);
     }
 
+    // TODO replace with access transformer IntegerProperty.java max field
     public int getMaxAge() {
-        return cropSpecies.getMaxAge();
+        return cropSpecies.getAgeProperty().getPossibleValues().stream().max(Comparator.comparingInt(Integer::intValue)).get();
     }
 
     public int getAge() {
-        return age;
+        return cropState.getValue(cropSpecies.getAgeProperty());
     }
 
     public void setAge(int age) {
-        if (this.age == age) {
+        if (this.getAge() == age) {
             return;
         }
-        this.age = age;
+        if (age <= getMaxAge()) {
+            this.cropState = cropState.setValue(cropSpecies.getAgeProperty(), age);
+        } else {
+            this.cropState = cropState.setValue(cropSpecies.getAgeProperty(), getMaxAge());
+        }
         markUpdated();
     }
 
     public boolean isMaxAge() {
-        return age >= this.getMaxAge();
+        return cropState.getValue(cropSpecies.getAgeProperty()) >= getMaxAge();
     }
 
     public void growCrops(Level pLevel) {
@@ -95,7 +106,7 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
         if (i > j) {
             i = j;
         }
-        this.age = i;
+        setAge(i);
         markUpdated();
     }
 
@@ -128,9 +139,15 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
         CompoundTag saveTag = new CompoundTag();
         nbt.put(NBTTags.INFO_TAG, saveTag);
         saveTag.put(NBTTags.GENOME_TAG, genome.writeTag());
-        saveTag.putInt(NBTTags.AGE_TAG, this.age);
         if (cropSpecies != null) {
             saveTag.putString(NBTTags.CROP_SPECIES_TAG, GTCropSpecies.CROP_SPECIES_REGISTRY.get().getKey(cropSpecies).toString());
+        }
+        if (cropState != null) {
+            CompoundTag stateTag = new CompoundTag();
+            for (Property property : this.cropState.getProperties()) {
+                stateTag.put(property.getName(), NBTTags.encodeNbt(property.codec(), cropState.getValue(property)));
+            }
+            saveTag.put(NBTTags.CROP_STATE_TAG, stateTag);
         }
     }
 
@@ -142,11 +159,28 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
             }
             if (saveTag.contains(NBTTags.CROP_SPECIES_TAG)) {
                 this.cropSpecies = GTCropSpecies.CROP_SPECIES_REGISTRY.get().getValue(new ResourceLocation(saveTag.getString(NBTTags.CROP_SPECIES_TAG)));
+            } else {
+                // default to wheat species if nbt does not contain
+                cropSpecies = GTCropSpecies.GT_WHEAT.get();
             }
-            if (saveTag.contains(NBTTags.AGE_TAG)) {
-                age = saveTag.getInt(NBTTags.AGE_TAG);
+            this.cropState = cropSpecies.defaultCropState();
+            if (saveTag.contains(NBTTags.CROP_STATE_TAG)) {
+                CompoundTag stateTag = saveTag.getCompound(NBTTags.CROP_STATE_TAG);
+                for (Property property : cropState.getProperties()) {
+                    // See how nbt key names are formatted in NBTTags.java
+                    String nbtPropertyName = property.getName();
+                    // Check that property name exists in nbt and is the correct type
+                    if (stateTag.contains(nbtPropertyName)) {
+                        cropState = setValue(cropState, property, NBTTags.decodeNbt(property.codec(), stateTag.get(nbtPropertyName)));
+                    }
+                }
             }
         }
+    }
+
+    // Work around to ignore generics that don't exist on NBT but still be able to serialize properties of different types
+    public static <T extends Comparable<T>> CropState setValue(CropState oldState, Property<T> property, Object value) {
+        return oldState.setValue(property, (T)value);
     }
 
     // The getUpdatePacket()/onDataPacket() pair is used when a block update happens on the client
@@ -162,8 +196,9 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
     @Override
     public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
         // This is called client side: remember the current state of the values that we're interested in
-        int oldAge = this.age;
+        int oldAge = getAge();
         Genome oldGenome = this.genome;
+        String oldSpecies = GTCropSpecies.CROP_SPECIES_REGISTRY.get().getKey(cropSpecies).toString();
 
         CompoundTag tag = pkt.getTag();
         // This will call loadClientData()
@@ -171,7 +206,8 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
 
         // If any of the values was changed we request a refresh of our model data and send a block update (this will cause
         // the baked model to be recreated)
-        if (oldAge != age || !(oldGenome.equals(this.genome))) {
+        String newSpecies = GTCropSpecies.CROP_SPECIES_REGISTRY.get().getKey(cropSpecies).toString();
+        if (oldAge != getAge() || !(oldGenome.equals(this.genome)) || oldSpecies != newSpecies) {
             markUpdated();
         }
     }
