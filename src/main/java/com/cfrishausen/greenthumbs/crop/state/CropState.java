@@ -10,8 +10,4 @@ public class CropState extends StateHolder<ICropSpecies, CropState> {
     public CropState(ICropSpecies pOwner, ImmutableMap<Property<?>, Comparable<?>> pValues, MapCodec<CropState> pPropertiesCodec) {
         super(pOwner, pValues, pPropertiesCodec);
     }
-
-    public ICropSpecies getOwner() {
-        return owner;
-    }
 }

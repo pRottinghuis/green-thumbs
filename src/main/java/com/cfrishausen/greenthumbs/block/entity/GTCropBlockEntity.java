@@ -1,5 +1,6 @@
 package com.cfrishausen.greenthumbs.block.entity;
 
+import com.cfrishausen.greenthumbs.GreenThumbs;
 import com.cfrishausen.greenthumbs.crop.ICropEntity;
 import com.cfrishausen.greenthumbs.crop.ICropSpecies;
 import com.cfrishausen.greenthumbs.crop.NBTTags;
@@ -196,7 +197,7 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
     @Override
     public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
         // This is called client side: remember the current state of the values that we're interested in
-        int oldAge = getAge();
+        CropState oldState = getCropState();
         Genome oldGenome = this.genome;
         String oldSpecies = GTCropSpecies.CROP_SPECIES_REGISTRY.get().getKey(cropSpecies).toString();
 
@@ -207,7 +208,7 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
         // If any of the values was changed we request a refresh of our model data and send a block update (this will cause
         // the baked model to be recreated)
         String newSpecies = GTCropSpecies.CROP_SPECIES_REGISTRY.get().getKey(cropSpecies).toString();
-        if (oldAge != getAge() || !(oldGenome.equals(this.genome)) || oldSpecies != newSpecies) {
+        if (oldState != getCropState() || !(oldGenome.equals(this.genome)) || oldSpecies != newSpecies) {
             markUpdated();
         }
     }
@@ -224,5 +225,22 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
     public String toString() {
         String result = "CropBlockEntity at : " + this.getBlockPos() + " ";
         return result + this.getUpdateTag().toString();
+    }
+
+    @Override
+    public CropState getCropState() {
+        return this.cropState;
+    }
+
+    // When crop species is reset make sure to set cropState because it will set to the default state from the species
+    @Override
+    public void setCropSpecies(ICropSpecies cropSpecies) {
+        this.cropSpecies = cropSpecies;
+        refreshCropState();
+    }
+
+    @Override
+    public void refreshCropState() {
+        this.cropState = this.cropSpecies.defaultCropState();
     }
 }

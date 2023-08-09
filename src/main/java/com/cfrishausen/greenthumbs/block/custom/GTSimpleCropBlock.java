@@ -4,6 +4,7 @@ import com.cfrishausen.greenthumbs.block.entity.GTCropBlockEntity;
 import com.cfrishausen.greenthumbs.crop.ICropSpecies;
 import com.cfrishausen.greenthumbs.registries.GTItems;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.*;
@@ -12,8 +13,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -24,6 +27,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.PlantType;
 import net.minecraftforge.common.Tags;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -78,8 +82,6 @@ public class GTSimpleCropBlock extends Block implements IPlantable, Bonemealable
         return super.use(state, level, pos, player, hand, hit);
     }
 
-
-
     @Override
     public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         BlockEntity entity = level.getBlockEntity(pos);
@@ -132,7 +134,7 @@ public class GTSimpleCropBlock extends Block implements IPlantable, Bonemealable
     public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, boolean p_50900_) {
         BlockEntity entity = level.getBlockEntity(pos);
         if (entity instanceof GTCropBlockEntity cropEntity) {
-            return !cropEntity.isMaxAge();
+            return cropEntity.getCropSpecies().isValidBonemealTarget(level, pos, state, p_50900_, cropEntity);
         }
         return false;
     }
@@ -146,7 +148,7 @@ public class GTSimpleCropBlock extends Block implements IPlantable, Bonemealable
     public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
         BlockEntity entity = level.getBlockEntity(pos);
         if (entity instanceof GTCropBlockEntity cropEntity) {
-            cropEntity.growCrops(level);
+            cropEntity.getCropSpecies().performBonemeal(level, random, pos, state, cropEntity);
         }
     }
 
@@ -166,5 +168,16 @@ public class GTSimpleCropBlock extends Block implements IPlantable, Bonemealable
         } else {
             return super.getCloneItemStack(level, pos, state);
         }
+    }
+
+    @Override
+    public @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos currentPos, BlockPos neighborPos) {
+        BlockEntity entity = level.getBlockEntity(currentPos);
+        BlockState blockState = null;
+        if (entity instanceof GTCropBlockEntity cropBlockEntity) {
+            blockState = cropBlockEntity.getCropSpecies().updateShape(state, direction, neighborState, level, currentPos, neighborPos, this, cropBlockEntity);
+        }
+        // If there is no crop species use default block update shape
+        return !(blockState == null) ? blockState : super.updateShape(state, direction, neighborState, level, currentPos, neighborPos);
     }
 }

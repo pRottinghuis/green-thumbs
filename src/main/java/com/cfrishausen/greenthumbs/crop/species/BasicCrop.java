@@ -18,18 +18,20 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.ItemLike;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
@@ -41,7 +43,7 @@ public class BasicCrop implements ICropSpecies {
 
     public static final IntegerProperty AGE = BlockStateProperties.AGE_7;
     protected final StateDefinition<ICropSpecies, CropState> cropStateDef;
-    private CropState defaultCropState;
+    protected CropState defaultCropState;
     private static final VoxelShape[] SHAPE_BY_AGE = new VoxelShape[]{
             Block.box(0.0D, 0.0D, 0.0D, 16.0D, 2.0D, 16.0D),
             Block.box(0.0D, 0.0D, 0.0D, 16.0D, 4.0D, 16.0D),
@@ -57,7 +59,7 @@ public class BasicCrop implements ICropSpecies {
     private GTGenomeCropBlockItem cutting;
 
     // name of model file to look in
-    private final String pathName;
+    protected final String pathName;
 
     public BasicCrop(String pathName, GTGenomeCropBlockItem seed, Item crop, GTGenomeCropBlockItem cutting) {
         this.pathName = pathName;
@@ -67,7 +69,7 @@ public class BasicCrop implements ICropSpecies {
         StateDefinition.Builder<ICropSpecies, CropState> builder = new StateDefinition.Builder<>(this);
         this.createBlockStateDefinition(builder);
         this.cropStateDef = builder.create(ICropSpecies::defaultCropState, CropState::new);
-        this.registerDefaultState(this.cropStateDef.any());
+        this.registerDefaultState(this.cropStateDef.any().setValue(AGE, 0));
     }
 
     public final CropState defaultCropState() {
@@ -138,7 +140,10 @@ public class BasicCrop implements ICropSpecies {
         return false;
     }
 
-
+    @Override
+    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit, GTCropBlockEntity cropBlockEntity) {
+        return null;
+    }
 
     @Override
     public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random, GTSimpleCropBlock block, ICropEntity cropEntity) {
@@ -154,6 +159,11 @@ public class BasicCrop implements ICropSpecies {
                 }
             }
         }
+    }
+
+    @Override
+    public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state, GTCropBlockEntity cropEntity) {
+        cropEntity.growCrops(level);
     }
 
     // TODO add fortune drops
@@ -228,5 +238,18 @@ public class BasicCrop implements ICropSpecies {
             modelMap.put(defaultCropState.setValue(AGE, age), ModelResourceLocation.vanilla(pathName, "age=" + age));
         }
         return modelMap;
+    }
+
+    @Override
+    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos currentPos, BlockPos neighborPos, Block block, GTCropBlockEntity cropBlockEntity) {
+        if (canSurvive(state, level, currentPos, block)) {
+            return Blocks.AIR.defaultBlockState();
+        }
+        return state;
+    }
+
+    @Override
+    public String getPath() {
+        return this.pathName;
     }
 }

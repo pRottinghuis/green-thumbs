@@ -1,21 +1,23 @@
 package com.cfrishausen.greenthumbs.crop;
 
 import com.cfrishausen.greenthumbs.block.custom.GTSimpleCropBlock;
+import com.cfrishausen.greenthumbs.block.entity.GTCropBlockEntity;
 import com.cfrishausen.greenthumbs.client.ICropSpeciesExtensions;
 import com.cfrishausen.greenthumbs.crop.state.CropState;
 import com.cfrishausen.greenthumbs.genetics.Genome;
 import com.cfrishausen.greenthumbs.item.custom.GTGenomeCropBlockItem;
 import com.cfrishausen.greenthumbs.registries.GTCropSpecies;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.ItemLike;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -23,8 +25,10 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -101,10 +105,14 @@ public interface ICropSpecies extends ICropSpeciesExtensions {
      */
     boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos, Block block);
 
-    /**
-     * What does crop need to do on a tick
-     */
+    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit, GTCropBlockEntity cropBlockEntity);
+
+        /**
+         * What does crop need to do on a tick
+         */
     void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random, GTSimpleCropBlock block, ICropEntity cropEntity);
+
+    void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state, GTCropBlockEntity cropEntity);
 
     /**
      * Set the voxel shape for the crop
@@ -141,4 +149,10 @@ public interface ICropSpecies extends ICropSpeciesExtensions {
     @NotNull
     IntegerProperty getAgeProperty();
 
+    @NonNull
+    BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos currentPos, BlockPos neighborPos, Block block, GTCropBlockEntity cropBlockEntity);
+
+    String getPath();
+
+    default boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, boolean p50900, GTCropBlockEntity cropEntity) {return true;}
 }

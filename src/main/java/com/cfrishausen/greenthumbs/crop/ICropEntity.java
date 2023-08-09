@@ -1,5 +1,6 @@
 package com.cfrishausen.greenthumbs.crop;
 
+import com.cfrishausen.greenthumbs.crop.state.CropState;
 import com.cfrishausen.greenthumbs.genetics.Genome;
 import net.minecraft.nbt.CompoundTag;
 
@@ -24,4 +25,10 @@ public interface ICropEntity {
      *  Update fields from nbt
      */
     void load(CompoundTag nbt);
+
+    CropState getCropState();
+
+    void setCropSpecies(ICropSpecies cropSpecies);
+
+    void refreshCropState();
 }
