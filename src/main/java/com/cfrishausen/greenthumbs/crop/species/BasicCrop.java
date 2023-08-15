@@ -9,7 +9,6 @@ import com.cfrishausen.greenthumbs.crop.NBTTags;
 import com.cfrishausen.greenthumbs.crop.state.CropState;
 import com.cfrishausen.greenthumbs.genetics.Genome;
 import com.cfrishausen.greenthumbs.item.custom.GTGenomeCropBlockItem;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -146,16 +145,15 @@ public class BasicCrop implements ICropSpecies {
     }
 
     @Override
-    public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random, GTSimpleCropBlock block, ICropEntity cropEntity) {
+    public void randomTick(ServerLevel level, BlockPos pos, RandomSource random, GTSimpleCropBlock block, ICropEntity cropEntity) {
         if (!level.isAreaLoaded(pos, 1))
             return; // Forge: prevent loading unloaded chunks when checking neighbor's light
         if (level.getRawBrightness(pos, 0) >= 9) {
             int i = cropEntity.getAge();
             if (i < cropEntity.getMaxAge()) {
                 float f = cropEntity.getGenome().getGrowthSpeed(block, level, pos);
-                if (net.minecraftforge.common.ForgeHooks.onCropsGrowPre(level, pos, state, random.nextInt((int) (25.0F / f) + 1) == 0)) {
+                if (random.nextInt((int) (25.0F / f) + 1) == 0) {
                     cropEntity.setAge(cropEntity.getAge() + 1);
-                    net.minecraftforge.common.ForgeHooks.onCropsGrowPost(level, pos, state);
                 }
             }
         }
@@ -251,5 +249,10 @@ public class BasicCrop implements ICropSpecies {
     @Override
     public String getPath() {
         return this.pathName;
+    }
+
+    @Override
+    public boolean canTakeCutting(ICropEntity cropEntity) {
+        return cropEntity.isMaxAge();
     }
 }

@@ -22,15 +22,16 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.Map;
+import java.util.function.Supplier;
 
 public class AttachedStemCrop extends BasicCrop{
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     private static final Map<Direction, VoxelShape> AABBS = Maps.newEnumMap(ImmutableMap.of(Direction.SOUTH, Block.box(6.0D, 0.0D, 6.0D, 10.0D, 10.0D, 16.0D), Direction.WEST, Block.box(0.0D, 0.0D, 6.0D, 10.0D, 10.0D, 10.0D), Direction.NORTH, Block.box(6.0D, 0.0D, 0.0D, 10.0D, 10.0D, 10.0D), Direction.EAST, Block.box(6.0D, 0.0D, 6.0D, 16.0D, 10.0D, 10.0D)));
-    private final StemGrownCrop fruit;
+    private final Supplier<ICropSpecies> fruit;
 
 
 
-    public AttachedStemCrop(String name, GTGenomeCropBlockItem seed, Item crop, GTGenomeCropBlockItem cutting, StemGrownCrop fruit) {
+    public AttachedStemCrop(String name, GTGenomeCropBlockItem seed, Item crop, GTGenomeCropBlockItem cutting, Supplier<ICropSpecies> fruit) {
         super(name, seed, crop, cutting);
         this.fruit = fruit;
         this.registerDefaultState(this.cropStateDef.any().setValue(AGE, 0).setValue(FACING, Direction.NORTH));
@@ -53,10 +54,10 @@ public class AttachedStemCrop extends BasicCrop{
         if (neighborEntity instanceof GTCropBlockEntity neighborCropEntity) {
             if (neighborCropEntity.getCropSpecies() instanceof StemCrop neighborStemCrop) {
                 // If the dir the attached stem is facing is not attached to the correct StemGrownCrop block
-                if (!(neighborStemCrop.getFruit().getPath() == this.fruit.getPath()) && direction == cropBlockEntity.getCropState().getValue(FACING)) {
+                if (!(neighborStemCrop.getFruit().getPath() == this.fruit.get().getPath()) && direction == cropBlockEntity.getCropState().getValue(FACING)) {
                     // Revert this AttachedStemCrop to a StemCrop
-                    cropBlockEntity.setCropSpecies(this.fruit.getStemSpecies());
-                    cropBlockEntity.setAge(cropBlockEntity.getMaxAge());
+                    neighborCropEntity.setCropSpecies(((StemGrownCrop) this.fruit.get()).getStemSpecies());
+                    neighborCropEntity.setAge(cropBlockEntity.getMaxAge());
                 }
             }
         }

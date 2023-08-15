@@ -28,9 +28,9 @@ public class BeetrootCrop extends BasicCrop{
     }
 
     @Override
-    public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random, GTSimpleCropBlock block, ICropEntity cropEntity) {
-        if (random.nextInt(3) != 0) {
-            super.randomTick(state, level, pos, random, block, cropEntity);
+    public void randomTick(ServerLevel level, BlockPos pos, RandomSource random, GTSimpleCropBlock block, ICropEntity cropEntity) {
+        if (random.nextInt(getMaxAge()) != 0) {
+            super.randomTick(level, pos, random, block, cropEntity);
         }
     }
 

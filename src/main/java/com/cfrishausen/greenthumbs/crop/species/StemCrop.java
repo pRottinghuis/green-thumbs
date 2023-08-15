@@ -15,8 +15,9 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.function.Supplier;
 
 public class StemCrop extends BasicCrop {
     protected static final VoxelShape[] SHAPE_BY_AGE = new VoxelShape[]{
@@ -30,28 +31,23 @@ public class StemCrop extends BasicCrop {
             Block.box(7.0D, 0.0D, 7.0D, 9.0D, 16.0D, 9.0D),
     };
 
-    private final StemGrownCrop fruit;
+    private final Supplier<ICropSpecies> fruit;
 
-    public StemCrop(String name, GTGenomeCropBlockItem seed, Item crop, GTGenomeCropBlockItem cutting, StemGrownCrop fruit) {
+    public StemCrop(String name, GTGenomeCropBlockItem seed, Item crop, GTGenomeCropBlockItem cutting, Supplier<ICropSpecies> fruit) {
         super(name, seed, crop, cutting);
         this.fruit = fruit;
     }
 
     @Override
-    public void createBlockStateDefinition(StateDefinition.Builder<ICropSpecies, CropState> builder) {
-        super.createBlockStateDefinition(builder);
-        builder.add(AGE);
-    }
-
-    @Override
-    public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random, GTSimpleCropBlock block, ICropEntity cropEntity) {
+    public void randomTick(ServerLevel level, BlockPos pos, RandomSource random, GTSimpleCropBlock block, ICropEntity cropEntity) {
         if (!level.isAreaLoaded(pos, 1)) return; // Forge: prevent loading unloaded chunks when checking neighbor's light
         if (level.getRawBrightness(pos, 0) >= 9) {
             float f = cropEntity.getGenome().getGrowthSpeed(block, level, pos);
-            if (net.minecraftforge.common.ForgeHooks.onCropsGrowPre(level, pos, state, random.nextInt((int)(25.0F / f) + 1) == 0)) {
-                int i = state.getValue(AGE);
-                if (i < 7) {
-                    level.setBlock(pos, state.setValue(AGE, Integer.valueOf(i + 1)), 2);
+            // TODO change back to 25
+            if (random.nextInt((int)(/*25.0F*/ 5.0F / f) + 1) == 0) {
+                int i = cropEntity.getCropState().getValue(AGE);
+                if (i < getMaxAge()) {
+                    cropEntity.growCrops(level);
                 } else {
                     Direction direction = Direction.Plane.HORIZONTAL.getRandomDirection(random);
                     BlockPos fruitPos = pos.relative(direction);
@@ -59,13 +55,15 @@ public class StemCrop extends BasicCrop {
                     if (level.isEmptyBlock(fruitPos) && (blockstate.canSustainPlant(level, fruitPos.below(), Direction.UP, ((GTSimpleCropBlock) GTBlocks.GT_CROP_BLOCK.get())) || blockstate.is(Blocks.FARMLAND) || blockstate.is(BlockTags.DIRT))) {
                         // set block in targeted position to GTCropBlock and then set species to fruit
                         level.setBlockAndUpdate(fruitPos, GTBlocks.GT_CROP_BLOCK.get().defaultBlockState());
-                        ((GTCropBlockEntity) level.getBlockEntity(fruitPos)).setCropSpecies(this.fruit);
+                        GTCropBlockEntity fruitCropBlockEntity = ((GTCropBlockEntity) level.getBlockEntity(fruitPos));
+                        fruitCropBlockEntity.setCropSpecies(this.fruit.get());
+                        fruitCropBlockEntity.setGenome(cropEntity.getGenome());
+                        fruitCropBlockEntity.markUpdated();
                         // change the old stem to be an attached stem connected to the fruit
-                        cropEntity.setCropSpecies(this.fruit.getAttachedStemSpecies());
-                        cropEntity.getCropState().setValue(AttachedStemCrop.FACING, direction);
+                        cropEntity.setCropSpecies(((StemGrownCrop) this.fruit.get()).getAttachedStemSpecies());
+                        cropEntity.setCropState(cropEntity.getCropState().setValue(AttachedStemCrop.FACING, direction));
                     }
                 }
-                net.minecraftforge.common.ForgeHooks.onCropsGrowPost(level, pos, state);
             }
 
         }
@@ -77,7 +75,7 @@ public class StemCrop extends BasicCrop {
     }
 
     public StemGrownCrop getFruit() {
-        return this.fruit;
+        return ((StemGrownCrop) this.fruit.get());
     }
 
     @Override

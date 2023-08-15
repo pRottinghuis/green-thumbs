@@ -139,7 +139,9 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
     private void saveStandardNBT(CompoundTag nbt) {
         CompoundTag saveTag = new CompoundTag();
         nbt.put(NBTTags.INFO_TAG, saveTag);
-        saveTag.put(NBTTags.GENOME_TAG, genome.writeTag());
+        if (genome != null) {
+            saveTag.put(NBTTags.GENOME_TAG, genome.writeTag());
+        }
         if (cropSpecies != null) {
             saveTag.putString(NBTTags.CROP_SPECIES_TAG, GTCropSpecies.CROP_SPECIES_REGISTRY.get().getKey(cropSpecies).toString());
         }
@@ -199,7 +201,7 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
         // This is called client side: remember the current state of the values that we're interested in
         CropState oldState = getCropState();
         Genome oldGenome = this.genome;
-        String oldSpecies = GTCropSpecies.CROP_SPECIES_REGISTRY.get().getKey(cropSpecies).toString();
+        String oldSpecies = cropSpecies == null ? null : GTCropSpecies.CROP_SPECIES_REGISTRY.get().getKey(cropSpecies).toString();
 
         CompoundTag tag = pkt.getTag();
         // This will call loadClientData()
@@ -232,15 +234,27 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
         return this.cropState;
     }
 
+    public void setCropState(CropState cropState) {
+        this.cropState = cropState;
+        markUpdated();
+    }
+
     // When crop species is reset make sure to set cropState because it will set to the default state from the species
     @Override
     public void setCropSpecies(ICropSpecies cropSpecies) {
         this.cropSpecies = cropSpecies;
         refreshCropState();
+        markUpdated();
     }
 
     @Override
     public void refreshCropState() {
         this.cropState = this.cropSpecies.defaultCropState();
+    }
+
+    @Override
+    public void setGenome(Genome genome) {
+        this.genome = genome;
+        markUpdated();
     }
 }

@@ -23,8 +23,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.level.block.state.properties.Property;
-import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -74,6 +72,8 @@ public interface ICropSpecies extends ICropSpeciesExtensions {
      */
     void quickReplant(BlockState pState, Level pLevel, BlockPos pPos, ICropEntity crop);
 
+    // TODO make getStackWithReplantTag and getStackWithCuttingTag more concise
+
     /**
      *
      * @param crop ICropEntity item to copy genome from
@@ -85,7 +85,6 @@ public interface ICropSpecies extends ICropSpeciesExtensions {
         CompoundTag infoTag = new CompoundTag();
         cropStack.getOrCreateTag().put(NBTTags.INFO_TAG, infoTag);
         infoTag.put(NBTTags.GENOME_TAG, crop.getGenome().writeReproductionTag(random));
-        infoTag.putInt(NBTTags.AGE_TAG, 0);
         infoTag.putString(NBTTags.CROP_SPECIES_TAG, GTCropSpecies.CROP_SPECIES_REGISTRY.get().getKey(crop.getCropSpecies()).toString());
         return cropStack;
     }
@@ -95,7 +94,6 @@ public interface ICropSpecies extends ICropSpeciesExtensions {
         CompoundTag infoTag = new CompoundTag();
         cropStack.getOrCreateTag().put(NBTTags.INFO_TAG, infoTag);
         infoTag.put(NBTTags.GENOME_TAG, crop.getGenome().writeCuttingTag(random));
-        infoTag.putInt(NBTTags.AGE_TAG, 0);
         infoTag.putString(NBTTags.CROP_SPECIES_TAG, GTCropSpecies.CROP_SPECIES_REGISTRY.get().getKey(crop.getCropSpecies()).toString());
         return cropStack;
     }
@@ -110,7 +108,7 @@ public interface ICropSpecies extends ICropSpeciesExtensions {
         /**
          * What does crop need to do on a tick
          */
-    void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random, GTSimpleCropBlock block, ICropEntity cropEntity);
+    void randomTick(ServerLevel level, BlockPos pos, RandomSource random, GTSimpleCropBlock block, ICropEntity cropEntity);
 
     void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state, GTCropBlockEntity cropEntity);
 
@@ -155,4 +153,6 @@ public interface ICropSpecies extends ICropSpeciesExtensions {
     String getPath();
 
     default boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, boolean p50900, GTCropBlockEntity cropEntity) {return true;}
+
+    boolean canTakeCutting(ICropEntity cropEntity);
 }

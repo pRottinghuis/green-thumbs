@@ -2,17 +2,13 @@ package com.cfrishausen.greenthumbs.registries;
 
 import com.cfrishausen.greenthumbs.GreenThumbs;
 import com.cfrishausen.greenthumbs.crop.ICropSpecies;
-import com.cfrishausen.greenthumbs.crop.species.BasicCrop;
-import com.cfrishausen.greenthumbs.crop.species.BeetrootCrop;
-import com.cfrishausen.greenthumbs.crop.species.RootCrop;
+import com.cfrishausen.greenthumbs.crop.species.*;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.RegistryBuilder;
 import net.minecraftforge.registries.RegistryObject;
-import org.apache.logging.log4j.core.pattern.AbstractStyleNameConverter;
 
 import java.util.function.Supplier;
 
@@ -31,6 +27,18 @@ public class GTCropSpecies {
 
     public static final RegistryObject<ICropSpecies> GT_BEETROOT = CROP_SPECIES.register("gt_beetroot",
             () -> new BeetrootCrop("beetroots", GTItems.BEETROOT_SEEDS.get(), Items.BEETROOT, GTItems.BEETROOT_CUTTING.get()));
+
+    public static final RegistryObject<ICropSpecies> GT_PUMPKIN = GTCropSpecies.CROP_SPECIES.register("gt_pumpkin",
+            () -> new StemGrownCrop("pumpkin", GTItems.PUMPKIN_SEEDS.get(), Items.PUMPKIN, GTItems.PUMPKIN_CUTTING.get(),
+                    GTCropSpecies.GT_PUMPKIN_STEM, GTCropSpecies.GT_ATTACHED_PUMPKIN_STEM));
+
+    public static final RegistryObject<ICropSpecies> GT_PUMPKIN_STEM = CROP_SPECIES.register("gt_pumpkin_stem",
+            () -> new StemCrop("pumpkin_stem", GTItems.PUMPKIN_SEEDS.get(), Items.PUMPKIN, GTItems.PUMPKIN_CUTTING.get(),
+                    GT_PUMPKIN));
+
+    public static final RegistryObject<ICropSpecies> GT_ATTACHED_PUMPKIN_STEM = CROP_SPECIES.register("gt_pumpkin_attached_stem",
+            () -> new AttachedStemCrop("attached_pumpkin_stem", GTItems.PUMPKIN_SEEDS.get(), Items.PUMPKIN, GTItems.PUMPKIN_CUTTING.get(),
+                    GT_PUMPKIN));
 
     public static ICropSpecies getSpecies(ResourceLocation key) {
         return CROP_SPECIES_REGISTRY.get().getValue(key);

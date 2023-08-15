@@ -17,6 +17,6 @@ public class EventHandler {
     }
 
     public static void createNewRegistry(NewRegistryEvent event) {
-        event.create(new RegistryBuilder<ICropSpecies>().setName(new ResourceLocation(GreenThumbs.ID, "crop_type")));
+        event.create(new RegistryBuilder<ICropSpecies>().setName(new ResourceLocation(GreenThumbs.ID, "crop_species")));
     }
 }

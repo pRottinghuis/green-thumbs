@@ -9,14 +9,12 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.*;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -44,7 +42,9 @@ public class GTSimpleCropBlock extends Block implements IPlantable, Bonemealable
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         if (level.getBlockEntity(pos) instanceof GTCropBlockEntity cropEntity) {
-            return cropEntity.getCropSpecies().getShape(state, level, pos, context, cropEntity);
+            if (cropEntity.getCropSpecies() != null) {
+                return cropEntity.getCropSpecies().getShape(state, level, pos, context, cropEntity);
+            }
         }
         return SHAPE_BY_AGE[0];
     }
@@ -57,7 +57,7 @@ public class GTSimpleCropBlock extends Block implements IPlantable, Bonemealable
             if (handStack.is(Tags.Items.SHEARS)) {
                 BlockEntity blockEntity = level.getBlockEntity(pos);
                 if (blockEntity instanceof GTCropBlockEntity cropEntity) {
-                    if (cropEntity.isMaxAge()) {
+                    if (cropEntity.getCropSpecies().canTakeCutting(cropEntity)) {
                         SimpleContainer drops = new SimpleContainer(1);
                         ICropSpecies cropSpecies = cropEntity.getCropSpecies();
                         ItemStack cuttingStack = cropSpecies.getStackWithCuttingTag(cropEntity, cropSpecies.getCutting(), level.getRandom());
@@ -101,7 +101,7 @@ public class GTSimpleCropBlock extends Block implements IPlantable, Bonemealable
     public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         BlockEntity entity = level.getBlockEntity(pos);
         if (entity instanceof GTCropBlockEntity cropEntity) {
-            cropEntity.getCropSpecies().randomTick(state, level, pos, random, this, cropEntity);
+            cropEntity.getCropSpecies().randomTick(level, pos, random, this, cropEntity);
         }
 
     }

@@ -2,6 +2,7 @@ package com.cfrishausen.greenthumbs.item.custom;
 
 import com.cfrishausen.greenthumbs.block.entity.GTCropBlockEntity;
 import com.cfrishausen.greenthumbs.crop.NBTTags;
+import com.cfrishausen.greenthumbs.crop.species.BasicCrop;
 import com.cfrishausen.greenthumbs.genetics.Genome;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -34,7 +35,7 @@ public class GTDebugStick extends Item {
                 if (updateTag.contains(NBTTags.INFO_TAG)) {
                     updateTag = updateTag.getCompound(NBTTags.INFO_TAG);
                     player.sendSystemMessage(Component.literal("Crop at " + clickedPos.toShortString() + ":"));
-                    player.sendSystemMessage(Component.literal("Age: " + updateTag.getInt(NBTTags.AGE_TAG)));
+                    player.sendSystemMessage(Component.literal("Age: " + NBTTags.decodeNbt(BasicCrop.AGE.codec(), updateTag.getCompound(NBTTags.CROP_STATE_TAG).get(BasicCrop.AGE.getName()))));
                     player.sendSystemMessage(Component.literal("Species: " + updateTag.getString(NBTTags.CROP_SPECIES_TAG)));
                     if (updateTag.contains(NBTTags.GENOME_TAG)) {
                         CompoundTag genomeTag = updateTag.getCompound(NBTTags.GENOME_TAG);

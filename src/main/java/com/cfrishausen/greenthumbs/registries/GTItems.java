@@ -21,11 +21,14 @@ public class GTItems {
     public static final RegistryObject<GTGenomeCropBlockItem> CARROT_CUTTING = registerGenomeBlockItem("carrot_cutting", GTBlocks.GT_CROP_BLOCK);
     public static final RegistryObject<GTGenomeCropBlockItem> WHEAT_SEEDS = registerGenomeBlockItem("wheat_seeds", GTBlocks.GT_CROP_BLOCK);
     public static final RegistryObject<GTGenomeCropBlockItem> WHEAT_CUTTING = registerGenomeBlockItem("wheat_cutting", GTBlocks.GT_CROP_BLOCK);
-
     public static final RegistryObject<GTGenomeCropBlockItem> POTATO_SEEDS = registerGenomeBlockItem("potato_seeds", GTBlocks.GT_CROP_BLOCK);
     public static final RegistryObject<GTGenomeCropBlockItem> POTATO_CUTTING = registerGenomeBlockItem("potato_cutting", GTBlocks.GT_CROP_BLOCK);
     public static final RegistryObject<GTGenomeCropBlockItem> BEETROOT_SEEDS = registerGenomeBlockItem("beetroot_seeds", GTBlocks.GT_CROP_BLOCK);
     public static final RegistryObject<GTGenomeCropBlockItem> BEETROOT_CUTTING = registerGenomeBlockItem("beetroot_cutting", GTBlocks.GT_CROP_BLOCK);
+
+
+    public static final RegistryObject<GTGenomeCropBlockItem> PUMPKIN_SEEDS = registerGenomeBlockItem("pumpkin_seeds", GTBlocks.GT_CROP_BLOCK);
+    public static final RegistryObject<GTGenomeCropBlockItem> PUMPKIN_CUTTING = registerGenomeBlockItem("pumpkin_cutting", GTBlocks.GT_CROP_BLOCK);
 
     public static final RegistryObject<BlockItem> SEED_SPLICING_STATION = ITEMS.register("seed_splicing_station", () -> new BlockItem(GTBlocks.SEED_SPLICING_STATION.get(), new Item.Properties()));
 
