@@ -9,6 +9,7 @@ import com.cfrishausen.greenthumbs.crop.NBTTags;
 import com.cfrishausen.greenthumbs.crop.state.CropState;
 import com.cfrishausen.greenthumbs.genetics.Genome;
 import com.cfrishausen.greenthumbs.item.custom.GTGenomeCropBlockItem;
+import com.cfrishausen.greenthumbs.registries.GTItems;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -26,6 +27,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -33,8 +35,10 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.common.Tags;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -68,7 +72,7 @@ public class BasicCrop implements ICropSpecies {
         StateDefinition.Builder<ICropSpecies, CropState> builder = new StateDefinition.Builder<>(this);
         this.createBlockStateDefinition(builder);
         this.cropStateDef = builder.create(ICropSpecies::defaultCropState, CropState::new);
-        this.registerDefaultState(this.cropStateDef.any().setValue(AGE, 0));
+        this.registerDefaultState();
     }
 
     public final CropState defaultCropState() {
@@ -80,8 +84,8 @@ public class BasicCrop implements ICropSpecies {
 
     }
 
-    public void registerDefaultState(CropState state) {
-        this.defaultCropState = state;
+    public void registerDefaultState() {
+        this.defaultCropState = this.cropStateDef.any().setValue(AGE, 0);
     }
 
     /**
@@ -140,8 +144,30 @@ public class BasicCrop implements ICropSpecies {
     }
 
     @Override
-    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit, GTCropBlockEntity cropBlockEntity) {
-        return null;
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit, GTCropBlockEntity cropBlockEntity) {
+        if (!level.isClientSide()) {
+            ItemStack handStack = player.getMainHandItem();
+
+            if (handStack.is(Tags.Items.SHEARS)) {
+                if (cropBlockEntity.getCropSpecies().canTakeCutting(cropBlockEntity)) {
+                    SimpleContainer drops = new SimpleContainer(1);
+                    ItemStack cuttingStack = getStackWithCuttingTag(cropBlockEntity, getCutting(), level.getRandom());
+                    drops.addItem(cuttingStack);
+                    setAge(cropBlockEntity, 0);
+                    Containers.dropContents(level, pos, drops);
+                }
+
+            } else {
+                // Don't Quick Replant on debug stick
+                if (!handStack.is(GTItems.GT_DEBUG_STICK.get())) {
+                    // quick replant from harvest implementation
+                    if (isMaxAge(cropBlockEntity)) {
+                        cropBlockEntity.getCropSpecies().quickReplant(state, level, pos, cropBlockEntity);
+                    }
+                }
+            }
+        }
+        return InteractionResult.PASS;
     }
 
     @Override
@@ -149,11 +175,10 @@ public class BasicCrop implements ICropSpecies {
         if (!level.isAreaLoaded(pos, 1))
             return; // Forge: prevent loading unloaded chunks when checking neighbor's light
         if (level.getRawBrightness(pos, 0) >= 9) {
-            int i = cropEntity.getAge();
-            if (i < cropEntity.getMaxAge()) {
+            if (!isMaxAge(cropEntity)) {
                 float f = cropEntity.getGenome().getGrowthSpeed(block, level, pos);
                 if (random.nextInt((int) (25.0F / f) + 1) == 0) {
-                    cropEntity.setAge(cropEntity.getAge() + 1);
+                    setAge(cropEntity, getAge(cropEntity) + 1);
                 }
             }
         }
@@ -161,7 +186,16 @@ public class BasicCrop implements ICropSpecies {
 
     @Override
     public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state, GTCropBlockEntity cropEntity) {
-        cropEntity.growCrops(level);
+        growCrops(level, cropEntity);
+    }
+
+    public void growCrops(Level level, ICropEntity cropEntity) {
+        int i = getAge(cropEntity) + getBonemealAgeIncrease(level);
+        int j = getMaxAge();
+        if (i > j) {
+            i = j;
+        }
+        setAge(cropEntity, i);
     }
 
     // TODO add fortune drops
@@ -179,7 +213,7 @@ public class BasicCrop implements ICropSpecies {
         }
         drops.setItem(0, allAgeDropStack);
         // Add crop max age drop
-        if (cropEntity.isMaxAge()) {
+        if (isMaxAge(cropEntity)) {
             drops.setItem(1, maxAgeDrop(cropEntity, level.getRandom()));
         }
         Containers.dropContents(level, pos, drops);
@@ -188,22 +222,24 @@ public class BasicCrop implements ICropSpecies {
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context, ICropEntity cropEntity) {
-        if (this.SHAPE_BY_AGE[cropEntity.getAge()] != null) {
-            return this.SHAPE_BY_AGE[cropEntity.getAge()];
+        if (this.SHAPE_BY_AGE[getAge(cropEntity)] != null) {
+            return this.SHAPE_BY_AGE[getAge(cropEntity)];
         }
-        GreenThumbs.LOGGER.warn("BasicCrop species does not have a voxel shape for {} for age {}", cropEntity, cropEntity.getAge());
+        GreenThumbs.LOGGER.warn("BasicCrop species does not have a voxel shape for {} for state {}", cropEntity, cropEntity.getCropState());
         return this.SHAPE_BY_AGE[0];
     }
 
+    // TODO replace with access transformer IntegerProperty.java max field
     @Override
     public int getMaxAge() {
-        return 7;
+        return getAgeProperty().getPossibleValues().stream().max(Comparator.comparingInt(Integer::intValue)).get();
     }
 
     public GTGenomeCropBlockItem getBaseItemId() {
         return this.seed;
     }
 
+    // TODO change so that dynamic with crops with different max ages
     @Override
     public int getBonemealAgeIncrease(Level level) {
         return Mth.nextInt(level.random, 2, 5);
@@ -226,14 +262,14 @@ public class BasicCrop implements ICropSpecies {
 
     @Override
     public @NotNull IntegerProperty getAgeProperty() {
-        return AGE;
+        return this.AGE;
     }
 
     @Override
     public Map<CropState, ModelResourceLocation> getModelMap() {
         Map<CropState, ModelResourceLocation> modelMap = new HashMap<>();
         for (int age = 0; age <= getMaxAge(); age++) {
-            modelMap.put(defaultCropState.setValue(AGE, age), ModelResourceLocation.vanilla(pathName, "age=" + age));
+            modelMap.put(defaultCropState.setValue(getAgeProperty(), age), ModelResourceLocation.vanilla(pathName, "age=" + age));
         }
         return modelMap;
     }
@@ -253,6 +289,36 @@ public class BasicCrop implements ICropSpecies {
 
     @Override
     public boolean canTakeCutting(ICropEntity cropEntity) {
-        return cropEntity.isMaxAge();
+        return isMaxAge(cropEntity);
+    }
+
+    @Override
+    public int getAge(ICropEntity cropEntity) {
+        CropState entityCropState = cropEntity.getCropState();
+        if (entityCropState.hasProperty(getAgeProperty())) {
+            return entityCropState.getValue(getAgeProperty());
+        }
+        GreenThumbs.LOGGER.warn("Trying to access crop species {} with no age property", this);
+        return 0;
+    }
+
+    @Override
+    public void setAge(ICropEntity cropEntity, int age) {
+        CropState entityCropState = cropEntity.getCropState();
+        if (entityCropState.hasProperty(getAgeProperty())) {
+            cropEntity.setCropState(entityCropState.setValue(getAgeProperty(), age));
+        } else {
+            GreenThumbs.LOGGER.warn("Trying to set age on {} species which does not have an age property", this);
+        }
+    }
+
+    @Override
+    public boolean isMaxAge(ICropEntity cropEntity) {
+        CropState entityCropState = cropEntity.getCropState();
+        if (entityCropState.hasProperty(getAgeProperty())) {
+            return getAge(cropEntity) == getMaxAge();
+        }
+        GreenThumbs.LOGGER.warn("Trying to check max age on {} which has no age property", this);
+        return false;
     }
 }

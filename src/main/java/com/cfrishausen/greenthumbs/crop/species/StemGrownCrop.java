@@ -7,14 +7,26 @@ import com.cfrishausen.greenthumbs.crop.state.CropState;
 import com.cfrishausen.greenthumbs.item.custom.GTGenomeCropBlockItem;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
+import org.spongepowered.asm.mixin.gen.AccessorGenerator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +41,21 @@ public class StemGrownCrop extends BasicCrop{
         super(pathName, seed, crop, cutting);
         this.stemSpecies = stemSpecies;
         this.attachedStemSpecies = attachedStemSpecies;
+    }
+
+    @Override
+    public void createBlockStateDefinition(StateDefinition.Builder<ICropSpecies, CropState> builder) {
+        return;
+    }
+
+    @Override
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit, GTCropBlockEntity cropBlockEntity) {
+        return InteractionResult.PASS;
+    }
+
+    @Override
+    public void registerDefaultState() {
+        this.defaultCropState = this.cropStateDef.any();
     }
 
     @Override
@@ -58,9 +85,7 @@ public class StemGrownCrop extends BasicCrop{
     @Override
     public Map<CropState, ModelResourceLocation> getModelMap() {
         Map<CropState, ModelResourceLocation> modelMap = new HashMap<>();
-        for (int age = 0; age <= getMaxAge(); age++) {
-            modelMap.put(defaultCropState.setValue(AGE, age), ModelResourceLocation.vanilla(pathName, ""));
-        }
+        modelMap.put(defaultCropState, ModelResourceLocation.vanilla(pathName, ""));
         return modelMap;
     }
 
@@ -68,4 +93,5 @@ public class StemGrownCrop extends BasicCrop{
     public boolean canTakeCutting(ICropEntity cropEntity) {
         return false;
     }
+
 }

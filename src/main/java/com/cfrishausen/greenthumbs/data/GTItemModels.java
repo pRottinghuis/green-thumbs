@@ -17,6 +17,7 @@ public class GTItemModels extends ItemModelProvider {
         this.basicItem(GTItems.WHEAT_SEEDS.get());
         this.basicItem(GTItems.POTATO_SEEDS.get());
         this.basicItem(GTItems.BEETROOT_SEEDS.get());
+        this.basicItem(GTItems.PUMPKIN_SEEDS.get());
 
         this.basicItem(GTItems.CARROT_CUTTING.get());
         this.basicItem(GTItems.WHEAT_CUTTING.get());

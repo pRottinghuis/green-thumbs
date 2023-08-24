@@ -14,14 +14,6 @@ public interface ICropEntity {
 
     void setGenome(Genome genome);
 
-    boolean isMaxAge();
-
-    int getAge();
-
-    void setAge(int age);
-
-    int getMaxAge();
-
     ICropSpecies getCropSpecies();
 
     /**
@@ -36,8 +28,6 @@ public interface ICropEntity {
     void setCropSpecies(ICropSpecies cropSpecies);
 
     void refreshCropState();
-
-    void growCrops(Level pLevel);
 
     void markUpdated();
 }

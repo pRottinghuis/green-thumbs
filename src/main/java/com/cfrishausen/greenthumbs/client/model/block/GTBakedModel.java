@@ -37,12 +37,12 @@ public class GTBakedModel implements IDynamicBakedModel {
         if (state == null) {
             return Collections.emptyList();
         }
-        if (side != null) {
-            return Collections.emptyList();
-        }
+//        if (side != null) {
+//            return Collections.emptyList();
+//        }
         if (data.has(GTCropBlockEntity.CROP_STATE)) {
             BakedModel bakedModel = bakedModels.get(data.get(GTCropBlockEntity.CROP_STATE));
-            return bakedModel == null ? Collections.emptyList() : bakedModel.getQuads(null, null, rand, ModelData.EMPTY, null);
+            return bakedModel == null ? Collections.emptyList() : bakedModel.getQuads(null, side, rand, ModelData.EMPTY, null);
 
         }
         return Collections.emptyList();
@@ -77,10 +77,11 @@ public class GTBakedModel implements IDynamicBakedModel {
     // used by forge in place of getParticleIcion()
     @Override
     public TextureAtlasSprite getParticleIcon(@NotNull ModelData data) {
-        if (data.has(GTCropBlockEntity.AGE) && data.has(GTCropBlockEntity.CROP_TYPE)) {
-            return bakedModels.get(data.get(GTCropBlockEntity.CROP_STATE)).getParticleIcon();
+        BakedModel bakedModel = null;
+        if (data.has(GTCropBlockEntity.CROP_STATE)) {
+            bakedModel = bakedModels.get(data.get(GTCropBlockEntity.CROP_STATE));
         }
-        return Minecraft.getInstance().getModelManager().getMissingModel().getParticleIcon();
+        return bakedModel == null ? Minecraft.getInstance().getModelManager().getMissingModel().getParticleIcon() : bakedModel.getParticleIcon();
     }
 
     @Override

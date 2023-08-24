@@ -38,9 +38,6 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
 
     private ICropSpecies cropSpecies = null;
 
-    public static ModelProperty<Integer> AGE = new ModelProperty<>();
-    public static ModelProperty<String> CROP_TYPE = new ModelProperty<>();
-
     public static ModelProperty<CropState> CROP_STATE = new ModelProperty<>();
 
     private Genome genome;
@@ -74,41 +71,6 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
     public void load(CompoundTag nbt) {
         super.load(nbt);
         readStandardNBT(nbt);
-    }
-
-    // TODO replace with access transformer IntegerProperty.java max field
-    public int getMaxAge() {
-        return cropSpecies.getAgeProperty().getPossibleValues().stream().max(Comparator.comparingInt(Integer::intValue)).get();
-    }
-
-    public int getAge() {
-        return cropState.getValue(cropSpecies.getAgeProperty());
-    }
-
-    public void setAge(int age) {
-        if (this.getAge() == age) {
-            return;
-        }
-        if (age <= getMaxAge()) {
-            this.cropState = cropState.setValue(cropSpecies.getAgeProperty(), age);
-        } else {
-            this.cropState = cropState.setValue(cropSpecies.getAgeProperty(), getMaxAge());
-        }
-        markUpdated();
-    }
-
-    public boolean isMaxAge() {
-        return cropState.getValue(cropSpecies.getAgeProperty()) >= getMaxAge();
-    }
-
-    public void growCrops(Level pLevel) {
-        int i = this.getAge() + this.cropSpecies.getBonemealAgeIncrease(pLevel);
-        int j = this.getMaxAge();
-        if (i > j) {
-            i = j;
-        }
-        setAge(i);
-        markUpdated();
     }
 
     public void markUpdated() {

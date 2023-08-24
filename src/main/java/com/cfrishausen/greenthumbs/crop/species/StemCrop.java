@@ -13,8 +13,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.function.Supplier;
@@ -47,14 +49,14 @@ public class StemCrop extends BasicCrop {
             if (random.nextInt((int)(/*25.0F*/ 5.0F / f) + 1) == 0) {
                 int i = cropEntity.getCropState().getValue(AGE);
                 if (i < getMaxAge()) {
-                    cropEntity.growCrops(level);
+                    growCrops(level, cropEntity);
                 } else {
                     Direction direction = Direction.Plane.HORIZONTAL.getRandomDirection(random);
                     BlockPos fruitPos = pos.relative(direction);
                     BlockState blockstate = level.getBlockState(fruitPos.below());
                     if (level.isEmptyBlock(fruitPos) && (blockstate.canSustainPlant(level, fruitPos.below(), Direction.UP, ((GTSimpleCropBlock) GTBlocks.GT_CROP_BLOCK.get())) || blockstate.is(Blocks.FARMLAND) || blockstate.is(BlockTags.DIRT))) {
                         // set block in targeted position to GTCropBlock and then set species to fruit
-                        level.setBlockAndUpdate(fruitPos, GTBlocks.GT_CROP_BLOCK.get().defaultBlockState());
+                        level.setBlockAndUpdate(fruitPos, GTBlocks.GT_VEGETABLE_BLOCK.get().defaultBlockState());
                         GTCropBlockEntity fruitCropBlockEntity = ((GTCropBlockEntity) level.getBlockEntity(fruitPos));
                         fruitCropBlockEntity.setCropSpecies(this.fruit.get());
                         fruitCropBlockEntity.setGenome(cropEntity.getGenome());
@@ -84,4 +86,6 @@ public class StemCrop extends BasicCrop {
         // Ensure that there is a chance of growing a fruit
         state.randomTick(level, pos, random);
     }
+
+
 }

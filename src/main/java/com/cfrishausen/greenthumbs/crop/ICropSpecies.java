@@ -140,7 +140,7 @@ public interface ICropSpecies extends ICropSpeciesExtensions {
 
     void createBlockStateDefinition(StateDefinition.Builder<ICropSpecies, CropState> builder);
 
-    void registerDefaultState(CropState state);
+    void registerDefaultState();
 
     boolean doesQuickReplant();
 
@@ -155,4 +155,12 @@ public interface ICropSpecies extends ICropSpeciesExtensions {
     default boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, boolean p50900, GTCropBlockEntity cropEntity) {return true;}
 
     boolean canTakeCutting(ICropEntity cropEntity);
+
+    int getAge(ICropEntity cropEntity);
+
+    void setAge(ICropEntity cropEntity, int age);
+
+    boolean isMaxAge(ICropEntity cropEntity);
+
+    void growCrops(Level level, ICropEntity cropEntity);
 }

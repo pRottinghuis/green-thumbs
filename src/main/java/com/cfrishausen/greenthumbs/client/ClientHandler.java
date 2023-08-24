@@ -38,6 +38,7 @@ public class ClientHandler {
     private static void clientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
             ItemBlockRenderTypes.setRenderLayer(GTBlocks.GT_CROP_BLOCK.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(GTBlocks.GT_VEGETABLE_BLOCK.get(), RenderType.solid());
         });
     }
 
@@ -48,6 +49,7 @@ public class ClientHandler {
         Map<CropState, BakedModel> statesToModel = GTCropSpecies.CROP_SPECIES_REGISTRY.get().getValues().stream().map(ICropSpecies::getModelMap).flatMap(map -> {
             return map.entrySet().stream();
         }).map(entry -> {
+            // maps CropState to loaded BakedModel according to given previously mapped resource location
             return Pair.of(entry.getKey(), eventModels.get(entry.getValue()));
         }).filter(pair -> {
             // if failed to get model filter and warn
@@ -62,9 +64,11 @@ public class ClientHandler {
         GTBakedModel gtBakedModel = new GTBakedModel();
         gtBakedModel.addModels(statesToModel);
         eventModels.put(BlockModelShaper.stateToModelLocation(GTBlocks.GT_CROP_BLOCK.get().defaultBlockState()), gtBakedModel);
+        eventModels.put(BlockModelShaper.stateToModelLocation(GTBlocks.GT_VEGETABLE_BLOCK.get().defaultBlockState()), gtBakedModel);
     }
 
     public static void registerColorHandlersEvent (RegisterColorHandlersEvent.Block colorHandlersEvent) {
         colorHandlersEvent.register(new CropColor(), GTBlocks.GT_CROP_BLOCK.get());
+        colorHandlersEvent.register(new CropColor(), GTBlocks.GT_VEGETABLE_BLOCK.get());
     }
 }

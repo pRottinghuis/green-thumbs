@@ -18,7 +18,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 
-
 public class CropColor implements BlockColor {
     @Override
     public int getColor(BlockState pState, @Nullable BlockAndTintGetter pLevel, @Nullable BlockPos pPos, int pTintIndex) {
@@ -40,7 +39,7 @@ public class CropColor implements BlockColor {
             return 14731036;
         }
         if (sameSpecies(cropSpecies, GTCropSpecies.GT_PUMPKIN_STEM)) {
-            int i = cropEntity.getAge();
+            int i = cropEntity.getCropSpecies().getAge(cropEntity);
             int j = i * 32;
             int k = 255 - i * 8;
             int l = i * 4;

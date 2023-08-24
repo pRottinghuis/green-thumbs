@@ -24,10 +24,10 @@ public class RootCrop extends BasicCrop{
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context, ICropEntity cropEntity) {
-        if (this.SHAPE_BY_AGE[cropEntity.getAge()] != null) {
-            return this.SHAPE_BY_AGE[cropEntity.getAge()];
+        if (this.SHAPE_BY_AGE[getAge(cropEntity)] != null) {
+            return this.SHAPE_BY_AGE[getAge(cropEntity)];
         }
-        GreenThumbs.LOGGER.warn("CarrotLikeCrop species does not have a voxel shape for {} for age {}", cropEntity, cropEntity.getAge());
+        GreenThumbs.LOGGER.warn("{} species does not have a voxel shape for age {}", this, getAge(cropEntity));
         return this.SHAPE_BY_AGE[0];
     }
 }

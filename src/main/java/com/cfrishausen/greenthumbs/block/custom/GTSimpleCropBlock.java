@@ -49,34 +49,13 @@ public class GTSimpleCropBlock extends Block implements IPlantable, Bonemealable
         return SHAPE_BY_AGE[0];
     }
 
+    // TODO move into crop species
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (!level.isClientSide()) {
-            ItemStack handStack = player.getMainHandItem();
-
-            if (handStack.is(Tags.Items.SHEARS)) {
-                BlockEntity blockEntity = level.getBlockEntity(pos);
-                if (blockEntity instanceof GTCropBlockEntity cropEntity) {
-                    if (cropEntity.getCropSpecies().canTakeCutting(cropEntity)) {
-                        SimpleContainer drops = new SimpleContainer(1);
-                        ICropSpecies cropSpecies = cropEntity.getCropSpecies();
-                        ItemStack cuttingStack = cropSpecies.getStackWithCuttingTag(cropEntity, cropSpecies.getCutting(), level.getRandom());
-                        drops.addItem(cuttingStack);
-                        cropEntity.setAge(0);
-                        Containers.dropContents(level, pos, drops);
-                    }
-                }
-            } else {
-                // Don't Quick Replant on debug stick
-                if (!handStack.is(GTItems.GT_DEBUG_STICK.get())) {
-                    // quick replant from harvest implementation
-                    BlockEntity blockEntity = level.getBlockEntity(pos);
-                    if (blockEntity instanceof GTCropBlockEntity cropEntity) {
-                        if (cropEntity.isMaxAge()) {
-                            cropEntity.getCropSpecies().quickReplant(state, level, pos, cropEntity);
-                        }
-                    }
-                }
+            BlockEntity blockEntity = level.getBlockEntity(pos);
+            if (blockEntity instanceof GTCropBlockEntity cropEntity) {
+                return cropEntity.getCropSpecies().use(state, level, pos, player, hand, hit, cropEntity);
             }
         }
         return super.use(state, level, pos, player, hand, hit);
