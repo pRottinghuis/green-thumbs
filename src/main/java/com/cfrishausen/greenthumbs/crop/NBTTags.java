@@ -1,7 +1,9 @@
 package com.cfrishausen.greenthumbs.crop;
 
 import com.cfrishausen.greenthumbs.GreenThumbs;
+import com.cfrishausen.greenthumbs.crop.state.CropState;
 import com.mojang.serialization.Codec;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.util.StringRepresentable;
@@ -41,6 +43,13 @@ public class NBTTags {
 
     public static <T> T decodeNbt(Codec<T> codec, Tag json) {
         return codec.parse(NbtOps.INSTANCE, json).result().get();
+    }
+
+    public static CompoundTag defaultSpeciesTag(ICropSpecies cropSpecies) {
+        CompoundTag cropTag = cropSpecies.standardGenomelessTag(cropSpecies);
+        cropTag.getCompound(NBTTags.INFO_TAG).put(NBTTags.GENOME_TAG, cropSpecies.defineGenome().writeTag());
+        cropTag.getCompound(NBTTags.INFO_TAG).put(NBTTags.CROP_STATE_TAG, CropState.getDefaultStateTag(cropSpecies));
+        return cropTag;
     }
 
 }

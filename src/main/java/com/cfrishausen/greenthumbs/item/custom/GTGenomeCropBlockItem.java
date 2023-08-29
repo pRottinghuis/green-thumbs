@@ -1,5 +1,6 @@
 package com.cfrishausen.greenthumbs.item.custom;
 
+import com.cfrishausen.greenthumbs.GreenThumbs;
 import com.cfrishausen.greenthumbs.block.entity.GTCropBlockEntity;
 import com.cfrishausen.greenthumbs.crop.ICropSpecies;
 import com.cfrishausen.greenthumbs.crop.NBTTags;
@@ -67,12 +68,18 @@ public class GTGenomeCropBlockItem extends ItemNameBlockItem {
     public static List<Component> getToolTips(CompoundTag tag) {
         List<Component> tooltips = Lists.newArrayList();
         if (tag.contains(NBTTags.INFO_TAG)) {
-            CompoundTag genomeTag = tag.getCompound(NBTTags.INFO_TAG).getCompound(NBTTags.GENOME_TAG);
-            // Add genes for tooltip based on what is in nbt tag
-            for (String genomeTagKey : genomeTag.getAllKeys()) {
-                String geneStr = genomeTag.getString(genomeTagKey);
-                tooltips.add(Component.translatable(genomeTagKey).append(Component.literal(": " + geneStr)).withStyle(ChatFormatting.GREEN));
+            CompoundTag infoTag = tag.getCompound(NBTTags.INFO_TAG);
+            CompoundTag genomeTag = infoTag.getCompound(NBTTags.GENOME_TAG);
+            if (!genomeTag.isEmpty()) {
+                // Add genes for tooltip based on what is in nbt tag
+                for (String genomeTagKey : genomeTag.getAllKeys()) {
+                    String geneStr = genomeTag.getString(genomeTagKey);
+                    tooltips.add(Component.translatable(genomeTagKey).append(Component.literal(": " + geneStr)).withStyle(ChatFormatting.GREEN));
+                }
+            } else {
+                GreenThumbs.LOGGER.warn("Can't add genome tooltip because {} compound is empty", NBTTags.GENOME_TAG);
             }
+            tooltips.add(Component.literal(infoTag.getCompound(NBTTags.CROP_STATE_TAG).toString()));
         }
         return tooltips;
     }
@@ -80,14 +87,14 @@ public class GTGenomeCropBlockItem extends ItemNameBlockItem {
 
 
     @Override
-    protected boolean canPlace(BlockPlaceContext pContext, BlockState pState) {
-        Player player  = pContext.getPlayer();
+    protected boolean canPlace(BlockPlaceContext context, BlockState state) {
+        Player player  = context.getPlayer();
         CompoundTag nbt = player.getItemInHand(InteractionHand.MAIN_HAND).getTag();
         CompoundTag saveTag = nbt.getCompound(NBTTags.INFO_TAG);
         if (saveTag.contains(NBTTags.CROP_SPECIES_TAG)) {
             saveTag.getString(NBTTags.CROP_SPECIES_TAG);
             ICropSpecies cropSpecies = GTCropSpecies.CROP_SPECIES_REGISTRY.get().getValue(new ResourceLocation(saveTag.getString(NBTTags.CROP_SPECIES_TAG)));
-            return cropSpecies.canSurvive(pState, pContext.getLevel(), pContext.getClickedPos(), this.getBlock());
+            return cropSpecies.mayPlaceOn(context.getLevel().getBlockState(context.getClickedPos().below()));
         } else {
             player.sendSystemMessage(Component.literal("Seed has no species").withStyle(style -> style.withColor(ChatFormatting.RED)));
         }

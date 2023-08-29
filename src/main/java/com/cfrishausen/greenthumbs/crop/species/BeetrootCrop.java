@@ -21,13 +21,18 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Supplier;
+
+/**
+ * Beetroot like crops. Max age is 3.
+ */
 public class BeetrootCrop extends BasicCrop{
 
     private static final VoxelShape[] SHAPE_BY_AGE = new VoxelShape[]{Block.box(0.0D, 0.0D, 0.0D, 16.0D, 2.0D, 16.0D), Block.box(0.0D, 0.0D, 0.0D, 16.0D, 4.0D, 16.0D), Block.box(0.0D, 0.0D, 0.0D, 16.0D, 6.0D, 16.0D), Block.box(0.0D, 0.0D, 0.0D, 16.0D, 8.0D, 16.0D)};
     public static final IntegerProperty AGE_3 = BlockStateProperties.AGE_3;
 
 
-    public BeetrootCrop(String name, GTGenomeCropBlockItem seeds, Item crop, GTGenomeCropBlockItem cutting) {
+    public BeetrootCrop(String name, Supplier<GTGenomeCropBlockItem> seeds, Supplier<Item> crop, Supplier<GTGenomeCropBlockItem> cutting) {
         super(name, seeds, crop, cutting);
     }
 
@@ -43,6 +48,7 @@ public class BeetrootCrop extends BasicCrop{
 
     @Override
     public void randomTick(ServerLevel level, BlockPos pos, RandomSource random, GTSimpleCropBlock block, ICropEntity cropEntity) {
+        // Reduce rate that beetroot grows because age is lower. See vanilla's BeetrootBlock.java
         if (random.nextInt(getMaxAge()) != 0) {
             super.randomTick(level, pos, random, block, cropEntity);
         }

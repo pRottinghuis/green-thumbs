@@ -90,7 +90,7 @@ public class GTSimpleCropBlock extends Block implements IPlantable, Bonemealable
         if (!pState.is(pNewState.getBlock())) {
             BlockEntity entity = pLevel.getBlockEntity(pPos);
             if (entity instanceof GTCropBlockEntity cropEntity) {
-                cropEntity.getCropSpecies().drops(cropEntity, pLevel, pPos, false);
+                cropEntity.getCropSpecies().onRemove(pState, pLevel, pPos, pNewState, pIsMoving, cropEntity);
             }
         }
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
@@ -154,7 +154,9 @@ public class GTSimpleCropBlock extends Block implements IPlantable, Bonemealable
         BlockEntity entity = level.getBlockEntity(currentPos);
         BlockState blockState = null;
         if (entity instanceof GTCropBlockEntity cropBlockEntity) {
-            blockState = cropBlockEntity.getCropSpecies().updateShape(state, direction, neighborState, level, currentPos, neighborPos, this, cropBlockEntity);
+            if (cropBlockEntity.getCropSpecies() != null) {
+                blockState = cropBlockEntity.getCropSpecies().updateShape(state, direction, neighborState, level, currentPos, neighborPos, this, cropBlockEntity);
+            }
         }
         // If there is no crop species use default block update shape
         return !(blockState == null) ? blockState : super.updateShape(state, direction, neighborState, level, currentPos, neighborPos);

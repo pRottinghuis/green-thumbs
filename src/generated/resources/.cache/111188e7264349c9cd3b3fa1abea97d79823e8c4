@@ -1,4 +1,4 @@
-// 1.19.4	2023-06-06T22:11:10.5758689	Item Models: greenthumbs
+// 1.19.4	2023-08-24T16:38:36.3806882	Item Models: greenthumbs
 a2444f577bdbd81113d864c477ed710843b87e97 assets/greenthumbs/models/item/beetroot_cutting.json
 89e7223820d2e99906441a7196ac463257b4d8f8 assets/greenthumbs/models/item/beetroot_seeds.json
 e3756573917d75a3aa66065ffb38de8c66aed882 assets/greenthumbs/models/item/carrot_cutting.json
@@ -6,5 +6,6 @@ ed9bb7d66d203b60496b1707202ed8d7291fdc43 assets/greenthumbs/models/item/carrot_s
 c0cd136299756c5d9a0e56280710704ec3801889 assets/greenthumbs/models/item/gt_debug_stick.json
 c18e01bacc5ae3c2bbe4844e1cfb35bd86ecfd78 assets/greenthumbs/models/item/potato_cutting.json
 aee31e0ebf08ab72d929d09e446ce32cc11fafe4 assets/greenthumbs/models/item/potato_seeds.json
+cd2c58fd2048297e8aec8d36e64c7dd65e19f189 assets/greenthumbs/models/item/pumpkin_seeds.json
 cf801a94e88d489c9b532100929c0513661266b4 assets/greenthumbs/models/item/wheat_cutting.json
 5746dcff37d664cba18fd7c8343cba25e90d70f0 assets/greenthumbs/models/item/wheat_seeds.json

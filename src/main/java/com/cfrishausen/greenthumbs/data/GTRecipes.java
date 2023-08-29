@@ -41,7 +41,7 @@ public class GTRecipes extends RecipeProvider {
 
         GTCropShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, GTItems.PUMPKIN_CUTTING.get(), GTCropSpecies.GT_PUMPKIN_STEM.get())
                 .requires(Items.PUMPKIN_SEEDS)
-                .unlockedBy("has_beetroot_seeds", has(Items.PUMPKIN_SEEDS))
+                .unlockedBy("has_pumpkin_seeds", has(Items.PUMPKIN_SEEDS))
                 .save(pWriter);
     }
 }

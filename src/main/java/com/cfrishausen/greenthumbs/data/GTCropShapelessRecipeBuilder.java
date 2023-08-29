@@ -2,6 +2,7 @@ package com.cfrishausen.greenthumbs.data;
 
 import com.cfrishausen.greenthumbs.crop.ICropEntity;
 import com.cfrishausen.greenthumbs.crop.ICropSpecies;
+import com.cfrishausen.greenthumbs.crop.NBTTags;
 import com.cfrishausen.greenthumbs.item.custom.GTGenomeCropBlockItem;
 import com.cfrishausen.greenthumbs.registries.GTCropSpecies;
 import com.cfrishausen.greenthumbs.registries.GTItems;
@@ -15,6 +16,7 @@ import net.minecraft.advancements.RequirementsStrategy;
 import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.*;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -22,6 +24,7 @@ import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
+import org.checkerframework.checker.units.qual.C;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -181,27 +184,11 @@ public class GTCropShapelessRecipeBuilder extends CraftingRecipeBuilder implemen
                 jsonobject.addProperty("count", this.count);
             }
 
-            // Example format
-            // "{\"greenthumbs.Info\": {\"greenthumbs.Genome\": {\"growth-speed\": \"Gg\"}, \"greenthumbs.Age\": 0, \"greenthumbs.CropSpecies\": \"greenthumbs:gt_carrot\"}}"
+            // Add nbt to recipe
+            CompoundTag cropTag = cropSpecies.standardGenomelessTag(cropSpecies);
+            cropTag.getCompound(NBTTags.INFO_TAG).put(NBTTags.GENOME_TAG, cropSpecies.defineGenome().writeTag());
 
-            // Add nbt section
-            String nbtString = "{\"greenthumbs.Info\": {\"greenthumbs.Genome\": {";
-
-            // Add specific genes
-            Map<String, String> cropSpeciesGenes = cropSpecies.defineGenome().getGenes();
-            for (String geneName : cropSpeciesGenes.keySet()) {
-                nbtString += "\"" + geneName + "\"" + ": "; // "growth-speed":
-                nbtString += "\"" + cropSpeciesGenes.get(geneName) + "\", "; //"Gg"
-            }
-            // Remove ending comma and space
-            nbtString = nbtString.substring(0, nbtString.length() - 2);
-
-            nbtString += "}, \"greenthumbs.Age\": 0, \"greenthumbs.CropSpecies\": \"";
-
-            // add crop species
-            nbtString += GTCropSpecies.CROP_SPECIES_REGISTRY.get().getKey(cropSpecies).toString() + "\"}}";
-
-            jsonobject.addProperty("nbt", nbtString);
+            jsonobject.addProperty("nbt", cropTag.toString());
 
             pJson.add("result", jsonobject);
         }

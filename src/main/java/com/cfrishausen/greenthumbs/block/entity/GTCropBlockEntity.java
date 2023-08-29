@@ -8,27 +8,22 @@ import com.cfrishausen.greenthumbs.crop.state.CropState;
 import com.cfrishausen.greenthumbs.genetics.Genome;
 import com.cfrishausen.greenthumbs.registries.GTBlockEntities;
 import com.cfrishausen.greenthumbs.registries.GTCropSpecies;
-import com.google.common.collect.Comparators;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.client.model.data.ModelProperty;
+import org.apache.logging.log4j.core.pattern.AbstractStyleNameConverter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Comparator;
 
 public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
 
@@ -128,7 +123,7 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
                 // default to wheat species if nbt does not contain
                 cropSpecies = GTCropSpecies.GT_WHEAT.get();
             }
-            this.cropState = cropSpecies.defaultCropState();
+            this.cropState = cropSpecies.getDefaultCropState();
             if (saveTag.contains(NBTTags.CROP_STATE_TAG)) {
                 CompoundTag stateTag = saveTag.getCompound(NBTTags.CROP_STATE_TAG);
                 for (Property property : cropState.getProperties()) {
@@ -178,11 +173,19 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
     }
 
     public ICropSpecies getCropSpecies() {
-        return cropSpecies;
+        if (cropSpecies != null) {
+            return cropSpecies;
+        }
+        GreenThumbs.LOGGER.warn("Entity at {} crop species is null", this.getBlockPos());
+        return GTCropSpecies.GT_WHEAT.get();
     }
 
     public Genome getGenome() {
-        return genome;
+        if (this.genome != null) {
+            return genome;
+        }
+        GreenThumbs.LOGGER.warn("Entity at {} genome is null", this.getBlockPos());
+        return GTCropSpecies.GT_WHEAT.get().defineGenome();
     }
 
     @Override
@@ -193,7 +196,11 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
 
     @Override
     public CropState getCropState() {
-        return this.cropState;
+        if (this.cropState != null) {
+            return this.cropState;
+        }
+        GreenThumbs.LOGGER.warn("Entity at {} cropState is null", this.getBlockPos());
+        return GTCropSpecies.GT_WHEAT.get().getDefaultCropState();
     }
 
     public void setCropState(CropState cropState) {
@@ -201,7 +208,7 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
         markUpdated();
     }
 
-    // When crop species is reset make sure to set cropState because it will set to the default state from the species
+    // When crop species is reset make sure to set cropState because it will set to the default state from the species. Not all crop species have the same crop state properties
     @Override
     public void setCropSpecies(ICropSpecies cropSpecies) {
         this.cropSpecies = cropSpecies;
@@ -211,7 +218,7 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
 
     @Override
     public void refreshCropState() {
-        this.cropState = this.cropSpecies.defaultCropState();
+        this.cropState = this.cropSpecies.getDefaultCropState();
     }
 
     @Override

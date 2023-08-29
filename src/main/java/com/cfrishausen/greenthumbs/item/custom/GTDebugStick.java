@@ -15,6 +15,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.properties.Property;
 
 import java.awt.event.ComponentListener;
 
@@ -35,8 +36,10 @@ public class GTDebugStick extends Item {
                 if (updateTag.contains(NBTTags.INFO_TAG)) {
                     updateTag = updateTag.getCompound(NBTTags.INFO_TAG);
                     player.sendSystemMessage(Component.literal("Crop at " + clickedPos.toShortString() + ":"));
-                    player.sendSystemMessage(Component.literal("Age: " + NBTTags.decodeNbt(BasicCrop.AGE.codec(), updateTag.getCompound(NBTTags.CROP_STATE_TAG).get(BasicCrop.AGE.getName()))));
                     player.sendSystemMessage(Component.literal("Species: " + updateTag.getString(NBTTags.CROP_SPECIES_TAG)));
+                    for (Property property : cropEntity.getCropState().getProperties()) {
+                        player.sendSystemMessage(Component.literal(property.getName() + ": " + cropEntity.getCropState().getValue(property)).withStyle(ChatFormatting.DARK_GREEN));
+                    }
                     if (updateTag.contains(NBTTags.GENOME_TAG)) {
                         CompoundTag genomeTag = updateTag.getCompound(NBTTags.GENOME_TAG);
                         genomeTag.getAllKeys().forEach(geneKey -> {

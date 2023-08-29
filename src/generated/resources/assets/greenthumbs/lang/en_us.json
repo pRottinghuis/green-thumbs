@@ -1,4 +1,6 @@
 {
+  "block.greenthumbs.gt_crop_block": "Crop Block",
+  "block.greenthumbs.gt_vegetable_block": "Vegetable Block",
   "block.greenthumbs.seed_splicing_station": "Seed Splicing Station",
   "growth-speed": "Growth Speed",
   "item.greenthumbs.beetroot_cutting": "Beetroot Cutting",
@@ -8,6 +10,8 @@
   "item.greenthumbs.gt_debug_stick": "Green Thumbs Debug Stick",
   "item.greenthumbs.potato_cutting": "Potato Cutting",
   "item.greenthumbs.potato_seeds": "Potato Seeds",
+  "item.greenthumbs.pumpkin_cutting": "Pumpkin Cutting",
+  "item.greenthumbs.pumpkin_seeds": "Pumpkin Seeds",
   "item.greenthumbs.wheat_cutting": "Wheat Cutting",
   "item.greenthumbs.wheat_seeds": "Wheat Seeds",
   "mutativity": "Mutativity",
