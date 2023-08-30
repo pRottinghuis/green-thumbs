@@ -25,6 +25,8 @@ public class GTItems {
     public static final RegistryObject<GTGenomeCropBlockItem> POTATO_CUTTING = registerGenomeBlockItem("potato_cutting", GTBlocks.GT_CROP_BLOCK);
     public static final RegistryObject<GTGenomeCropBlockItem> BEETROOT_SEEDS = registerGenomeBlockItem("beetroot_seeds", GTBlocks.GT_CROP_BLOCK);
     public static final RegistryObject<GTGenomeCropBlockItem> BEETROOT_CUTTING = registerGenomeBlockItem("beetroot_cutting", GTBlocks.GT_CROP_BLOCK);
+    public static final RegistryObject<GTGenomeCropBlockItem> SWEET_BERRY_SEEDS = registerGenomeBlockItem("sweet_berry_seeds", GTBlocks.GT_CROP_BLOCK);
+    public static final RegistryObject<GTGenomeCropBlockItem> SWEET_BERRY_CUTTING = registerGenomeBlockItem("sweet_berry_cutting", GTBlocks.GT_CROP_BLOCK);
 
 
     public static final RegistryObject<GTGenomeCropBlockItem> PUMPKIN_SEEDS = registerGenomeBlockItem("pumpkin_seeds", GTBlocks.GT_CROP_BLOCK);

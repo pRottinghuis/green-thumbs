@@ -15,6 +15,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -91,6 +92,11 @@ public interface ICropSpecies extends ICropSpeciesExtensions {
      * What does a crop do when it is quick replanted
      */
     void quickReplant(BlockState pState, Level pLevel, BlockPos pPos, ICropEntity crop);
+
+    /**
+     * Override for crops that need functionality when there is entity colliding with them. For example berries hurt entities that move into them.
+     */
+    default void entityInside(BlockState state, Level level, BlockPos pos, Entity collidingEntity, GTCropBlockEntity cropBlockEntity) {}
 
     /**
      * Get a stack that has a reproduction tag on it. Helper for when a crop is broken the standard vanilla way

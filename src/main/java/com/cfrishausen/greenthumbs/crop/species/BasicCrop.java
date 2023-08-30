@@ -15,6 +15,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
@@ -122,6 +124,7 @@ public class BasicCrop implements ICropSpecies {
                     SimpleContainer drops = new SimpleContainer(1);
                     ItemStack cuttingStack = getStackWithCuttingTag(this, cropBlockEntity, getCutting(), level.getRandom());
                     drops.addItem(cuttingStack);
+                    level.playSound(null, pos, SoundEvents.SHEEP_SHEAR, SoundSource.BLOCKS, 1.0F, 0.8F + level.random.nextFloat() * 0.4F);
                     setAge(cropBlockEntity, 0);
                     Containers.dropContents(level, pos, drops);
                 }
@@ -149,9 +152,8 @@ public class BasicCrop implements ICropSpecies {
 
     // TODO fortune drops
     public ItemStack drops(ICropEntity cropEntity, Level level, BlockPos pos, boolean quickReplant) {
-
         ItemStack returnStack = null;
-        SimpleContainer drops = new SimpleContainer();
+        SimpleContainer drops;
         ICropSpecies cropSpecies = cropEntity.getCropSpecies();
         if (cropSpecies.isMaxAge(cropEntity)) {
             drops = stateSpecificDrop(cropEntity, level.getRandom());

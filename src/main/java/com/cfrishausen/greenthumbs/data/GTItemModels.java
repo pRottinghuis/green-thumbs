@@ -18,11 +18,14 @@ public class GTItemModels extends ItemModelProvider {
         this.basicItem(GTItems.POTATO_SEEDS.get());
         this.basicItem(GTItems.BEETROOT_SEEDS.get());
         this.basicItem(GTItems.PUMPKIN_SEEDS.get());
+        this.basicItem(GTItems.SWEET_BERRY_SEEDS.get());
 
         this.basicItem(GTItems.CARROT_CUTTING.get());
         this.basicItem(GTItems.WHEAT_CUTTING.get());
         this.basicItem(GTItems.POTATO_CUTTING.get());
         this.basicItem(GTItems.BEETROOT_CUTTING.get());
+        // pumpkin cutting
+        this.basicItem(GTItems.SWEET_BERRY_CUTTING.get());
 
     }
 }

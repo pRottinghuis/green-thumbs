@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:pumpkin_seeds"
+    }
+  ],
+  "result": {
+    "item": "greenthumbs:pumpkin_cutting",
+    "nbt": "{greenthumbs.Info:{greenthumbs.CropSpecies:\"greenthumbs:gt_pumpkin_stem\",greenthumbs.CropState:{age:\"0\"},greenthumbs.Genome:{growth-speed:\"Gg\",mutativity:\"Mm\",temperature-preference:\"Tt\"}}}"
+  }
+}

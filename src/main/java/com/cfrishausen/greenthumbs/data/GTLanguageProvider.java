@@ -22,12 +22,14 @@ public class GTLanguageProvider extends LanguageProvider {
         this.add(GTItems.POTATO_SEEDS.get(), "Potato Seeds");
         this.add(GTItems.BEETROOT_SEEDS.get(), "Beetroot Seeds");
         this.add(GTItems.PUMPKIN_SEEDS.get(), "Pumpkin Seeds");
+        this.add(GTItems.SWEET_BERRY_SEEDS.get(), "Sweet Berry Seeds");
 
         this.add(GTItems.WHEAT_CUTTING.get(), "Wheat Cutting");
         this.add(GTItems.CARROT_CUTTING.get(), "Carrot Cutting");
         this.add(GTItems.POTATO_CUTTING.get(), "Potato Cutting");
         this.add(GTItems.BEETROOT_CUTTING.get(), "Beetroot Cutting");
         this.add(GTItems.PUMPKIN_CUTTING.get(), "Pumpkin Cutting");
+        this.add(GTItems.SWEET_BERRY_CUTTING.get(), "Sweet Berry Cutting");
 
         this.add(GTBlocks.GT_CROP_BLOCK.get(), "Crop Block");
         this.add(GTBlocks.GT_VEGETABLE_BLOCK.get(), "Vegetable Block");

@@ -69,13 +69,14 @@ public class GreenThumbs
                 output.accept(getStackWithTag(GTItems.CARROT_SEEDS.get(), GTCropSpecies.GT_CARROT.get()));
                 output.accept(getStackWithTag(GTItems.POTATO_SEEDS.get(), GTCropSpecies.GT_POTATO.get()));
                 output.accept(getStackWithTag(GTItems.PUMPKIN_SEEDS.get(), GTCropSpecies.GT_PUMPKIN_STEM.get()));
+                output.accept(getStackWithTag(GTItems.SWEET_BERRY_SEEDS.get(), GTCropSpecies.GT_SWEET_BERRY.get()));
 
                 output.accept(getStackWithTag(GTItems.WHEAT_CUTTING.get(), GTCropSpecies.GT_WHEAT.get()));
                 output.accept(getStackWithTag(GTItems.BEETROOT_CUTTING.get(), GTCropSpecies.GT_BEETROOT.get()));
                 output.accept(getStackWithTag(GTItems.CARROT_CUTTING.get(), GTCropSpecies.GT_CARROT.get()));
                 output.accept(getStackWithTag(GTItems.POTATO_CUTTING.get(), GTCropSpecies.GT_POTATO.get()));
                 output.accept(getStackWithTag(GTItems.PUMPKIN_CUTTING.get(), GTCropSpecies.GT_PUMPKIN_STEM.get()));
-
+                output.accept(getStackWithTag(GTItems.SWEET_BERRY_CUTTING.get(), GTCropSpecies.GT_SWEET_BERRY.get()));
             });
         });
     }

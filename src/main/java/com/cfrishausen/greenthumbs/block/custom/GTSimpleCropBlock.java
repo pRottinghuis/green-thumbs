@@ -8,6 +8,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.*;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -121,6 +122,16 @@ public class GTSimpleCropBlock extends Block implements IPlantable, Bonemealable
     @Override
     public boolean isBonemealSuccess(Level pLevel, RandomSource pRandom, BlockPos pPos, BlockState pState) {
         return true;
+    }
+
+    @Override
+    public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        if (blockEntity instanceof GTCropBlockEntity cropEntity) {
+            cropEntity.getCropSpecies().entityInside(state, level, pos, entity, cropEntity);
+        } else {
+            super.entityInside(state, level, pos, entity);
+        }
     }
 
     @Override

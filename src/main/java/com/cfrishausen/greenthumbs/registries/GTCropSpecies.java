@@ -40,6 +40,9 @@ public class GTCropSpecies {
             () -> new AttachedStemCrop("attached_pumpkin_stem", GTItems.PUMPKIN_SEEDS, () -> Items.PUMPKIN, GTItems.PUMPKIN_CUTTING,
                     GT_PUMPKIN));
 
+    public static final RegistryObject<ICropSpecies> GT_SWEET_BERRY = CROP_SPECIES.register("gt_sweet_berry",
+            () -> new BerryBushCrop("sweet_berry_bush", GTItems.SWEET_BERRY_SEEDS, () -> Items.SWEET_BERRIES, GTItems.SWEET_BERRY_CUTTING));
+
     public static ICropSpecies getSpecies(ResourceLocation key) {
         return CROP_SPECIES_REGISTRY.get().getValue(key);
     }

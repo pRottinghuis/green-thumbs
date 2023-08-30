@@ -48,8 +48,6 @@ public class AttachedStemCrop extends BasicCrop{
     private static final Map<Direction, VoxelShape> AABBS = Maps.newEnumMap(ImmutableMap.of(Direction.SOUTH, Block.box(6.0D, 0.0D, 6.0D, 10.0D, 10.0D, 16.0D), Direction.WEST, Block.box(0.0D, 0.0D, 6.0D, 10.0D, 10.0D, 10.0D), Direction.NORTH, Block.box(6.0D, 0.0D, 0.0D, 10.0D, 10.0D, 10.0D), Direction.EAST, Block.box(6.0D, 0.0D, 6.0D, 16.0D, 10.0D, 10.0D)));
     private final Supplier<ICropSpecies> fruit;
 
-
-
     public AttachedStemCrop(String name, Supplier<GTGenomeCropBlockItem> seed, Supplier<Item> crop, Supplier<GTGenomeCropBlockItem> cutting, Supplier<ICropSpecies> fruit) {
         super(name, seed, crop, cutting);
         this.fruit = fruit;
@@ -77,7 +75,6 @@ public class AttachedStemCrop extends BasicCrop{
                     ItemStack cuttingStack = getStackWithCuttingTag(this, cropBlockEntity, getCutting(), level.getRandom());
                     drops.addItem(cuttingStack);
 
-                    cropBlockEntity.load(cuttingStack.getTag());
                     cropBlockEntity.setCropSpecies(((StemGrownCrop) this.fruit.get()).getStemSpecies());
                     setAge(cropBlockEntity, 0);
                     Containers.dropContents(level, pos, drops);
@@ -94,26 +91,6 @@ public class AttachedStemCrop extends BasicCrop{
         drops.addItem(dropStack);
         Containers.dropContents(level, pos, drops);
         return null;
-    }
-
-    @Override
-    public void quickReplant(BlockState pState, Level pLevel, BlockPos pPos, ICropEntity cropEntity) {
-        if (!doesQuickReplant()) {
-            return;
-        }
-        ItemStack replantStack = drops(cropEntity, pLevel, pPos, true);
-        if (replantStack != null) {
-            CompoundTag replantTag = replantStack.getTag();
-            if (replantTag != null && replantTag.contains(NBTTags.INFO_TAG)) {
-                // load the genome from the cutting tag into the genome into the crop entity
-                cropEntity.load(replantTag);
-                // Species needs to be set first to make sure that the crop state is reloaded and we can adjust the age to 0
-                cropEntity.setCropSpecies(((StemGrownCrop) this.fruit.get()).getStemSpecies());
-                cropEntity.getCropSpecies().setAge(cropEntity, 0);
-                // sendBlockUpdated will reload model quads from baked model
-                pLevel.sendBlockUpdated(pPos, pState, pState, Block.UPDATE_ALL);
-            }
-        }
     }
 
     @Override
