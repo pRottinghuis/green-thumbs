@@ -7,6 +7,7 @@ import com.cfrishausen.greenthumbs.crop.ICropEntity;
 import com.cfrishausen.greenthumbs.crop.ICropSpecies;
 import com.cfrishausen.greenthumbs.crop.state.CropState;
 import com.cfrishausen.greenthumbs.item.custom.GTGenomeCropBlockItem;
+import com.cfrishausen.greenthumbs.registries.GTItems;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -20,6 +21,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Interaction;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -77,10 +79,18 @@ public class BerryBushCrop extends BasicCrop{
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit, GTCropBlockEntity cropBlockEntity) {
+        // Dont harvest when using debug stick
+        if (player.getMainHandItem().is(GTItems.GT_DEBUG_STICK.get())) {
+            return InteractionResult.PASS;
+        }
+
+
         int age = getAge(cropBlockEntity);
         boolean flag = age == 3;
-        if (!flag && player.getItemInHand(hand).is(Items.BONE_MEAL)) {
+        // don't harvest when using bonemeal until max age
+        if (!flag && (player.getItemInHand(hand).is(Items.BONE_MEAL))) {
             return InteractionResult.PASS;
+        // if using shears do cutting
         } else if (player.getItemInHand(hand).is(Tags.Items.SHEARS) && cropBlockEntity.getCropSpecies().canTakeCutting(cropBlockEntity)) {
             SimpleContainer drops = new SimpleContainer(1);
             ItemStack cuttingStack = getStackWithCuttingTag(this, cropBlockEntity, getCutting(), level.getRandom());
@@ -88,6 +98,7 @@ public class BerryBushCrop extends BasicCrop{
             level.playSound(null, pos, SoundEvents.SHEEP_SHEAR, SoundSource.BLOCKS, 1.0F, 0.8F + level.random.nextFloat() * 0.4F);
             setAge(cropBlockEntity, 0);
             Containers.dropContents(level, pos, drops);
+        // Otherwise, harvest seeds and berries.
         } else if (age > 1) {
             // berry harvest is needed
             int berryCount = 1 + level.random.nextInt(2);
