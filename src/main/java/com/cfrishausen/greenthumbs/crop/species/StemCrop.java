@@ -51,8 +51,7 @@ public class StemCrop extends BasicCrop {
         if (!level.isAreaLoaded(pos, 1)) return; // Forge: prevent loading unloaded chunks when checking neighbor's light
         if (level.getRawBrightness(pos, 0) >= 9) {
             float f = cropEntity.getGenome().getGrowthSpeed(block, level, pos);
-            // TODO change back to 25
-            if (random.nextInt((int)(/*25.0F*/ 5.0F / f) + 1) == 0) {
+            if (random.nextInt((int)(25.0F / f) + 1) == 0) {
                 int i = cropEntity.getCropState().getValue(AGE_7);
                 if (i < getMaxAge()) {
                     growCrops(level, cropEntity);

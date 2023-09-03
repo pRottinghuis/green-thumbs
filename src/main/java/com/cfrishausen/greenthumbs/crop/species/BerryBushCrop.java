@@ -8,7 +8,6 @@ import com.cfrishausen.greenthumbs.crop.ICropSpecies;
 import com.cfrishausen.greenthumbs.crop.state.CropState;
 import com.cfrishausen.greenthumbs.item.custom.GTGenomeCropBlockItem;
 import com.cfrishausen.greenthumbs.registries.GTItems;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -21,7 +20,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Interaction;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -36,7 +34,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -46,7 +43,6 @@ import net.minecraftforge.common.Tags;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Map;
 import java.util.function.Supplier;
 
 public class BerryBushCrop extends BasicCrop{
@@ -103,7 +99,7 @@ public class BerryBushCrop extends BasicCrop{
             // berry harvest is needed
             int berryCount = 1 + level.random.nextInt(2);
             // Drop berries
-            Block.popResource(level, pos, new ItemStack(this.getCrop(), berryCount + (flag ? 1 : 0)));
+            Block.popResource(level, pos, new ItemStack(this.getCrop(), berryCount + (flag ? 1 : 0) + cropBlockEntity.getGenome().getExtraCropYield()));
             // drop seeds
             Block.popResource(level, pos, getStackWithReplantTag(this, cropBlockEntity, this.getSeed(), level.getRandom()));
             level.playSound((Player)null, pos, SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, SoundSource.BLOCKS, 1.0F, 0.8F + level.random.nextFloat() * 0.4F);
@@ -145,7 +141,7 @@ public class BerryBushCrop extends BasicCrop{
         // Drop a seed
         dropContainer.addItem(stackWithCopiedTag(this, cropEntity, getSeed()));
         // drop berries
-        int berryCount = 1 + random.nextInt(2);
+        int berryCount = 1 + random.nextInt(2) + cropEntity.getGenome().getExtraCropYield();
         dropContainer.addItem(new ItemStack(this.getCrop(), berryCount + (cropEntity.getCropState().getValue(AGE_3) == 3 ?  1 : 0)));
         return dropContainer;
     }

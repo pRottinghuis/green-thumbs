@@ -84,6 +84,7 @@ public class BasicCrop implements ICropSpecies {
         genes.put(Genome.GROWTH_SPEED, "Gg");
         genes.put(Genome.TEMPERATURE_PREFERENCE, "Tt");
         genes.put(Genome.MUTATIVITY, "Mm");
+        genes.put(Genome.CROP_YIELD, "Cc");
         return new Genome(genes);
     }
 
@@ -180,7 +181,7 @@ public class BasicCrop implements ICropSpecies {
     public @NonNull SimpleContainer stateSpecificDrop(ICropEntity cropEntity, RandomSource random) {
         SimpleContainer dropContainer = new SimpleContainer(2);
         dropContainer.addItem(getStackWithReplantTag(this, cropEntity, getSeed(), random));
-        dropContainer.addItem(new ItemStack(getCrop()));
+        dropContainer.addItem(new ItemStack(getCrop(), 1 + cropEntity.getGenome().getExtraCropYield()));
         return dropContainer;
     }
 

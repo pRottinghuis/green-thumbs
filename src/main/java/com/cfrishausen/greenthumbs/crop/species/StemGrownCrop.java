@@ -70,7 +70,7 @@ public class StemGrownCrop extends BasicCrop{
     @Override
     public ItemStack drops(ICropEntity cropEntity, Level level, BlockPos pos, boolean quickReplant) {
         SimpleContainer drops = new SimpleContainer(2);
-        drops.addItem(new ItemStack(this.getCrop()));
+        drops.addItem(new ItemStack(this.getCrop(), 1 + cropEntity.getGenome().getExtraCropYield()));
         drops.addItem(stackWithCopiedTag(this.getStemSpecies(), cropEntity, getSeed()));
         Containers.dropContents(level, pos, drops);
         return null;
