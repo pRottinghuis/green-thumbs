@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:sweet_berries"
+    }
+  ],
+  "result": {
+    "item": "greenthumbs:sweet_berry_seeds",
+    "nbt": "{greenthumbs.Info:{greenthumbs.CropSpecies:\"greenthumbs:gt_sweet_berry\",greenthumbs.CropState:{age:\"0\"},greenthumbs.Genome:{crop-yield:\"Cc\",growth-speed:\"Gg\",mutativity:\"Mm\",temperature-preference:\"Tt\"}}}"
+  }
+}
