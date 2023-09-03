@@ -39,9 +39,20 @@ public class GTRecipes extends RecipeProvider {
                 .unlockedBy("has_beetroot_seeds", has(Items.BEETROOT_SEEDS))
                 .save(pWriter);
 
-        GTCropShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, GTItems.PUMPKIN_CUTTING.get(), GTCropSpecies.GT_PUMPKIN_STEM.get())
+        GTCropShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, GTItems.SWEET_BERRY_SEEDS.get(), GTCropSpecies.GT_SWEET_BERRY.get())
+                .requires(Items.SWEET_BERRIES)
+                .unlockedBy("has_sweet_berries", has(Items.SWEET_BERRIES))
+                .save(pWriter);
+
+        GTCropShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, GTItems.PUMPKIN_SEEDS.get(), GTCropSpecies.GT_PUMPKIN_STEM.get())
                 .requires(Items.PUMPKIN_SEEDS)
                 .unlockedBy("has_pumpkin_seeds", has(Items.PUMPKIN_SEEDS))
                 .save(pWriter);
+
+        GTCropShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, GTItems.MELON_SEEDS.get(), GTCropSpecies.GT_MELON_STEM.get())
+                .requires(Items.PUMPKIN_SEEDS)
+                .unlockedBy("has_melon_seeds", has(Items.MELON_SEEDS))
+                .save(pWriter);
+
     }
 }

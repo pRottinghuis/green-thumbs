@@ -35,10 +35,10 @@ public class CropColor implements BlockColor {
     }
 
     private int getColorFromCrop(ICropEntity cropEntity, ICropSpecies cropSpecies) {
-        if (sameSpecies(cropSpecies, GTCropSpecies.GT_ATTACHED_PUMPKIN_STEM)) {
+        if (sameSpecies(cropSpecies, GTCropSpecies.GT_ATTACHED_PUMPKIN_STEM) || sameSpecies(cropSpecies, GTCropSpecies.GT_ATTACHED_MELON_STEM)) {
             return 14731036;
         }
-        if (sameSpecies(cropSpecies, GTCropSpecies.GT_PUMPKIN_STEM)) {
+        if (sameSpecies(cropSpecies, GTCropSpecies.GT_PUMPKIN_STEM) || sameSpecies(cropSpecies, GTCropSpecies.GT_MELON_STEM)) {
             int i = cropEntity.getCropSpecies().getAge(cropEntity);
             int j = i * 32;
             int k = 255 - i * 8;
