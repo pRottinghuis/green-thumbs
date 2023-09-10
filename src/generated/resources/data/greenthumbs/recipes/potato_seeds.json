@@ -8,6 +8,6 @@
   ],
   "result": {
     "item": "greenthumbs:potato_seeds",
-    "nbt": "{greenthumbs.Info:{greenthumbs.CropSpecies:\"greenthumbs:gt_potato\",greenthumbs.CropState:{age:\"0\"},greenthumbs.Genome:{crop-yield:\"Cc\",growth-speed:\"Gg\",mutativity:\"Mm\",temperature-preference:\"Tt\"}}}"
+    "nbt": "{greenthumbs.Info:{greenthumbs.CropSpecies:\"greenthumbs:gt_potato\",greenthumbs.CropState:{age:\"0\"},greenthumbs.Genome:{crop-yield:\"Cc\",fertilizer-response:\"Ff\",growth-speed:\"Gg\",light-tolerance:\"Ll\",mutativity:\"Mm\"}}}"
   }
 }

@@ -81,10 +81,11 @@ public class BasicCrop implements ICropSpecies {
     @Override
     public Genome defineGenome() {
         Map<String, String> genes = new HashMap<>();
+        genes.put(Genome.LIGHT_TOLERANCE, "Ll");
         genes.put(Genome.GROWTH_SPEED, "Gg");
-        genes.put(Genome.TEMPERATURE_PREFERENCE, "Tt");
         genes.put(Genome.MUTATIVITY, "Mm");
         genes.put(Genome.CROP_YIELD, "Cc");
+        genes.put(Genome.FERTILIZER_RESPONSE, "Ff");
         return new Genome(genes);
     }
 
@@ -104,7 +105,7 @@ public class BasicCrop implements ICropSpecies {
     public void randomTick(ServerLevel level, BlockPos pos, RandomSource random, GTSimpleCropBlock block, ICropEntity cropEntity) {
         if (!level.isAreaLoaded(pos, 1))
             return; // Forge: prevent loading unloaded chunks when checking neighbor's light
-        if (level.getRawBrightness(pos, 0) >= 9) {
+        if (level.getRawBrightness(pos, 0) >= cropEntity.getGenome().getLightTolerance()) {
             if (!isMaxAge(cropEntity)) {
                 float f = cropEntity.getGenome().getGrowthSpeed(block, level, pos);
                 if (random.nextInt((int) (25.0F / f) + 1) == 0) {
@@ -207,7 +208,10 @@ public class BasicCrop implements ICropSpecies {
         BlockPos belowPos = pPos.below();
         if (pState.getBlock() == block) { //Forge: This function is called during world gen and placement, before this block is set, so if we are not 'here' then assume it's the pre-check.
             if (pLevel.getBlockEntity(pPos) instanceof GTCropBlockEntity cropEntity) {
-                return pLevel.getRawBrightness(pPos, 0) >= 8 && cropEntity.getCropSpecies().mayPlaceOn(pLevel.getBlockState(belowPos));
+                // Can survive brightness is 1 lower than light required to grow.
+                int brightnessReq = cropEntity.getGenome().getLightTolerance() == 1 ? 0 : cropEntity.getGenome().getLightTolerance() - 1;
+                // check valid brightness and if can survive on the block below
+                return (pLevel.getRawBrightness(pPos, 0) >= brightnessReq || pLevel.canSeeSky(pPos)) && cropEntity.getCropSpecies().mayPlaceOn(pLevel.getBlockState(belowPos));
             }
         }
         return false;
@@ -216,6 +220,10 @@ public class BasicCrop implements ICropSpecies {
     @Override
     public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state, GTCropBlockEntity cropEntity) {
         growCrops(level, cropEntity);
+        // Grow crops again according to chance from genome fertilizer response trait
+        if (level.getRandom().nextFloat() < cropEntity.getGenome().getFertilizerResponse()) {
+            growCrops(level, cropEntity);
+        }
     }
 
     public void growCrops(Level level, ICropEntity cropEntity) {

@@ -1,4 +1,4 @@
-// 1.19.4	2023-09-02T23:35:50.466697	Recipes
+// 1.19.4	2023-09-10T12:00:09.8728883	Recipes
 4d42d0c3d7c36407141cecf64d353eab5314fa8c data/greenthumbs/advancements/recipes/misc/beetroot_seeds.json
 3aecb096265701103137c1381784677bf184c2fe data/greenthumbs/advancements/recipes/misc/carrot_seeds.json
 888f41ae1b661400c35e800e7380b0ed1c6e985c data/greenthumbs/advancements/recipes/misc/melon_seeds.json
@@ -6,10 +6,10 @@
 b13fe37d957460d37f96ec2959d838c047982e5a data/greenthumbs/advancements/recipes/misc/pumpkin_seeds.json
 42b5a23c80bf8e9ee7e1d1d89303d691803cc797 data/greenthumbs/advancements/recipes/misc/sweet_berry_seeds.json
 71a77a46af30d5783c4c859fcd65eb8a7c4b99c9 data/greenthumbs/advancements/recipes/misc/wheat_seeds.json
-f07da58ab321a4021c570d815e1cace77b1a9004 data/greenthumbs/recipes/beetroot_seeds.json
-6f61fb77d390c44627b2731541afcd9513527bf3 data/greenthumbs/recipes/carrot_seeds.json
-b44dd7c473bfc822b3a68d5495da6426c3ec1d59 data/greenthumbs/recipes/melon_seeds.json
-68092eca6e9b18c3b9903f6dd507b937af0863db data/greenthumbs/recipes/potato_seeds.json
-0ce228caa0d4a3031355c65d11dc33343a92ce4c data/greenthumbs/recipes/pumpkin_seeds.json
-124a22e11bcf5af365ebb89d629c264424454818 data/greenthumbs/recipes/sweet_berry_seeds.json
-bc453339b30dbeac0bdaeb073298a6b0e97bc299 data/greenthumbs/recipes/wheat_seeds.json
+86a8e01b03009c54a63982b165fe6613f21d5e8a data/greenthumbs/recipes/beetroot_seeds.json
+b1d45f83bb376436b983f937691b111c1939b54e data/greenthumbs/recipes/carrot_seeds.json
+84ebfb388bddfaabba7f8ad6ce5dff294f7806e0 data/greenthumbs/recipes/melon_seeds.json
+623cd355a45ef6f4514a927a9e931ba487e2914f data/greenthumbs/recipes/potato_seeds.json
+b4413c6ed952450d2ef2e8d186acfc1df562442c data/greenthumbs/recipes/pumpkin_seeds.json
+9d77ebe12a467b05ab46c304407085beb8d770c1 data/greenthumbs/recipes/sweet_berry_seeds.json
+7f7b1b78444fb0a38ba5914569b8b97b088bc025 data/greenthumbs/recipes/wheat_seeds.json

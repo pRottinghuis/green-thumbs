@@ -95,6 +95,7 @@ public interface ICropSpecies extends ICropSpeciesExtensions {
 
     /**
      * Override for crops that need functionality when there is entity colliding with them. For example berries hurt entities that move into them.
+     * TODO add mob grief
      */
     default void entityInside(BlockState state, Level level, BlockPos pos, Entity collidingEntity, GTCropBlockEntity cropBlockEntity) {}
 

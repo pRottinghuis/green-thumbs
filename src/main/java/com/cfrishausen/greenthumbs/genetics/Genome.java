@@ -8,6 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.animal.Panda;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -24,12 +25,6 @@ public class Genome {
     public static final String GROWTH_SPEED = "growth-speed";
 
     /**
-     * Alleles Tt
-     * use {@link Genome#getTempPreference(Block, BlockGetter, BlockPos)}
-     */
-    public static final String TEMPERATURE_PREFERENCE = "temperature-preference";
-
-    /**
      * Alleles Mm
      * use {@link Genome#mutationChance()}
      */
@@ -40,6 +35,18 @@ public class Genome {
      * use {@link Genome#getExtraCropYield()}
      */
     public static final String CROP_YIELD = "crop-yield";
+
+    /**
+     * Alleles Ll
+     * use {@link Genome#getLightTolerance()}
+     */
+    public static final String LIGHT_TOLERANCE = "light-tolerance";
+
+    /**
+     * Alleles Ff
+     * use {@link Genome#getFertilizerResponse()}
+     */
+    public static final String FERTILIZER_RESPONSE = "fertilizer-response";
 
     private final Map<String, String> GENES = new HashMap<>();
 
@@ -242,6 +249,35 @@ public class Genome {
             }
         }
         return 0;
+    }
+
+    /**
+     * @return Minimum light level for growth
+     */
+    public int getLightTolerance() {
+        if (!GENES.containsKey(LIGHT_TOLERANCE)) {
+            GreenThumbs.LOGGER.warn("{} does not have {} gene", this, LIGHT_TOLERANCE);
+        } else {
+            if (isRecessive(GENES.get(LIGHT_TOLERANCE))) {
+                return 8;
+            }
+        }
+        // Default vanilla brightness requirement for plants is 8
+        return 9;
+    }
+
+    /**
+     * @return % chance that bonemeal can cause extra growth
+     */
+    public float getFertilizerResponse() {
+        if (!GENES.containsKey(FERTILIZER_RESPONSE)) {
+            GreenThumbs.LOGGER.warn("{} does not have {} gene", this, FERTILIZER_RESPONSE);
+        } else {
+            if (isRecessive(GENES.get(FERTILIZER_RESPONSE))) {
+                return .33F;
+            }
+        }
+        return 0.0F;
     }
 
     /**

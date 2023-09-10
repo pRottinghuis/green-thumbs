@@ -91,12 +91,17 @@ public class GTGenomeCropBlockItem extends ItemNameBlockItem {
         Player player  = context.getPlayer();
         CompoundTag nbt = player.getItemInHand(InteractionHand.MAIN_HAND).getTag();
         CompoundTag saveTag = nbt.getCompound(NBTTags.INFO_TAG);
-        if (saveTag.contains(NBTTags.CROP_SPECIES_TAG)) {
+        if (saveTag.contains(NBTTags.CROP_SPECIES_TAG) && saveTag.contains(NBTTags.GENOME_TAG)) {
             saveTag.getString(NBTTags.CROP_SPECIES_TAG);
             ICropSpecies cropSpecies = GTCropSpecies.CROP_SPECIES_REGISTRY.get().getValue(new ResourceLocation(saveTag.getString(NBTTags.CROP_SPECIES_TAG)));
-            return cropSpecies.mayPlaceOn(context.getLevel().getBlockState(context.getClickedPos().below()));
+            Genome genome = new Genome(saveTag.getCompound(NBTTags.GENOME_TAG));
+            // Can survive brightness is 1 lower than light required to grow.
+            int brightnessReq = genome.getLightTolerance() == 1 ? 0 : genome.getLightTolerance() - 1;
+            Level level = context.getLevel();
+            BlockPos clickedPos = context.getClickedPos();
+            return cropSpecies.mayPlaceOn(context.getLevel().getBlockState(context.getClickedPos().below())) && (level.getRawBrightness(clickedPos, 0) >= brightnessReq || level.canSeeSky(clickedPos));
         } else {
-            player.sendSystemMessage(Component.literal("Seed has no species").withStyle(style -> style.withColor(ChatFormatting.RED)));
+            GreenThumbs.LOGGER.warn("Missing crop species and/or genome when trying to place GTCropBlockItem");
         }
         return false;
     }

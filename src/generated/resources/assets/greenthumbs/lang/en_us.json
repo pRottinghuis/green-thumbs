@@ -3,6 +3,7 @@
   "block.greenthumbs.gt_vegetable_block": "Vegetable Block",
   "block.greenthumbs.seed_splicing_station": "Seed Splicing Station",
   "crop-yield": "Crop Yield",
+  "fertilizer-response": "Fertilizer Response",
   "growth-speed": "Growth Speed",
   "item.greenthumbs.beetroot_cutting": "Beetroot Cutting",
   "item.greenthumbs.beetroot_seeds": "Beetroot Seeds",
@@ -19,6 +20,6 @@
   "item.greenthumbs.sweet_berry_seeds": "Sweet Berry Seeds",
   "item.greenthumbs.wheat_cutting": "Wheat Cutting",
   "item.greenthumbs.wheat_seeds": "Wheat Seeds",
-  "mutativity": "Mutativity",
-  "temperature-preference": "Temperature Preference"
+  "light-tolerance": "Light Tolerance",
+  "mutativity": "Mutativity"
 }

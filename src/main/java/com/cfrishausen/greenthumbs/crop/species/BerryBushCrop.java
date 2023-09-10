@@ -68,7 +68,7 @@ public class BerryBushCrop extends BasicCrop{
     @Override
     public void randomTick(ServerLevel level, BlockPos pos, RandomSource random, GTSimpleCropBlock block, ICropEntity cropEntity) {
         int age = getAge(cropEntity);
-        if (age < 3 && level.getRawBrightness(pos.above(), 0) >= 9) {
+        if (age < 3 && level.getRawBrightness(pos.above(), 0) >= cropEntity.getGenome().getLightTolerance()) {
             cropEntity.setCropState(cropEntity.getCropState().setValue(AGE_3, getAge(cropEntity) + 1));
         }
     }

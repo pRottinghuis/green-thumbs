@@ -39,9 +39,10 @@ public class GTLanguageProvider extends LanguageProvider {
 
 
         this.add(Genome.MUTATIVITY, "Mutativity");
-        this.add(Genome.TEMPERATURE_PREFERENCE, "Temperature Preference");
         this.add(Genome.GROWTH_SPEED, "Growth Speed");
         this.add(Genome.CROP_YIELD, "Crop Yield");
+        this.add(Genome.LIGHT_TOLERANCE, "Light Tolerance");
+        this.add(Genome.FERTILIZER_RESPONSE, "Fertilizer Response");
 
 
 

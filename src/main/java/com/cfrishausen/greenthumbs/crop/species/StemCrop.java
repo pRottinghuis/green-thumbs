@@ -49,7 +49,7 @@ public class StemCrop extends BasicCrop {
     @Override
     public void randomTick(ServerLevel level, BlockPos pos, RandomSource random, GTSimpleCropBlock block, ICropEntity cropEntity) {
         if (!level.isAreaLoaded(pos, 1)) return; // Forge: prevent loading unloaded chunks when checking neighbor's light
-        if (level.getRawBrightness(pos, 0) >= 9) {
+        if (level.getRawBrightness(pos, 0) >= cropEntity.getGenome().getLightTolerance()) {
             float f = cropEntity.getGenome().getGrowthSpeed(block, level, pos);
             if (random.nextInt((int)(25.0F / f) + 1) == 0) {
                 int i = cropEntity.getCropState().getValue(AGE_7);
@@ -102,6 +102,10 @@ public class StemCrop extends BasicCrop {
         super.performBonemeal(level, random, pos, state, cropEntity);
         // Ensure that there is a chance of growing a fruit
         state.randomTick(level, pos, random);
+        // Extra chance to grow fruit when boneheaded
+        if (level.getRandom().nextFloat() < cropEntity.getGenome().getFertilizerResponse()) {
+            state.randomTick(level, pos, random);
+        }
     }
 
     @Override
