@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:block",
+  "functions": [
+    {
+      "function": "greenthumbs:gt_loot_function"
+    }
+  ],
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "greenthumbs:wheat_seeds"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ]
+}

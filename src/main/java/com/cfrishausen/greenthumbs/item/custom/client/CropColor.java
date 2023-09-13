@@ -1,4 +1,4 @@
-package com.cfrishausen.greenthumbs.client;
+package com.cfrishausen.greenthumbs.item.custom.client;
 
 import com.cfrishausen.greenthumbs.GreenThumbs;
 import com.cfrishausen.greenthumbs.block.entity.GTCropBlockEntity;

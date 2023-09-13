@@ -1,4 +1,4 @@
-package com.cfrishausen.greenthumbs.client.model.block;
+package com.cfrishausen.greenthumbs.item.custom.client.model.block;
 
 import com.cfrishausen.greenthumbs.block.entity.GTCropBlockEntity;
 import com.cfrishausen.greenthumbs.crop.state.CropState;

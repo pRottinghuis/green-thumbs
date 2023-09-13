@@ -2,7 +2,7 @@ package com.cfrishausen.greenthumbs.crop;
 
 import com.cfrishausen.greenthumbs.block.custom.GTSimpleCropBlock;
 import com.cfrishausen.greenthumbs.block.entity.GTCropBlockEntity;
-import com.cfrishausen.greenthumbs.client.ICropSpeciesExtensions;
+import com.cfrishausen.greenthumbs.item.custom.client.ICropSpeciesExtensions;
 import com.cfrishausen.greenthumbs.crop.state.CropState;
 import com.cfrishausen.greenthumbs.genetics.Genome;
 import com.cfrishausen.greenthumbs.item.custom.GTGenomeCropBlockItem;
@@ -14,11 +14,11 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -33,9 +33,10 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
+import java.util.Map;
 
 /**
- * All assumed functionality for a crop species
+ * All crop species must implement
  */
 public interface ICropSpecies extends ICropSpeciesExtensions {
 
@@ -55,7 +56,7 @@ public interface ICropSpecies extends ICropSpeciesExtensions {
     void registerDefaultState();
 
     /**
-     * What does crop need to do on a tick
+     * What does species need to do on a tick
      */
     void randomTick(ServerLevel level, BlockPos pos, RandomSource random, GTSimpleCropBlock block, ICropEntity cropEntity);
 
@@ -65,33 +66,16 @@ public interface ICropSpecies extends ICropSpeciesExtensions {
     InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit, GTCropBlockEntity cropBlockEntity);
 
     /**
-     *  What does a species do when it is removed. Do not include functionality found in BlockBehavior.onRemove().
-     */
-    void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving, ICropEntity cropEntity);
-
-    /**
      * Drop items when crop is broken
      * @param quickReplant should the drops
      * @return item stack for what should remain in the location that crop was harvested from. Used for quick replant for crop that should be replanted
      */
-    ItemStack drops(ICropEntity crop, Level level, BlockPos pos, boolean quickReplant);
-
-    /**
-     * @return Container with items that need to drop when crop is destroyed at non-specific crop states. Make sure index 0 of container contains plantable item because it will be subtracted from for quick plant.
-     */
-    @NonNull
-    SimpleContainer stateNonSpecificDrop(ICropEntity crop, RandomSource random);
-
-    /**
-     * @return Container with items that need to drop when crop is destroyed at a specific crop state. Make sure index 0 of container contains plantable item because it will be subtracted from for quick plant.
-     */
-    @NonNull
-    SimpleContainer stateSpecificDrop(ICropEntity crop, RandomSource random);
+    ItemStack drops(ICropEntity crop, Level level, BlockPos pos, Map<Enchantment, Integer> enchantments, boolean quickReplant);
 
     /**
      * What does a crop do when it is quick replanted
      */
-    void quickReplant(BlockState pState, Level pLevel, BlockPos pPos, ICropEntity crop);
+    void quickReplant(BlockState pState, Level pLevel, BlockPos pPos, Map<Enchantment, Integer> enchantments, ICropEntity crop);
 
     /**
      * Override for crops that need functionality when there is entity colliding with them. For example berries hurt entities that move into them.
@@ -102,8 +86,8 @@ public interface ICropSpecies extends ICropSpeciesExtensions {
     /**
      * Get a stack that has a reproduction tag on it. Helper for when a crop is broken the standard vanilla way
      */
-    default ItemStack getStackWithReplantTag(ICropSpecies cropSpecies, ICropEntity cropEntity, Item item, RandomSource random) {
-        ItemStack cropStack = new ItemStack(item, 1);
+    default ItemStack getStackWithReplantTag(ICropSpecies cropSpecies, ICropEntity cropEntity, Item item, int size, RandomSource random) {
+        ItemStack cropStack = new ItemStack(item, size);
         cropStack.setTag(standardGenomelessTag(cropSpecies));
         cropStack.getTag().getCompound(NBTTags.INFO_TAG).put(NBTTags.GENOME_TAG, cropEntity.getGenome().writeReproductionTag(random));
         return cropStack;
@@ -243,6 +227,11 @@ public interface ICropSpecies extends ICropSpeciesExtensions {
      * @return Path name for the crop. Used for resource files
      */
     String getPath();
+
+    /**
+     * @return does crop support fortune breaks
+     */
+    boolean getDoesFortune();
 
     /**
      * Get the default CropState for the species. Should be state that represents crop species for initial placement.

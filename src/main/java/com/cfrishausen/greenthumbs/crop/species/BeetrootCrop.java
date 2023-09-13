@@ -32,8 +32,8 @@ public class BeetrootCrop extends BasicCrop{
     public static final IntegerProperty AGE_3 = BlockStateProperties.AGE_3;
 
 
-    public BeetrootCrop(String name, Supplier<GTGenomeCropBlockItem> seeds, Supplier<Item> crop, Supplier<GTGenomeCropBlockItem> cutting) {
-        super(name, seeds, crop, cutting);
+    public BeetrootCrop(String name, Supplier<GTGenomeCropBlockItem> seeds, Supplier<Item> crop, Supplier<GTGenomeCropBlockItem> cutting, boolean doesFortune) {
+        super(name, seeds, crop, cutting, doesFortune);
     }
 
     @Override

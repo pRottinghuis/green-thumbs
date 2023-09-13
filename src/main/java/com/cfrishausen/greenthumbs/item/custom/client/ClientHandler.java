@@ -1,7 +1,7 @@
-package com.cfrishausen.greenthumbs.client;
+package com.cfrishausen.greenthumbs.item.custom.client;
 
 import com.cfrishausen.greenthumbs.GreenThumbs;
-import com.cfrishausen.greenthumbs.client.model.block.GTBakedModel;
+import com.cfrishausen.greenthumbs.item.custom.client.model.block.GTBakedModel;
 import com.cfrishausen.greenthumbs.crop.ICropSpecies;
 import com.cfrishausen.greenthumbs.crop.state.CropState;
 import com.cfrishausen.greenthumbs.registries.GTBlocks;
@@ -12,18 +12,12 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.StemBlock;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import org.checkerframework.checker.units.qual.C;
 
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.stream.Collectors;
 

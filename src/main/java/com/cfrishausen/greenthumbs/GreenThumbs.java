@@ -1,14 +1,12 @@
 package com.cfrishausen.greenthumbs;
 
-import com.cfrishausen.greenthumbs.client.ClientHandler;
+import com.cfrishausen.greenthumbs.item.custom.client.ClientHandler;
 import com.cfrishausen.greenthumbs.crop.ICropSpecies;
 import com.cfrishausen.greenthumbs.crop.NBTTags;
-import com.cfrishausen.greenthumbs.crop.state.CropState;
 import com.cfrishausen.greenthumbs.event.EventHandler;
 import com.cfrishausen.greenthumbs.registries.*;
 import com.cfrishausen.greenthumbs.screen.SeedSplicingStationScreen;
 import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -39,6 +37,7 @@ public class GreenThumbs
         GTItems.ITEMS.register(modEventBus);
         GTBlockEntities.BLOCK_ENTITIES.register(modEventBus);
         GTCropSpecies.CROP_SPECIES.register(modEventBus);
+        GTLoot.LOOT_FUNCTION_TYPE.register(modEventBus);
         GTMenuTypes.register(modEventBus);
 
         EventHandler.register();

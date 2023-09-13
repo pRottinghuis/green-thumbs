@@ -18,6 +18,7 @@ import net.minecraft.world.Containers;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
@@ -25,6 +26,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import java.util.Map;
 import java.util.function.Supplier;
 
 public class StemCrop extends BasicCrop {
@@ -41,8 +43,8 @@ public class StemCrop extends BasicCrop {
 
     private final Supplier<ICropSpecies> fruit;
 
-    public StemCrop(String name, Supplier<GTGenomeCropBlockItem> seed, Supplier<Item> crop, Supplier<GTGenomeCropBlockItem> cutting, Supplier<ICropSpecies> fruit) {
-        super(name, seed, crop, cutting);
+    public StemCrop(String name, Supplier<GTGenomeCropBlockItem> seed, Supplier<Item> crop, Supplier<GTGenomeCropBlockItem> cutting, Supplier<ICropSpecies> fruit, boolean doesFortune) {
+        super(name, seed, crop, cutting, doesFortune);
         this.fruit = fruit;
     }
 
@@ -84,7 +86,7 @@ public class StemCrop extends BasicCrop {
     }
 
     @Override
-    public ItemStack drops(ICropEntity cropEntity, Level level, BlockPos pos, boolean quickReplant) {
+    public ItemStack drops(ICropEntity cropEntity, Level level, BlockPos pos, Map<Enchantment, Integer> enchantments, boolean quickReplant) {
         SimpleContainer drops = new SimpleContainer(2);
         drops.addItem(stackWithCopiedTag(this, cropEntity, getSeed()));
         Containers.dropContents(level, pos, drops);

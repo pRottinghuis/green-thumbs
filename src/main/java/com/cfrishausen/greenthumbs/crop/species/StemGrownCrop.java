@@ -16,6 +16,7 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
@@ -46,8 +47,8 @@ public class StemGrownCrop extends BasicCrop{
     private Supplier<ICropSpecies> stemSpecies;
     private Supplier<ICropSpecies> attachedStemSpecies;
 
-    public StemGrownCrop(String pathName, Supplier<GTGenomeCropBlockItem> seed, Supplier<Item> crop, Supplier<GTGenomeCropBlockItem> cutting, Supplier<ICropSpecies> stemSpecies, Supplier<ICropSpecies> attachedStemSpecies) {
-        super(pathName, seed, crop, cutting);
+    public StemGrownCrop(String pathName, Supplier<GTGenomeCropBlockItem> seed, Supplier<Item> crop, Supplier<GTGenomeCropBlockItem> cutting, Supplier<ICropSpecies> stemSpecies, Supplier<ICropSpecies> attachedStemSpecies, boolean doesFortune) {
+        super(pathName, seed, crop, cutting, doesFortune);
         this.stemSpecies = stemSpecies;
         this.attachedStemSpecies = attachedStemSpecies;
     }
@@ -68,7 +69,7 @@ public class StemGrownCrop extends BasicCrop{
     }
 
     @Override
-    public ItemStack drops(ICropEntity cropEntity, Level level, BlockPos pos, boolean quickReplant) {
+    public ItemStack drops(ICropEntity cropEntity, Level level, BlockPos pos, Map<Enchantment, Integer> enchantments, boolean quickReplant) {
         SimpleContainer drops = new SimpleContainer(2);
         drops.addItem(new ItemStack(this.getCrop(), 1 + cropEntity.getGenome().getExtraCropYield()));
         drops.addItem(stackWithCopiedTag(this.getStemSpecies(), cropEntity, getSeed()));

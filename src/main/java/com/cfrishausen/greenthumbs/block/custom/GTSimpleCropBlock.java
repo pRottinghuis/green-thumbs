@@ -86,16 +86,7 @@ public class GTSimpleCropBlock extends Block implements IPlantable, Bonemealable
 
     }
 
-    @Override
-    public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
-        if (!pState.is(pNewState.getBlock())) {
-            BlockEntity entity = pLevel.getBlockEntity(pPos);
-            if (entity instanceof GTCropBlockEntity cropEntity) {
-                cropEntity.getCropSpecies().onRemove(pState, pLevel, pPos, pNewState, pIsMoving, cropEntity);
-            }
-        }
-        super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
-    }
+
 
     @Override
     public PlantType getPlantType(BlockGetter level, BlockPos pos) {

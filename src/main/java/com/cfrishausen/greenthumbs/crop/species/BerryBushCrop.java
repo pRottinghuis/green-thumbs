@@ -25,6 +25,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
@@ -43,6 +45,7 @@ import net.minecraftforge.common.Tags;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
 import java.util.function.Supplier;
 
 public class BerryBushCrop extends BasicCrop{
@@ -51,8 +54,8 @@ public class BerryBushCrop extends BasicCrop{
     private static final VoxelShape SAPLING_SHAPE = Block.box(3.0D, 0.0D, 3.0D, 13.0D, 8.0D, 13.0D);
     private static final VoxelShape MID_GROWTH_SHAPE = Block.box(1.0D, 0.0D, 1.0D, 15.0D, 16.0D, 15.0D);
 
-    public BerryBushCrop(String pathName, Supplier<GTGenomeCropBlockItem> seed, Supplier<Item> crop, Supplier<GTGenomeCropBlockItem> cutting) {
-        super(pathName, seed, crop, cutting);
+    public BerryBushCrop(String pathName, Supplier<GTGenomeCropBlockItem> seed, Supplier<Item> crop, Supplier<GTGenomeCropBlockItem> cutting, boolean doesFortune) {
+        super(pathName, seed, crop, cutting, doesFortune);
     }
 
     @Override
@@ -101,7 +104,7 @@ public class BerryBushCrop extends BasicCrop{
             // Drop berries
             Block.popResource(level, pos, new ItemStack(this.getCrop(), berryCount + (flag ? 1 : 0) + cropBlockEntity.getGenome().getExtraCropYield()));
             // drop seeds
-            Block.popResource(level, pos, getStackWithReplantTag(this, cropBlockEntity, this.getSeed(), level.getRandom()));
+            Block.popResource(level, pos, getStackWithReplantTag(this, cropBlockEntity, this.getSeed(),1,  level.getRandom()));
             level.playSound((Player)null, pos, SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, SoundSource.BLOCKS, 1.0F, 0.8F + level.random.nextFloat() * 0.4F);
             cropBlockEntity.setCropState(cropBlockEntity.getCropState().setValue(AGE_3, 1));
             return InteractionResult.sidedSuccess(level.isClientSide);
@@ -117,33 +120,28 @@ public class BerryBushCrop extends BasicCrop{
      *  when there are berries grown on it those berries will also drop.
      */
     @Override
-    public ItemStack drops(ICropEntity cropEntity, Level level, BlockPos pos, boolean quickReplant) {
+    public ItemStack drops(ICropEntity cropEntity, Level level, BlockPos pos, Map<Enchantment, Integer> enchantments, boolean quickReplant) {
         SimpleContainer drops;
+        RandomSource random = level.getRandom();
+        // Berries need to drop
         if (getAge(cropEntity) > 1 ) {
-            drops = stateSpecificDrop(cropEntity, level.getRandom());
+            drops = new SimpleContainer(2);
+            // Drop a seed
+            drops.addItem(stackWithCopiedTag(this, cropEntity, getSeed()));
+            // drop berries
+            int berryCount = 1 + random.nextInt(2) + cropEntity.getGenome().getExtraCropYield();
+            // If fortune increase berry counts. See sweet_berry_bush.json
+            if (getDoesFortune() && enchantments.containsKey(Enchantments.BLOCK_FORTUNE)) {
+                berryCount += random.nextInt(enchantments.get(Enchantments.BLOCK_FORTUNE));
+            }
+            drops.addItem(new ItemStack(this.getCrop(), berryCount + (cropEntity.getCropState().getValue(AGE_3) == 3 ?  1 : 0)));
         } else {
-            drops = stateNonSpecificDrop(cropEntity, level.getRandom());
+            // only seeds need to drop
+            drops = new SimpleContainer(1);
+            drops.addItem(stackWithCopiedTag(this, cropEntity, getSeed()));
         }
         Containers.dropContents(level, pos, drops);
         return null;
-    }
-
-    @Override
-    public @NotNull SimpleContainer stateNonSpecificDrop(ICropEntity cropEntity, RandomSource random) {
-        SimpleContainer dropContainer = new SimpleContainer(1);
-        dropContainer.addItem(stackWithCopiedTag(this, cropEntity, getSeed()));
-        return dropContainer;
-    }
-
-    @Override
-    public @NonNull SimpleContainer stateSpecificDrop(ICropEntity cropEntity, RandomSource random) {
-        SimpleContainer dropContainer = new SimpleContainer(2);
-        // Drop a seed
-        dropContainer.addItem(stackWithCopiedTag(this, cropEntity, getSeed()));
-        // drop berries
-        int berryCount = 1 + random.nextInt(2) + cropEntity.getGenome().getExtraCropYield();
-        dropContainer.addItem(new ItemStack(this.getCrop(), berryCount + (cropEntity.getCropState().getValue(AGE_3) == 3 ?  1 : 0)));
-        return dropContainer;
     }
 
     @Override

@@ -1,0 +1,4 @@
+// 1.19.4	2023-09-11T22:34:56.312006	Loot Tables
+f8fdea166f7643028971934b56df7d00dbb084cc data/greenthumbs/loot_tables/blocks/gt_crop_block.json
+f8fdea166f7643028971934b56df7d00dbb084cc data/greenthumbs/loot_tables/blocks/gt_vegetable_block.json
+a16df9bbf79caf14d607b67c1b640e447aa499d8 data/greenthumbs/loot_tables/blocks/seed_splicing_station.json

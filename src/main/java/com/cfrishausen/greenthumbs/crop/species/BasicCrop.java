@@ -26,6 +26,8 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -67,11 +69,14 @@ public class BasicCrop implements ICropSpecies {
     // name of model file to look in
     protected final String pathName;
 
-    public BasicCrop(String pathName, Supplier<GTGenomeCropBlockItem> seed, Supplier<Item> crop, Supplier<GTGenomeCropBlockItem> cutting) {
+    private boolean doesFortune;
+
+    public BasicCrop(String pathName, Supplier<GTGenomeCropBlockItem> seed, Supplier<Item> crop, Supplier<GTGenomeCropBlockItem> cutting, boolean doesFortune) {
         this.pathName = pathName;
         this.seed = seed;
         this.crop = crop;
         this.cutting = cutting;
+        this.doesFortune = doesFortune;
         StateDefinition.Builder<ICropSpecies, CropState> builder = new StateDefinition.Builder<>(this);
         this.createBlockStateDefinition(builder);
         this.cropStateDef = builder.create(ICropSpecies::getDefaultCropState, CropState::new);
@@ -136,7 +141,8 @@ public class BasicCrop implements ICropSpecies {
                 if (!handStack.is(GTItems.GT_DEBUG_STICK.get())) {
                     // quick replant from harvest implementation
                     if (isMaxAge(cropBlockEntity)) {
-                        cropBlockEntity.getCropSpecies().quickReplant(state, level, pos, cropBlockEntity);
+
+                        cropBlockEntity.getCropSpecies().quickReplant(state, level, pos, handStack.getAllEnchantments(), cropBlockEntity);
                     }
                 }
             }
@@ -144,21 +150,28 @@ public class BasicCrop implements ICropSpecies {
         return InteractionResult.PASS;
     }
 
-    /**
-     * Standard crop only drops contents when it is removed.
-     */
-    @Override
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving, ICropEntity cropEntity) {
-        drops(cropEntity, level, pos, false);
-    }
-
     // TODO fortune drops
-    public ItemStack drops(ICropEntity cropEntity, Level level, BlockPos pos, boolean quickReplant) {
+    public ItemStack drops(ICropEntity cropEntity, Level level, BlockPos pos, Map<Enchantment, Integer> enchantments, boolean quickReplant) {
         ItemStack returnStack = null;
         SimpleContainer drops;
         ICropSpecies cropSpecies = cropEntity.getCropSpecies();
+        RandomSource random = level.getRandom();
         if (cropSpecies.isMaxAge(cropEntity)) {
-            drops = stateSpecificDrop(cropEntity, level.getRandom());
+            drops = new SimpleContainer(2);
+            int seedCount = 1;
+
+            // Add extra seeds on fortune. Used for wheat
+            if (getDoesFortune() && enchantments.containsKey(Enchantments.BLOCK_FORTUNE)) {
+                // See minecraft:wheat.json loot table
+                for (int i = 0; i < enchantments.get(Enchantments.BLOCK_FORTUNE) + 3; ++i) {
+                    if (random.nextFloat() < 0.5714286) {
+                        ++seedCount;
+                    }
+                }
+            }
+            drops.addItem(getStackWithReplantTag(this, cropEntity, getSeed(), seedCount, random));
+            drops.addItem(new ItemStack(getCrop(), 1 + cropEntity.getGenome().getExtraCropYield()));
+
             if (quickReplant) {
                 returnStack = drops.getItem(0);
                 if (!returnStack.isEmpty()) {
@@ -167,31 +180,18 @@ public class BasicCrop implements ICropSpecies {
                 }
             }
         } else {
-            drops = stateNonSpecificDrop(cropEntity, level.getRandom());
+            drops = new SimpleContainer(stackWithCopiedTag(this, cropEntity, getSeed()));
         }
         Containers.dropContents(level, pos, drops);
         return returnStack;
     }
 
     @Override
-    public @NotNull SimpleContainer stateNonSpecificDrop(ICropEntity cropEntity, RandomSource random) {
-        return new SimpleContainer(stackWithCopiedTag(this, cropEntity, getSeed()));
-    }
-
-    @Override
-    public @NonNull SimpleContainer stateSpecificDrop(ICropEntity cropEntity, RandomSource random) {
-        SimpleContainer dropContainer = new SimpleContainer(2);
-        dropContainer.addItem(getStackWithReplantTag(this, cropEntity, getSeed(), random));
-        dropContainer.addItem(new ItemStack(getCrop(), 1 + cropEntity.getGenome().getExtraCropYield()));
-        return dropContainer;
-    }
-
-    @Override
-    public void quickReplant(BlockState pState, Level pLevel, BlockPos pPos, ICropEntity cropEntity) {
+    public void quickReplant(BlockState pState, Level pLevel, BlockPos pPos, Map<Enchantment, Integer> enchantments, ICropEntity cropEntity) {
         if (!doesQuickReplant()) {
             return;
         }
-        ItemStack replantStack = drops(cropEntity, pLevel, pPos, true);
+        ItemStack replantStack = drops(cropEntity, pLevel, pPos, enchantments, true);
         if (replantStack != null) {
             CompoundTag replantTag = replantStack.getTag();
             if (replantTag != null && replantTag.contains(NBTTags.INFO_TAG)) {
@@ -330,6 +330,11 @@ public class BasicCrop implements ICropSpecies {
 
     public final CropState getDefaultCropState() {
         return this.defaultCropState;
+    }
+
+    @Override
+    public boolean getDoesFortune() {
+        return this.doesFortune;
     }
 
     @Override
