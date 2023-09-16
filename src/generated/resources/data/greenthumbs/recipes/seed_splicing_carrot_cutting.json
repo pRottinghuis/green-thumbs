@@ -1,0 +1,9 @@
+{
+  "type": "greenthumbs:seed_splicing",
+  "ingredients": [
+    {
+      "item": "greenthumbs:carrot_cutting"
+    }
+  ],
+  "result": "greenthumbs:carrot_cutting"
+}

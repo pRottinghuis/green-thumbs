@@ -1,0 +1,9 @@
+{
+  "type": "greenthumbs:seed_splicing",
+  "ingredients": [
+    {
+      "item": "greenthumbs:pumpkin_cutting"
+    }
+  ],
+  "result": "greenthumbs:pumpkin_cutting"
+}

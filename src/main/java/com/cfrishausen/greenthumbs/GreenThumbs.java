@@ -39,6 +39,7 @@ public class GreenThumbs
         GTCropSpecies.CROP_SPECIES.register(modEventBus);
         GTLoot.LOOT_FUNCTION_TYPE.register(modEventBus);
         GTMenuTypes.register(modEventBus);
+        GTRecipeTypes.register(modEventBus);
 
         EventHandler.register();
 

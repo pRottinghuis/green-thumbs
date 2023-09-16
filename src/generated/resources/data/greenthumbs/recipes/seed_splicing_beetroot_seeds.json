@@ -1,0 +1,9 @@
+{
+  "type": "greenthumbs:seed_splicing",
+  "ingredients": [
+    {
+      "item": "greenthumbs:beetroot_seeds"
+    }
+  ],
+  "result": "greenthumbs:beetroot_seeds"
+}

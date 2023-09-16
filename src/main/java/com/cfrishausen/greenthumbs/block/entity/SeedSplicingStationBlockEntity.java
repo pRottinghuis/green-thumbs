@@ -2,11 +2,13 @@ package com.cfrishausen.greenthumbs.block.entity;
 
 import com.cfrishausen.greenthumbs.crop.ICropSpecies;
 import com.cfrishausen.greenthumbs.crop.NBTTags;
+import com.cfrishausen.greenthumbs.data.recipe.SeedSplicingStationRecipe;
 import com.cfrishausen.greenthumbs.genetics.Genome;
 import com.cfrishausen.greenthumbs.item.custom.GTGenomeCropBlockItem;
 import com.cfrishausen.greenthumbs.registries.GTBlockEntities;
 import com.cfrishausen.greenthumbs.registries.GTBlocks;
 import com.cfrishausen.greenthumbs.registries.GTCropSpecies;
+import com.cfrishausen.greenthumbs.registries.GTRecipeTypes;
 import com.cfrishausen.greenthumbs.screen.SeedSplicingStationMenu;
 import com.cfrishausen.greenthumbs.screen.SeedSplicingStationScreen;
 import net.minecraft.core.BlockPos;
@@ -32,6 +34,8 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
 
 // Credit: Tutorials By Kaupenjoe | https://github.com/Tutorials-By-Kaupenjoe/Forge-Tutorial-1.19/tree/22-blockEntities
 public class SeedSplicingStationBlockEntity extends BlockEntity implements MenuProvider {
@@ -81,6 +85,8 @@ public class SeedSplicingStationBlockEntity extends BlockEntity implements MenuP
 
     private int buttonClicked = 0;
 
+    int hasRecipe = 0;
+
     public SeedSplicingStationBlockEntity(BlockPos pos, BlockState state) {
         super(GTBlockEntities.SEED_SPLICING_STATION_BLOCK_ENTITY.get(), pos, state);
         this.data = new ContainerData() {
@@ -90,6 +96,7 @@ public class SeedSplicingStationBlockEntity extends BlockEntity implements MenuP
                     case 0 -> SeedSplicingStationBlockEntity.this.progress;
                     case 1 -> SeedSplicingStationBlockEntity.this.maxProgress;
                     case 2 -> SeedSplicingStationBlockEntity.this.buttonClicked;
+                    case 3 -> SeedSplicingStationBlockEntity.this.hasRecipe;
                     default -> 0;
                 };
             }
@@ -100,12 +107,13 @@ public class SeedSplicingStationBlockEntity extends BlockEntity implements MenuP
                     case 0 -> SeedSplicingStationBlockEntity.this.progress = value;
                     case 1 -> SeedSplicingStationBlockEntity.this.maxProgress = value;
                     case 2 -> SeedSplicingStationBlockEntity.this.buttonClicked = value;
+                    case 3 -> SeedSplicingStationBlockEntity.this.hasRecipe = value;
                 }
             }
 
             @Override
             public int getCount() {
-                return 3;
+                return 4;
             }
         };
     }
@@ -168,12 +176,11 @@ public class SeedSplicingStationBlockEntity extends BlockEntity implements MenuP
         Containers.dropContents(this.level, this.worldPosition, inventory);
     }
     public static void tick(Level level, BlockPos pos, BlockState state, SeedSplicingStationBlockEntity pEntity) {
-
         if(level.isClientSide()) {
             return;
         }
 
-        if(hasRecipe(getInventoryCopy(pEntity)) && pEntity.buttonClicked != 0) {
+        if(hasRecipe(pEntity) && pEntity.buttonClicked != 0) {
             pEntity.progress++;
             setChanged(level, pos, state);
             if(pEntity.progress >= pEntity.maxProgress) {
@@ -192,13 +199,18 @@ public class SeedSplicingStationBlockEntity extends BlockEntity implements MenuP
 
     private static void craftItem(SeedSplicingStationBlockEntity pEntity) {
 
-        if(hasRecipe(getInventoryCopy(pEntity))) {
+        if(hasRecipe(pEntity)) {
+            Level level = pEntity.getLevel();
+            SimpleContainer inventory = getInventoryCopy(pEntity);
+            Optional<SeedSplicingStationRecipe> recipe = level.getRecipeManager().getRecipeFor(SeedSplicingStationRecipe.Type.INSTANCE, inventory, level);
+
+
             ItemStack seed1 = pEntity.itemHandler.getStackInSlot(0);
             ItemStack seed2 = pEntity.itemHandler.getStackInSlot(1);
 
             CompoundTag splicedTag = Genome.fullSpliceTag(seed1.getTag(), seed2.getTag());
 
-            ItemStack outputStack = new ItemStack(seed1.getItem(), 1);
+            ItemStack outputStack = recipe.get().getResultItem(level.registryAccess());
             outputStack.setTag(splicedTag);
             pEntity.itemHandler.setStackInSlot(2, outputStack);
             pEntity.resetProgress();
@@ -206,14 +218,24 @@ public class SeedSplicingStationBlockEntity extends BlockEntity implements MenuP
             // seeds need to extract after progress is reset because itemstackhandler prevents extract while data is indicating crafting
             pEntity.itemHandler.extractItem(0, 1, false);
             pEntity.itemHandler.extractItem(1, 1, false);
+
+            pEntity.setHasRecipe(0);
         }
     }
 
-    public static boolean hasRecipe(SimpleContainer inventory) {
+    public static boolean hasRecipe(SeedSplicingStationBlockEntity entity) {
+        Level level = entity.getLevel();
+        SimpleContainer inventory = getInventoryCopy(entity);
 
-        boolean hasGenomeBlockItems = inventory.getItem(0).getItem() instanceof GTGenomeCropBlockItem && inventory.getItem(1).getItem() instanceof GTGenomeCropBlockItem;
+        Optional<SeedSplicingStationRecipe> recipe = level.getRecipeManager().getRecipeFor(GTRecipeTypes.SEED_SPLICING_STATION_TYPE.get(), inventory, level);
 
-        return hasGenomeBlockItems && sameSpecies(inventory) && outputSlotEmpty(inventory);
+        boolean hasRecipe = recipe.isPresent() && outputSlotEmpty(inventory);
+        if (hasRecipe) {
+            entity.setHasRecipe(1);
+        } else {
+            entity.setHasRecipe(0);
+        }
+        return hasRecipe;
     }
 
     private static SimpleContainer getInventoryCopy(SeedSplicingStationBlockEntity entity) {
@@ -237,6 +259,15 @@ public class SeedSplicingStationBlockEntity extends BlockEntity implements MenuP
 
     private boolean isCrafting() {
         return this.data.get(2) != 0;
+    }
+
+    private void setHasRecipe(int val) {
+        if (val == 0) {
+            this.hasRecipe = 0;
+        } else {
+            this.hasRecipe = 1;
+        }
+        setChanged(this.level, this.getBlockPos(), this.getBlockState());
     }
 
 }

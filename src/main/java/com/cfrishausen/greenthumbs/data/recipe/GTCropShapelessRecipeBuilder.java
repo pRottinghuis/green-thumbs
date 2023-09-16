@@ -1,11 +1,7 @@
-package com.cfrishausen.greenthumbs.data;
+package com.cfrishausen.greenthumbs.data.recipe;
 
-import com.cfrishausen.greenthumbs.crop.ICropEntity;
 import com.cfrishausen.greenthumbs.crop.ICropSpecies;
 import com.cfrishausen.greenthumbs.crop.NBTTags;
-import com.cfrishausen.greenthumbs.item.custom.GTGenomeCropBlockItem;
-import com.cfrishausen.greenthumbs.registries.GTCropSpecies;
-import com.cfrishausen.greenthumbs.registries.GTItems;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -24,11 +20,9 @@ import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
-import org.checkerframework.checker.units.qual.C;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 public class GTCropShapelessRecipeBuilder extends CraftingRecipeBuilder implements RecipeBuilder {

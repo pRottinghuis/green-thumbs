@@ -1,0 +1,9 @@
+{
+  "type": "greenthumbs:seed_splicing",
+  "ingredients": [
+    {
+      "item": "greenthumbs:wheat_cutting"
+    }
+  ],
+  "result": "greenthumbs:wheat_cutting"
+}

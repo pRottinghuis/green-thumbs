@@ -1,5 +1,6 @@
 package com.cfrishausen.greenthumbs.screen;
 
+import com.cfrishausen.greenthumbs.GreenThumbs;
 import com.cfrishausen.greenthumbs.block.entity.SeedSplicingStationBlockEntity;
 import com.cfrishausen.greenthumbs.genetics.Genome;
 import com.cfrishausen.greenthumbs.item.custom.GTGenomeCropBlockItem;
@@ -39,7 +40,7 @@ public class SeedSplicingStationMenu extends AbstractContainerMenu {
     private SlotItemHandler outputSlot;
 
     public SeedSplicingStationMenu(int id, Inventory inv, FriendlyByteBuf extraData) {
-        this(id, inv, inv.player.level.getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(3));
+        this(id, inv, inv.player.level.getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(4));
     }
 
     public SeedSplicingStationMenu(int id, Inventory inv, BlockEntity entity, ContainerData data) {
@@ -172,11 +173,7 @@ public class SeedSplicingStationMenu extends AbstractContainerMenu {
     }
 
     public boolean hasRecipe() {
-        SimpleContainer inventory = new SimpleContainer(3);
-        inventory.setItem(0, seedSlot1.getItem());
-        inventory.setItem(1, seedSlot2.getItem());
-        inventory.setItem(2, outputSlot.getItem());
-        return SeedSplicingStationBlockEntity.hasRecipe(inventory);
+        return data.get(3) == 1;
     }
 
 
@@ -186,10 +183,14 @@ public class SeedSplicingStationMenu extends AbstractContainerMenu {
         ItemStack seed2 = seedSlot2.getItem();
         // Add name of item
         componentList.add(Component.translatable(seed1.getDescriptionId()).withStyle(ChatFormatting.WHITE));
-        // Get what the tag of the spliced item will be from genome
-        CompoundTag probableSpliceTag = Genome.fullSpliceTag(seed1.getTag(), seed2.getTag());
-        // GTGenomeCropBlockItem already has functionality for getting the tool tip we need for the possible resultant seed.
-        componentList.addAll(GTGenomeCropBlockItem.getToolTips(probableSpliceTag));
+        if (seed1.getTag() != null && seed2.getTag() != null) {
+            // Get what the tag of the spliced item will be from genome
+            CompoundTag probableSpliceTag = Genome.fullSpliceTag(seed1.getTag(), seed2.getTag());
+            // GTGenomeCropBlockItem already has functionality for getting the tool tip we need for the possible resultant seed.
+            componentList.addAll(GTGenomeCropBlockItem.getToolTips(probableSpliceTag));
+        } else {
+            GreenThumbs.LOGGER.warn("{} trying to get tooltip on items with null tags", this);
+        }
         return componentList;
     }
 }

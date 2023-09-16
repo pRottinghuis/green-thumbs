@@ -1,0 +1,9 @@
+{
+  "type": "greenthumbs:seed_splicing",
+  "ingredients": [
+    {
+      "item": "greenthumbs:sweet_berry_seeds"
+    }
+  ],
+  "result": "greenthumbs:sweet_berry_seeds"
+}

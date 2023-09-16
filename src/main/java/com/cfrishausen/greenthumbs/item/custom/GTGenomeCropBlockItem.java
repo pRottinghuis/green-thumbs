@@ -74,12 +74,11 @@ public class GTGenomeCropBlockItem extends ItemNameBlockItem {
                 // Add genes for tooltip based on what is in nbt tag
                 for (String genomeTagKey : genomeTag.getAllKeys()) {
                     String geneStr = genomeTag.getString(genomeTagKey);
-                    tooltips.add(Component.translatable(genomeTagKey).append(Component.literal(": " + geneStr)).withStyle(ChatFormatting.GREEN));
+                    tooltips.add(Component.translatable(genomeTagKey).append(Component.literal(": " + geneStr)).withStyle(ChatFormatting.DARK_GREEN));
                 }
             } else {
                 GreenThumbs.LOGGER.warn("Can't add genome tooltip because {} compound is empty", NBTTags.GENOME_TAG);
             }
-            tooltips.add(Component.literal(infoTag.getCompound(NBTTags.CROP_STATE_TAG).toString()));
         }
         return tooltips;
     }
