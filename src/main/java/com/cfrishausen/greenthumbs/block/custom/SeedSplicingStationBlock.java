@@ -10,6 +10,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -102,5 +103,10 @@ public class SeedSplicingStationBlock extends BaseEntityBlock {
                                                                   BlockEntityType<T> type) {
         return createTickerHelper(type, GTBlockEntities.SEED_SPLICING_STATION_BLOCK_ENTITY.get(),
                 SeedSplicingStationBlockEntity::tick);
+    }
+
+    @Override
+    protected void spawnDestroyParticles(Level pLevel, Player pPlayer, BlockPos pPos, BlockState pState) {
+        super.spawnDestroyParticles(pLevel, pPlayer, pPos, pState);
     }
 }

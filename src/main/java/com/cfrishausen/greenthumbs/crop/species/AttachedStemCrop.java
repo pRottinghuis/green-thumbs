@@ -111,7 +111,7 @@ public class AttachedStemCrop extends BasicCrop{
             }
             // Revert this AttachedStemCrop to a StemCrop
             cropBlockEntity.setCropSpecies(((StemGrownCrop) this.fruit.get()).getStemSpecies());
-            setAge(cropBlockEntity, cropBlockEntity.getCropSpecies().getMaxAge());
+            cropBlockEntity.getCropSpecies().setAge(cropBlockEntity, cropBlockEntity.getCropSpecies().getMaxAge());
         }
 
         return state;
@@ -140,5 +140,10 @@ public class AttachedStemCrop extends BasicCrop{
         });
 
         return modelMap;
+    }
+
+    @Override
+    public IntegerProperty getAgeProperty() {
+        return null;
     }
 }

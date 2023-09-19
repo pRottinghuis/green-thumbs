@@ -26,6 +26,7 @@ public class GTRecipes extends RecipeProvider {
 
     @Override
     protected void buildRecipes(Consumer<FinishedRecipe> pWriter) {
+        // Crafting recipes
         GTCropShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, GTItems.CARROT_SEEDS.get(), GTCropSpecies.GT_CARROT.get())
                 .requires(Items.CARROT)
                 .unlockedBy("has_carrot", has(Items.CARROT))
@@ -61,6 +62,8 @@ public class GTRecipes extends RecipeProvider {
                 .unlockedBy("has_melon_seeds", has(Items.MELON_SEEDS))
                 .save(pWriter);
 
+
+        // Seed splicing station recipes
         createSplicingRecipe(GTItems.CARROT_SEEDS, pWriter);
         createSplicingRecipe(GTItems.WHEAT_SEEDS, pWriter);
         createSplicingRecipe(GTItems.POTATO_SEEDS, pWriter);

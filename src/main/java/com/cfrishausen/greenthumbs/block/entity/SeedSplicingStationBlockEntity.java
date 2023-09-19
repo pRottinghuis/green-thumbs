@@ -246,13 +246,6 @@ public class SeedSplicingStationBlockEntity extends BlockEntity implements MenuP
         return inventory;
     }
 
-    private static boolean sameSpecies(SimpleContainer inventory) {
-        Item seed1 = inventory.getItem(0).getItem();
-        Item seed2 = inventory.getItem(1).getItem();
-
-        return seed1.equals(seed2);
-    }
-
     private static boolean outputSlotEmpty(SimpleContainer inventory) {
         return inventory.getItem(2).isEmpty();
     }
@@ -269,5 +262,4 @@ public class SeedSplicingStationBlockEntity extends BlockEntity implements MenuP
         }
         setChanged(this.level, this.getBlockPos(), this.getBlockState());
     }
-
 }

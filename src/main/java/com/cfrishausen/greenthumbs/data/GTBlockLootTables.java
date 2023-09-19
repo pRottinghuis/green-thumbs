@@ -36,6 +36,11 @@ public class GTBlockLootTables extends BlockLootSubProvider {
         this.add(GTBlocks.GT_VEGETABLE_BLOCK.get(), block -> {
             return LootTable.lootTable().withPool(LootPool.lootPool().add(LootItem.lootTableItem(GTItems.WHEAT_SEEDS.get()))).apply(GTLootFunction.gtLoot());
         });
+
+        this.add(GTBlocks.GT_COLOR_CROP_BLOCK.get(), block -> {
+            return LootTable.lootTable().withPool(LootPool.lootPool().add(LootItem.lootTableItem(GTItems.WHEAT_SEEDS.get()))).apply(GTLootFunction.gtLoot());
+        });
+
     }
 
     @Override

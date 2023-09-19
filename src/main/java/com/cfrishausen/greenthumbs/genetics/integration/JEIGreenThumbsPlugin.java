@@ -1,4 +1,4 @@
-package com.cfrishausen.greenthumbs.integration;
+package com.cfrishausen.greenthumbs.genetics.integration;
 
 import com.cfrishausen.greenthumbs.GreenThumbs;
 import com.cfrishausen.greenthumbs.data.recipe.SeedSplicingStationRecipe;

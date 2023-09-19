@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "greenthumbs:block/seed_splicing_station",
+      "y": 270
+    },
+    "facing=north": {
+      "model": "greenthumbs:block/seed_splicing_station",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "greenthumbs:block/seed_splicing_station"
+    },
+    "facing=west": {
+      "model": "greenthumbs:block/seed_splicing_station",
+      "y": 90
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "greenthumbs:block/seed_splicing_station_down",
+    "east": "greenthumbs:block/seed_splicing_station_east",
+    "north": "greenthumbs:block/seed_splicing_station_north",
+    "particle": "greenthumbs:block/seed_splicing_station_north",
+    "south": "greenthumbs:block/seed_splicing_station_south",
+    "up": "greenthumbs:block/seed_splicing_station_up",
+    "west": "greenthumbs:block/seed_splicing_station_west"
+  }
+}

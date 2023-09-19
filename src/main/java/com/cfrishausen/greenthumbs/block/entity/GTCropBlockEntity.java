@@ -205,6 +205,7 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
 
     public void setCropState(CropState cropState) {
         this.cropState = cropState;
+        requestModelDataUpdate();
         markUpdated();
     }
 
@@ -226,4 +227,6 @@ public class GTCropBlockEntity extends BlockEntity implements ICropEntity {
         this.genome = genome;
         markUpdated();
     }
+
+
 }

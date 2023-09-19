@@ -7,6 +7,7 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.apache.logging.log4j.core.pattern.AbstractStyleNameConverter;
 
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -22,6 +23,8 @@ public class GTData {
         gen.addProvider(true, new GTRecipes(output));
         gen.addProvider(true, new GTItemModels(output, GreenThumbs.ID, helper));
         gen.addProvider(true, new GTLanguageProvider(output, GreenThumbs.ID, "en_us"));
+        gen.addProvider(true, new GTBlockModels(output, GreenThumbs.ID, helper));
+        gen.addProvider(true, new GTBlockStateProvider(output, GreenThumbs.ID, helper));
         gen.addProvider(true, GTLootTableProvider.create(output));
 
     }

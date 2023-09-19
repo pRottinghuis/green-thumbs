@@ -2,7 +2,7 @@ package com.cfrishausen.greenthumbs.crop;
 
 import com.cfrishausen.greenthumbs.block.custom.GTSimpleCropBlock;
 import com.cfrishausen.greenthumbs.block.entity.GTCropBlockEntity;
-import com.cfrishausen.greenthumbs.item.custom.client.ICropSpeciesExtensions;
+import com.cfrishausen.greenthumbs.client.ICropSpeciesExtensions;
 import com.cfrishausen.greenthumbs.crop.state.CropState;
 import com.cfrishausen.greenthumbs.genetics.Genome;
 import com.cfrishausen.greenthumbs.item.custom.GTGenomeCropBlockItem;
@@ -216,9 +216,9 @@ public interface ICropSpecies extends ICropSpeciesExtensions {
     GTGenomeCropBlockItem getCutting();
 
     /**
+     * Make sure to null check when using. Null means crop does not have an age property
      * @return Age CropState property of species. If the species has no age property default to age property seven
      */
-    @NotNull
     IntegerProperty getAgeProperty();
 
     int getAge(ICropEntity cropEntity);

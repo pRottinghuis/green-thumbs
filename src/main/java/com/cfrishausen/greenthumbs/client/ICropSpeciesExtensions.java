@@ -1,4 +1,4 @@
-package com.cfrishausen.greenthumbs.item.custom.client;
+package com.cfrishausen.greenthumbs.client;
 
 import com.cfrishausen.greenthumbs.crop.state.CropState;
 import net.minecraft.client.resources.model.BakedModel;

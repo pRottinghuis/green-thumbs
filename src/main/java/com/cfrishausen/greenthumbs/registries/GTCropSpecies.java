@@ -6,6 +6,7 @@ import com.cfrishausen.greenthumbs.crop.species.*;
 import com.cfrishausen.greenthumbs.item.custom.GTGenomeCropBlockItem;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -46,7 +47,7 @@ public class GTCropSpecies {
                     GT_PUMPKIN, false));
 
     public static final RegistryObject<ICropSpecies> GT_MELON = GTCropSpecies.CROP_SPECIES.register("gt_melon",
-            () -> new StemGrownCrop("melon", GTItems.MELON_SEEDS, () -> Items.MELON, GTItems.MELON_CUTTING,
+            () -> new MelonLikeCrop("melon", GTItems.MELON_SEEDS, () -> Items.MELON_SLICE, () -> Items.MELON, GTItems.MELON_CUTTING,
                     GTCropSpecies.GT_MELON_STEM, GTCropSpecies.GT_ATTACHED_MELON_STEM, true));
 
     public static final RegistryObject<ICropSpecies> GT_MELON_STEM = CROP_SPECIES.register("gt_melon_stem",

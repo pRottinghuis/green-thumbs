@@ -23,11 +23,14 @@ public class GTBlocks {
     public static final RegistryObject<Block> GT_CROP_BLOCK = BLOCKS.register("gt_crop_block",
             () -> new GTSimpleCropBlock(BlockBehaviour.Properties.of(Material.PLANT).noCollission().randomTicks().instabreak().sound(SoundType.CROP)));
 
+    public static final RegistryObject<Block> GT_COLOR_CROP_BLOCK = BLOCKS.register("gt_color_crop_block",
+            () -> new GTSimpleCropBlock(BlockBehaviour.Properties.of(Material.PLANT).noCollission().randomTicks().instabreak().sound(SoundType.CROP)));
+
     public static final RegistryObject<Block> GT_VEGETABLE_BLOCK = BLOCKS.register("gt_vegetable_block",
             () -> new GTSimpleCropBlock(BlockBehaviour.Properties.of(Material.VEGETABLE).randomTicks().strength(1.0F).sound(SoundType.WOOD)));
 
     public static final RegistryObject<Block> SEED_SPLICING_STATION = BLOCKS.register("seed_splicing_station",
             () -> new SeedSplicingStationBlock(BlockBehaviour.Properties.of(Material.METAL)
-                    .strength(6f).requiresCorrectToolForDrops().noOcclusion()));
+                    .strength(6f).requiresCorrectToolForDrops()));
 
 }

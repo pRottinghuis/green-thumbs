@@ -42,8 +42,6 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.Tags;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.function.Supplier;
@@ -200,7 +198,7 @@ public class BerryBushCrop extends BasicCrop{
     }
 
     @Override
-    public @NotNull IntegerProperty getAgeProperty() {
+    public IntegerProperty getAgeProperty() {
         return AGE_3;
     }
 }

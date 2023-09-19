@@ -1,7 +1,7 @@
-package com.cfrishausen.greenthumbs.item.custom.client;
+package com.cfrishausen.greenthumbs.client;
 
 import com.cfrishausen.greenthumbs.GreenThumbs;
-import com.cfrishausen.greenthumbs.item.custom.client.model.block.GTBakedModel;
+import com.cfrishausen.greenthumbs.client.model.block.GTBakedModel;
 import com.cfrishausen.greenthumbs.crop.ICropSpecies;
 import com.cfrishausen.greenthumbs.crop.state.CropState;
 import com.cfrishausen.greenthumbs.registries.GTBlocks;
@@ -32,6 +32,7 @@ public class ClientHandler {
     private static void clientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
             ItemBlockRenderTypes.setRenderLayer(GTBlocks.GT_CROP_BLOCK.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(GTBlocks.GT_COLOR_CROP_BLOCK.get(), RenderType.cutout());
             ItemBlockRenderTypes.setRenderLayer(GTBlocks.GT_VEGETABLE_BLOCK.get(), RenderType.solid());
         });
     }
@@ -58,11 +59,11 @@ public class ClientHandler {
         GTBakedModel gtBakedModel = new GTBakedModel();
         gtBakedModel.addModels(statesToModel);
         eventModels.put(BlockModelShaper.stateToModelLocation(GTBlocks.GT_CROP_BLOCK.get().defaultBlockState()), gtBakedModel);
+        eventModels.put(BlockModelShaper.stateToModelLocation(GTBlocks.GT_COLOR_CROP_BLOCK.get().defaultBlockState()), gtBakedModel);
         eventModels.put(BlockModelShaper.stateToModelLocation(GTBlocks.GT_VEGETABLE_BLOCK.get().defaultBlockState()), gtBakedModel);
     }
 
     public static void registerColorHandlersEvent (RegisterColorHandlersEvent.Block colorHandlersEvent) {
-        colorHandlersEvent.register(new CropColor(), GTBlocks.GT_CROP_BLOCK.get());
-        colorHandlersEvent.register(new CropColor(), GTBlocks.GT_VEGETABLE_BLOCK.get());
+        colorHandlersEvent.register(new CropColor(), GTBlocks.GT_COLOR_CROP_BLOCK.get());
     }
 }

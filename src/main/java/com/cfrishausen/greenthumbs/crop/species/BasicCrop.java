@@ -39,8 +39,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.Tags;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -98,8 +96,9 @@ public class BasicCrop implements ICropSpecies {
      * Default crop (ex wheat) only have an age property
      */
     public void createBlockStateDefinition(StateDefinition.Builder<ICropSpecies, CropState> builder) {
-        builder.add(getAgeProperty());
-
+        if (getAgeProperty() != null) {
+            builder.add(getAgeProperty());
+        }
     }
 
     public void registerDefaultState() {
@@ -256,10 +255,9 @@ public class BasicCrop implements ICropSpecies {
     @Override
     public boolean isMaxAge(ICropEntity cropEntity) {
         CropState entityCropState = cropEntity.getCropState();
-        if (entityCropState.hasProperty(getAgeProperty())) {
+        if (getAgeProperty() != null && entityCropState.hasProperty(getAgeProperty())) {
             return getAge(cropEntity) == getMaxAge();
         }
-        GreenThumbs.LOGGER.warn("Trying to check max age on {} which has no age property", this);
         return false;
     }
     @Override
@@ -271,10 +269,6 @@ public class BasicCrop implements ICropSpecies {
         return this.SHAPE_BY_AGE[0];
     }
 
-    @Override
-    public int getMaxAge() {
-        return getAgeProperty().getPossibleValues().stream().max(Comparator.comparingInt(Integer::intValue)).get();
-    }
     public GTGenomeCropBlockItem getBaseItemId() {
         return this.seed.get();
     }
@@ -300,7 +294,7 @@ public class BasicCrop implements ICropSpecies {
     }
 
     @Override
-    public @NotNull IntegerProperty getAgeProperty() {
+    public IntegerProperty getAgeProperty() {
         return this.AGE_7;
     }
 
@@ -308,7 +302,9 @@ public class BasicCrop implements ICropSpecies {
     public Map<CropState, ModelResourceLocation> getModelMap() {
         Map<CropState, ModelResourceLocation> modelMap = new HashMap<>();
         for (int age = 0; age <= getMaxAge(); age++) {
-            modelMap.put(defaultCropState.setValue(getAgeProperty(), age), ModelResourceLocation.vanilla(pathName, "age=" + age));
+            if (getAgeProperty() != null) {
+                modelMap.put(defaultCropState.setValue(getAgeProperty(), age), ModelResourceLocation.vanilla(pathName, "age=" + age));
+            }
         }
         return modelMap;
     }
@@ -321,10 +317,9 @@ public class BasicCrop implements ICropSpecies {
     @Override
     public int getAge(ICropEntity cropEntity) {
         CropState entityCropState = cropEntity.getCropState();
-        if (entityCropState.hasProperty(getAgeProperty())) {
+        if (getAgeProperty() != null && entityCropState.hasProperty(getAgeProperty())) {
             return entityCropState.getValue(getAgeProperty());
         }
-        GreenThumbs.LOGGER.warn("Trying to access crop species {} with no age property", this);
         return 0;
     }
 
@@ -339,6 +334,9 @@ public class BasicCrop implements ICropSpecies {
 
     @Override
     public void setAge(ICropEntity cropEntity, int age) {
+        if (getAgeProperty() == null) {
+            return;
+        }
         CropState entityCropState = cropEntity.getCropState();
         if (entityCropState.hasProperty(getAgeProperty())) {
             cropEntity.setCropState(entityCropState.setValue(getAgeProperty(), age));

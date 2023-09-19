@@ -1,4 +1,4 @@
-package com.cfrishausen.greenthumbs.integration;
+package com.cfrishausen.greenthumbs.genetics.integration;
 
 import com.cfrishausen.greenthumbs.GreenThumbs;
 import com.cfrishausen.greenthumbs.data.recipe.SeedSplicingStationRecipe;
@@ -12,17 +12,15 @@ import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import net.minecraft.client.tutorial.Tutorial;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.vehicle.Minecart;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 
 public class SeedSplicingStationRecipeCategory implements IRecipeCategory<SeedSplicingStationRecipe> {
 
     public static final ResourceLocation UID = new ResourceLocation(GreenThumbs.ID, "seed_splicing");
-    public static final ResourceLocation TEXTURE = new ResourceLocation(GreenThumbs.ID, "textures/gui/container/seed_splicing_station_gui.png");
+    public static final ResourceLocation TEXTURE = new ResourceLocation(GreenThumbs.ID, "textures/gui/container/jei_seed_splicing_station_gui.png");
 
     private final IDrawable background;
     private final IDrawable icon;
