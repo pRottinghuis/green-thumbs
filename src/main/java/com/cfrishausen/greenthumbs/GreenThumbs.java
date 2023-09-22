@@ -37,7 +37,7 @@ public class GreenThumbs
         GTItems.ITEMS.register(modEventBus);
         GTBlockEntities.BLOCK_ENTITIES.register(modEventBus);
         GTCropSpecies.CROP_SPECIES.register(modEventBus);
-        GTLoot.LOOT_FUNCTION_TYPE.register(modEventBus);
+        GTLootFunctions.LOOT_FUNCTION_TYPE.register(modEventBus);
         GTMenuTypes.register(modEventBus);
         GTRecipeTypes.register(modEventBus);
 
@@ -64,7 +64,7 @@ public class GreenThumbs
             builder.displayItems((params, output) -> {
 
                 // Other items
-                output.accept(GTItems.GT_DEBUG_STICK.get());
+                //output.accept(GTItems.GT_DEBUG_STICK.get());
                 output.accept(GTItems.SEED_SPLICING_STATION.get());
 
                 // Seeds

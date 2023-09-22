@@ -229,7 +229,7 @@ public class Genome {
             return 0.0;
         }
         // % how likely is to mutate
-        double mutationChance = 0.7;
+        double mutationChance = 0.1;
         if (isRecessive(GENES.get(MUTATIVITY))) {
             // mutation chance is reduced by __ % when recessive trait is expressed
             mutationChance *= 0.5;

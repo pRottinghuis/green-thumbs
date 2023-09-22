@@ -105,7 +105,7 @@ public class BerryBushCrop extends BasicCrop{
             Block.popResource(level, pos, getStackWithReplantTag(this, cropBlockEntity, this.getSeed(),1,  level.getRandom()));
             level.playSound((Player)null, pos, SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, SoundSource.BLOCKS, 1.0F, 0.8F + level.random.nextFloat() * 0.4F);
             cropBlockEntity.setCropState(cropBlockEntity.getCropState().setValue(AGE_3, 1));
-            return InteractionResult.sidedSuccess(level.isClientSide);
+            return InteractionResult.CONSUME;
         } else {
             return InteractionResult.PASS;
         }

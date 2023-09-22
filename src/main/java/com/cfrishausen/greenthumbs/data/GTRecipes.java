@@ -7,14 +7,21 @@ import com.cfrishausen.greenthumbs.item.custom.GTGenomeCropBlockItem;
 import com.cfrishausen.greenthumbs.registries.GTCropSpecies;
 import com.cfrishausen.greenthumbs.registries.GTItems;
 import com.cfrishausen.greenthumbs.registries.GTRecipeTypes;
+import net.minecraft.advancements.CriterionTrigger;
+import net.minecraft.advancements.critereon.SimpleCriterionTrigger;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.RegistryObject;
 
+import java.awt.dnd.DropTarget;
 import java.util.function.Consumer;
 
 public class GTRecipes extends RecipeProvider {
@@ -80,7 +87,17 @@ public class GTRecipes extends RecipeProvider {
         createSplicingRecipe(GTItems.PUMPKIN_CUTTING, pWriter);
         createSplicingRecipe(GTItems.MELON_CUTTING, pWriter);
 
-
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, GTItems.SEED_SPLICING_STATION.get())
+                .pattern("XYX")
+                .pattern("ZZZ")
+                .pattern("AAA")
+                .define('X', Items.SMOOTH_STONE_SLAB)
+                .define('Y', Tags.Items.SHEARS)
+                .define('Z', Items.SCAFFOLDING)
+                .define('A', Items.BOOKSHELF)
+                .unlockedBy("has_item", has(Items.SHEARS))
+                .showNotification(false)
+                .save(pWriter);
     }
 
     private void createSplicingRecipe(RegistryObject<? extends GTGenomeCropBlockItem> cropItem, Consumer<FinishedRecipe> pWriter) {

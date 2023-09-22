@@ -17,15 +17,14 @@ import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.ItemNameBlockItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
@@ -87,7 +86,17 @@ public class GTGenomeCropBlockItem extends ItemNameBlockItem {
 
     @Override
     protected boolean canPlace(BlockPlaceContext context, BlockState state) {
-        Player player  = context.getPlayer();
+        Player player = context.getPlayer();
+        CollisionContext collisioncontext = player == null ? CollisionContext.empty() : CollisionContext.of(player);
+        if (!context.getLevel().isUnobstructed(state, context.getClickedPos(), collisioncontext)) {
+            return false;
+        }
+
+        if (!player.getItemInHand(InteractionHand.MAIN_HAND).hasTag()) {
+            GreenThumbs.LOGGER.warn("{} has null nbt", this);
+            return false;
+        }
+
         CompoundTag nbt = player.getItemInHand(InteractionHand.MAIN_HAND).getTag();
         CompoundTag saveTag = nbt.getCompound(NBTTags.INFO_TAG);
         if (saveTag.contains(NBTTags.CROP_SPECIES_TAG) && saveTag.contains(NBTTags.GENOME_TAG)) {

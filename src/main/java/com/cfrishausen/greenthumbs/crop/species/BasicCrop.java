@@ -149,7 +149,6 @@ public class BasicCrop implements ICropSpecies {
         return InteractionResult.PASS;
     }
 
-    // TODO fortune drops
     public ItemStack drops(ICropEntity cropEntity, Level level, BlockPos pos, Map<Enchantment, Integer> enchantments, boolean quickReplant) {
         ItemStack returnStack = null;
         SimpleContainer drops;
@@ -159,10 +158,16 @@ public class BasicCrop implements ICropSpecies {
             drops = new SimpleContainer(2);
             int seedCount = 1;
 
+            for (int i = 0; i < 3; ++i) {
+                if (random.nextFloat() < 0.5714286) {
+                    ++seedCount;
+                }
+            }
+
             // Add extra seeds on fortune. Used for wheat
             if (getDoesFortune() && enchantments.containsKey(Enchantments.BLOCK_FORTUNE)) {
                 // See minecraft:wheat.json loot table
-                for (int i = 0; i < enchantments.get(Enchantments.BLOCK_FORTUNE) + 3; ++i) {
+                for (int i = 0; i < enchantments.get(Enchantments.BLOCK_FORTUNE); ++i) {
                     if (random.nextFloat() < 0.5714286) {
                         ++seedCount;
                     }
@@ -174,7 +179,10 @@ public class BasicCrop implements ICropSpecies {
             if (quickReplant) {
                 returnStack = drops.getItem(0);
                 if (!returnStack.isEmpty()) {
-                    drops.setItem(0, new ItemStack(returnStack.getItem(), returnStack.getCount() - 1));
+                    CompoundTag returnTag = drops.getItem(0).getTag();
+                    ItemStack reducedStack = new ItemStack(returnStack.getItem(), returnStack.getCount() - 1);
+                    reducedStack.setTag(returnTag);
+                    drops.setItem(0, reducedStack);
                     returnStack.setCount(1);
                 }
             }

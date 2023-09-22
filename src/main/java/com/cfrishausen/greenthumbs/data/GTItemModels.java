@@ -30,8 +30,9 @@ public class GTItemModels extends ItemModelProvider {
         this.basicItem(GTItems.POTATO_CUTTING.get());
         this.basicItem(GTItems.BEETROOT_CUTTING.get());
         this.basicItem(GTItems.SWEET_BERRY_CUTTING.get());
-        // pumpkin cutting
-        // melon cutting
+        this.basicItem(GTItems.PUMPKIN_CUTTING.get());
+        this.basicItem(GTItems.MELON_CUTTING.get());
+
 
     }
 }

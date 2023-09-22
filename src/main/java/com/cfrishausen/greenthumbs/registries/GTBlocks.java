@@ -30,7 +30,6 @@ public class GTBlocks {
             () -> new GTSimpleCropBlock(BlockBehaviour.Properties.of(Material.VEGETABLE).randomTicks().strength(1.0F).sound(SoundType.WOOD)));
 
     public static final RegistryObject<Block> SEED_SPLICING_STATION = BLOCKS.register("seed_splicing_station",
-            () -> new SeedSplicingStationBlock(BlockBehaviour.Properties.of(Material.METAL)
-                    .strength(6f).requiresCorrectToolForDrops()));
+            () -> new SeedSplicingStationBlock(BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD)));
 
 }

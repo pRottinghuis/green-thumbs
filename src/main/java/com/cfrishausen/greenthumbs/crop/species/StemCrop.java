@@ -56,7 +56,7 @@ public class StemCrop extends BasicCrop {
             if (random.nextInt((int)(25.0F / f) + 1) == 0) {
                 int i = cropEntity.getCropState().getValue(AGE_7);
                 if (i < getMaxAge()) {
-                    growCrops(level, cropEntity);
+                    setAge(cropEntity, cropEntity.getCropSpecies().getAge(cropEntity) + 1);
                 } else {
                     Direction direction = Direction.Plane.HORIZONTAL.getRandomDirection(random);
                     BlockPos fruitPos = pos.relative(direction);

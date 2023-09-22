@@ -2,20 +2,16 @@ package com.cfrishausen.greenthumbs.data.loot;
 
 import com.cfrishausen.greenthumbs.GreenThumbs;
 import com.cfrishausen.greenthumbs.block.entity.GTCropBlockEntity;
-import com.cfrishausen.greenthumbs.registries.GTLoot;
+import com.cfrishausen.greenthumbs.registries.GTLootFunctions;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.storage.loot.functions.CopyBlockState;
 import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
-import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 
 public class GTLootFunction extends LootItemConditionalFunction {
 
@@ -41,7 +37,7 @@ public class GTLootFunction extends LootItemConditionalFunction {
 
     @Override
     public LootItemFunctionType getType() {
-        return GTLoot.GT_LOOT_FUNCTION.get();
+        return GTLootFunctions.GT_LOOT_FUNCTION.get();
     }
 
     public static LootItemConditionalFunction.Builder<?> gtLoot() {

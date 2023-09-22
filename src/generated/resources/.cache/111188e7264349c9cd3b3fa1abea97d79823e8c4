@@ -1,12 +1,14 @@
-// 1.19.4	2023-09-18T17:12:56.6597118	Item Models: greenthumbs
+// 1.19.4	2023-09-20T11:07:11.4270627	Item Models: greenthumbs
 a2444f577bdbd81113d864c477ed710843b87e97 assets/greenthumbs/models/item/beetroot_cutting.json
 89e7223820d2e99906441a7196ac463257b4d8f8 assets/greenthumbs/models/item/beetroot_seeds.json
 e3756573917d75a3aa66065ffb38de8c66aed882 assets/greenthumbs/models/item/carrot_cutting.json
 ed9bb7d66d203b60496b1707202ed8d7291fdc43 assets/greenthumbs/models/item/carrot_seeds.json
 c0cd136299756c5d9a0e56280710704ec3801889 assets/greenthumbs/models/item/gt_debug_stick.json
+5e484335af3700d7ea955d5fb724b0f9b9a8558f assets/greenthumbs/models/item/melon_cutting.json
 80ab71d11cc8cf23d620ec321a2cb7993d104ab8 assets/greenthumbs/models/item/melon_seeds.json
 c18e01bacc5ae3c2bbe4844e1cfb35bd86ecfd78 assets/greenthumbs/models/item/potato_cutting.json
 aee31e0ebf08ab72d929d09e446ce32cc11fafe4 assets/greenthumbs/models/item/potato_seeds.json
+aa52047db38094bf4b3abc5ee937192f9e939abb assets/greenthumbs/models/item/pumpkin_cutting.json
 cd2c58fd2048297e8aec8d36e64c7dd65e19f189 assets/greenthumbs/models/item/pumpkin_seeds.json
 93d430284e13d47b2eaefa49bfe8a9999ce3ce7e assets/greenthumbs/models/item/sweet_berry_cutting.json
 28b7d913d28e62bb3ccc1cc29783d43b892c5fc6 assets/greenthumbs/models/item/sweet_berry_seeds.json
