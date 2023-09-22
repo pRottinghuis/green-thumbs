@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "minecraft:bookshelf"
+    },
+    "X": {
+      "item": "minecraft:smooth_stone_slab"
+    },
+    "Y": {
+      "tag": "forge:shears"
+    },
+    "Z": {
+      "item": "minecraft:scaffolding"
+    }
+  },
+  "pattern": [
+    "XYX",
+    "ZZZ",
+    "AAA"
+  ],
+  "result": {
+    "item": "greenthumbs:seed_splicing_station"
+  },
+  "show_notification": false
+}
