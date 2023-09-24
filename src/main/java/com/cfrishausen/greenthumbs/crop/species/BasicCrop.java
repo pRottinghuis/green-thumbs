@@ -121,28 +121,27 @@ public class BasicCrop implements ICropSpecies {
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit, GTCropBlockEntity cropBlockEntity) {
-        if (!level.isClientSide()) {
-            ItemStack handStack = player.getMainHandItem();
+        ItemStack handStack = player.getMainHandItem();
 
-            // Do cutting with shears/shear-like items
-            if (handStack.is(Tags.Items.SHEARS)) {
-                if (cropBlockEntity.getCropSpecies().canTakeCutting(cropBlockEntity)) {
-                    SimpleContainer drops = new SimpleContainer(1);
-                    ItemStack cuttingStack = getStackWithCuttingTag(this, cropBlockEntity, getCutting(), level.getRandom());
-                    drops.addItem(cuttingStack);
-                    level.playSound(null, pos, SoundEvents.SHEEP_SHEAR, SoundSource.BLOCKS, 1.0F, 0.8F + level.random.nextFloat() * 0.4F);
-                    setAge(cropBlockEntity, 0);
-                    Containers.dropContents(level, pos, drops);
-                }
+        // Do cutting with shears/shear-like items
+        if (handStack.is(Tags.Items.SHEARS)) {
+            if (cropBlockEntity.getCropSpecies().canTakeCutting(cropBlockEntity)) {
+                SimpleContainer drops = new SimpleContainer(1);
+                ItemStack cuttingStack = getStackWithCuttingTag(this, cropBlockEntity, getCutting(), level.getRandom());
+                drops.addItem(cuttingStack);
+                level.playSound(null, pos, SoundEvents.SHEEP_SHEAR, SoundSource.BLOCKS, 1.0F, 0.8F + level.random.nextFloat() * 0.4F);
+                setAge(cropBlockEntity, 0);
+                Containers.dropContents(level, pos, drops);
+                return InteractionResult.sidedSuccess(level.isClientSide);
+            }
 
-            } else {
-                // Don't Quick Replant on debug stick
-                if (!handStack.is(GTItems.GT_DEBUG_STICK.get())) {
-                    // quick replant from harvest implementation
-                    if (isMaxAge(cropBlockEntity)) {
-
-                        cropBlockEntity.getCropSpecies().quickReplant(state, level, pos, handStack.getAllEnchantments(), cropBlockEntity);
-                    }
+        } else {
+            // Don't Quick Replant on debug stick
+            if (!handStack.is(GTItems.GT_DEBUG_STICK.get())) {
+                // quick replant from harvest implementation
+                if (isMaxAge(cropBlockEntity)) {
+                    cropBlockEntity.getCropSpecies().quickReplant(state, level, pos, handStack.getAllEnchantments(), cropBlockEntity);
+                    return InteractionResult.sidedSuccess(level.isClientSide);
                 }
             }
         }

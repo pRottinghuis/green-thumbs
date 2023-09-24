@@ -52,12 +52,10 @@ public class GTSimpleCropBlock extends Block implements IPlantable, Bonemealable
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (!level.isClientSide()) {
             BlockEntity blockEntity = level.getBlockEntity(pos);
             if (blockEntity instanceof GTCropBlockEntity cropEntity) {
                 return cropEntity.getCropSpecies().use(state, level, pos, player, hand, hit, cropEntity);
             }
-        }
         return super.use(state, level, pos, player, hand, hit);
     }
 
