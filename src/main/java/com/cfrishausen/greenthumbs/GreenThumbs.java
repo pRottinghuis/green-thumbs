@@ -11,6 +11,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.ComposterBlock;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -18,6 +20,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +48,7 @@ public class GreenThumbs
 
         DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> ClientHandler::registerEvents);
 
+        modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(GreenThumbs::addCreativeTab);
     }
 
@@ -55,6 +59,31 @@ public class GreenThumbs
 
             MenuScreens.register(GTMenuTypes.SEED_SPLICING_STATION_MENU.get(), SeedSplicingStationScreen::new);
         }
+    }
+
+    public void commonSetup(final FMLCommonSetupEvent event) {
+        // add gt mod items to composter block
+        // Seeds
+        addCompostable(0.3F, GTItems.CARROT_SEEDS.get());
+        addCompostable(0.3F, GTItems.WHEAT_SEEDS.get());
+        addCompostable(0.3F, GTItems.POTATO_SEEDS.get());
+        addCompostable(0.3F, GTItems.BEETROOT_SEEDS.get());
+        addCompostable(0.3F, GTItems.SWEET_BERRY_SEEDS.get());
+        addCompostable(0.3F, GTItems.PUMPKIN_SEEDS.get());
+        addCompostable(0.3F, GTItems.MELON_SEEDS.get());
+        // Cuttings
+        addCompostable(0.3F, GTItems.CARROT_CUTTING.get());
+        addCompostable(0.3F, GTItems.WHEAT_CUTTING.get());
+        addCompostable(0.3F, GTItems.POTATO_CUTTING.get());
+        addCompostable(0.3F, GTItems.BEETROOT_CUTTING.get());
+        addCompostable(0.3F, GTItems.SWEET_BERRY_CUTTING.get());
+        addCompostable(0.3F, GTItems.PUMPKIN_CUTTING.get());
+        addCompostable(0.3F, GTItems.MELON_CUTTING.get());
+
+    }
+
+    private static void addCompostable(float chance, ItemLike item) {
+        ComposterBlock.COMPOSTABLES.put(item, chance);
     }
 
     private static void addCreativeTab(CreativeModeTabEvent.Register event) {
